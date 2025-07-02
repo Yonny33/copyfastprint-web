@@ -114,6 +114,7 @@ function ensureLightboxNavButtons() {
 }
 
 // Mostrar imagen en el lightbox según el índice
+// ...código existente...
 function showLightboxImage(index) {
   const modal = document.getElementById("lightbox-modal");
   const modalImg = document.getElementById("lightbox-img");
@@ -123,16 +124,26 @@ function showLightboxImage(index) {
   modalImg.src = galleryImages[index].src;
   caption.textContent = galleryImages[index].alt;
 
-  // Obtener el título del suéter desde el h3 dentro de .card-info
+  // Obtener el título del suéter
   const designCard = galleryImages[index].closest(".design-card");
   const titleElement = designCard.querySelector(".card-info h3");
   const titulo = titleElement
     ? titleElement.textContent
     : galleryImages[index].alt;
 
-  // Usar el título en el mensaje de WhatsApp
-  const mensaje = encodeURIComponent(`Hola, me interesa el diseño: ${titulo}`);
-  whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`; // Cambia 5804120766642 por tu número real
+  // Extraer el color después de "Suéter" en el alt
+  let color = "";
+  const altText = galleryImages[index].alt;
+  const match = altText.match(/Suéter\s+(\w+)/i);
+  if (match) {
+    color = match[1];
+  }
+
+  // Mensaje con título y color
+  const mensaje = encodeURIComponent(
+    `Hola, me interesa el diseño: ${titulo} en color: ${color}`
+  );
+  whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`; // Cambia 1234567890 por tu número real
 
   modal.style.display = "flex";
   document.body.style.overflow = "hidden";
