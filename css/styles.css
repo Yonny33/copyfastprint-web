@@ -17,7 +17,12 @@ body {
 }
 
 /* Títulos y encabezados con Poppins */
-h1, h2, h3, h4, h5, h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
 .section-heading h2,
 .brand h2,
 .values-list h3,
@@ -963,4 +968,25 @@ header {
 }
 .lightbox-nav:hover {
   background: #ff0000;
+}
+/* Estilos para el botón de WhatsApp en el lightbox */
+.whatsapp-btn {
+  display: inline-block;
+  margin-top: 1em;
+  color: #fff;
+  background: #25d366;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.whatsapp-btn:hover {
+  background: #1ebe57;
+  color: #fff;
+}
+
+.whatsapp-btn i {
+  margin-right: 0.5em;
 }

@@ -118,12 +118,26 @@ function showLightboxImage(index) {
   const modal = document.getElementById("lightbox-modal");
   const modalImg = document.getElementById("lightbox-img");
   const caption = document.getElementById("lightbox-caption");
+  const whatsappBtn = document.getElementById("whatsapp-btn");
   currentImgIndex = index;
   modalImg.src = galleryImages[index].src;
   caption.textContent = galleryImages[index].alt;
+
+  // Obtener el título del suéter desde el h3 dentro de .card-info
+  const designCard = galleryImages[index].closest(".design-card");
+  const titleElement = designCard.querySelector(".card-info h3");
+  const titulo = titleElement
+    ? titleElement.textContent
+    : galleryImages[index].alt;
+
+  // Usar el título en el mensaje de WhatsApp
+  const mensaje = encodeURIComponent(`Hola, me interesa el diseño: ${titulo}`);
+  whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`; // Cambia 5804120766642 por tu número real
+
   modal.style.display = "flex";
   document.body.style.overflow = "hidden";
 }
+// ...código existente...
 
 // Evento click en cada imagen para abrir el lightbox
 galleryImages.forEach((img, idx) => {
