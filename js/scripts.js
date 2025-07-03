@@ -114,7 +114,6 @@ function ensureLightboxNavButtons() {
 }
 
 // Mostrar imagen en el lightbox según el índice
-// ...código existente...
 function showLightboxImage(index) {
   const modal = document.getElementById("lightbox-modal");
   const modalImg = document.getElementById("lightbox-img");
@@ -131,24 +130,26 @@ function showLightboxImage(index) {
     ? titleElement.textContent
     : galleryImages[index].alt;
 
-  // Extraer el color después de "Suéter" en el alt
+  // Extraer el color después de "Suéter" (puede tener acentos)
   let color = "";
   const altText = galleryImages[index].alt;
-  const match = altText.match(/Suéter\s+(\w+)/i);
+  const match = altText.match(/Suéter\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
   if (match) {
     color = match[1];
   }
 
-  // Mensaje con título y color
+  // Obtener el enlace absoluto de la imagen
+  const imagenUrl = galleryImages[index].src;
+
+  // Mensaje con título, color y enlace de la imagen
   const mensaje = encodeURIComponent(
-    `Hola, me interesa el diseño: ${titulo} en color: ${color}`
+    `Hola, me interesa el diseño: ${titulo} en color: ${color}. Enlace de la imagen: ${imagenUrl}`
   );
   whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`; // Cambia 1234567890 por tu número real
 
   modal.style.display = "flex";
   document.body.style.overflow = "hidden";
 }
-// ...código existente...
 
 // Evento click en cada imagen para abrir el lightbox
 galleryImages.forEach((img, idx) => {
