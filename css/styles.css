@@ -46,14 +46,14 @@ h6,
 .section-heading .divider {
   width: 60px; /* Ancho de la línea divisoria */
   height: 4px; /* Altura de la línea divisoria */
-  background-color: #ff0000; /* Color de la línea */
+  background-color: #c60e0f; /* Color de la línea */
   margin: 0.5em auto 1.5em; /* Centra la línea y da espaciado */
   border-radius: 2px;
 }
 
 /* Clases de utilidad */
 .highlight {
-  color: #ff0000; /* Color de realce, similar al rojo en el logo */
+  color: #c60e0f; /* Color de realce, similar al rojo en el logo */
 }
 
 /* Estilo para palabras clave en párrafos */
@@ -91,7 +91,7 @@ header {
 }
 
 .brand h2 span {
-  color: #ff0000; /* Color rojo para la parte FAST& */
+  color: #c60e0f; /* Color rojo para la parte FAST& */
 }
 
 .menu {
@@ -110,7 +110,7 @@ header {
 }
 
 .menu li a.active {
-  background-color: #ff0000;
+  background-color: #c60e0f;
   color: #fff;
   font-weight: 700;
   padding: 0.5em 1em; /* Ajuste para el padding */
@@ -118,7 +118,7 @@ header {
 }
 
 .menu li a:hover {
-  color: #ff0000;
+  color: #c60e0f;
 }
 
 .toggle_menu {
@@ -161,7 +161,7 @@ header {
 
 .info-content__subtitle {
   font-size: 1em;
-  color: #ff0000;
+  color: #c60e0f;
   font-weight: 600;
   display: block;
   margin-bottom: 0.5em;
@@ -176,7 +176,7 @@ header {
 }
 
 .info-content h1 span {
-  color: #ff0000;
+  color: #c60e0f;
 }
 
 /* Eliminado: .info-content .social-media { ... } */
@@ -188,7 +188,7 @@ header {
 }
 
 .info-content .download-cv {
-  background-color: #ff0000;
+  background-color: #c60e0f;
   color: #fff;
   border: none;
   padding: 0.8em 1.5em;
@@ -200,7 +200,7 @@ header {
 }
 
 .info-content .download-cv:hover {
-  background-color: #cc0000;
+  background-color: #c60e0f;
   transform: translateY(-2px);
 }
 
@@ -238,7 +238,7 @@ header {
 .about-us-section h1 span,
 .values-section h2 span,
 .why-choose-us-section h2 span {
-  color: #ff0000;
+  color: #c60e0f;
 }
 
 .section-heading p {
@@ -298,7 +298,7 @@ header {
 }
 
 .values-list li i {
-  color: #ff0000;
+  color: #c60e0f;
   font-size: 1.2em;
 }
 
@@ -325,7 +325,7 @@ header {
 
 .feature-item i {
   font-size: 3em;
-  color: #ff0000;
+  color: #c60e0f;
   margin-bottom: 0.8em;
 }
 
@@ -358,7 +358,7 @@ header {
 }
 
 .designs-section h2 span {
-  color: #ff0000;
+  color: #c60e0f;
 }
 
 .categories-filter {
@@ -382,7 +382,7 @@ header {
 
 .filter-btn.active,
 .filter-btn:hover {
-  background: #ff0000;
+  background: #c60e0f;
   color: #fff;
 }
 
@@ -451,7 +451,7 @@ header {
 
 .btn-design-info {
   display: inline-block;
-  background: #ff0000;
+  background: #c60e0f;
   color: #fff;
   padding: 0.5em 1.5em;
   border-radius: 8px;
@@ -463,7 +463,7 @@ header {
 }
 
 .btn-design-info:hover {
-  background: #cc0000;
+  background: #c60e0f;
   box-shadow: 0 4px 16px rgba(255, 107, 0, 0.16);
 }
 
@@ -502,7 +502,7 @@ header {
 }
 
 .contact-section h2 span {
-  color: #ff0000;
+  color: #c60e0f;
 }
 
 .container-contact {
@@ -559,8 +559,8 @@ header {
 .form-group .input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #ff0000;
-  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+  border-color: #c60e0f;
+  box-shadow: 0 0 0 3px rgba(198, 14, 15, 0.2);
 }
 
 .form-group textarea {
@@ -569,7 +569,7 @@ header {
 }
 
 .form-group .btn-submit {
-  background-color: #ff0000;
+  background-color: #c60e0f;
   color: #fff;
   border: none;
   padding: 12px 25px;
@@ -582,7 +582,7 @@ header {
 }
 
 .form-group .btn-submit:hover {
-  background-color: #cc0000;
+  background-color: #c60e0f;
   transform: translateY(-2px);
 }
 
@@ -618,7 +618,7 @@ header {
 
 .info-item i {
   font-size: 2.5em;
-  color: #ff0000;
+  color: #c60e0f;
   margin-bottom: 0.6em;
 }
 
@@ -636,14 +636,14 @@ header {
 
 .info-item a {
   display: inline-block;
-  color: #ff0000;
+  color: #c60e0f;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .info-item a:hover {
-  color: #cc0000;
+  color: #c60e0f;
 }
 
 /* ========================================================================== */
@@ -665,7 +665,7 @@ header {
 }
 
 .footer-content h2 span {
-  color: #ff0000; /* Rojo para la parte FAST& */
+  color: #c60e0f; /* Rojo para la parte FAST& */
 }
 
 .footer-content h5 {
@@ -689,7 +689,7 @@ header {
 }
 
 .sotial-networks a:hover {
-  color: #ff0000; /* Rojo al pasar el mouse */
+  color: #c60e0f; /* Rojo al pasar el mouse */
   transform: translateY(-3px);
 }
 
@@ -930,7 +930,7 @@ header {
   text-shadow: 0 2px 8px #222;
 }
 .lightbox-close:hover {
-  color: #ff0000;
+  color: #c60e0f;
 }
 .lightbox-caption {
   color: #fff;
@@ -967,7 +967,7 @@ header {
   right: 30px;
 }
 .lightbox-nav:hover {
-  background: #ff0000;
+  background: #c60e0f;
 }
 /* Estilos para el botón de WhatsApp en el lightbox */
 .whatsapp-btn {
