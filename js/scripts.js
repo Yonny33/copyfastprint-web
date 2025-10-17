@@ -86,6 +86,36 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// ==========================================================================
+// ===  FUNCIONALIDAD: BOTÓN SCROLL TO TOP  ===
+// ==========================================================================
+
+const scrollToTopBtn = document.getElementById("scroll-to-top");
+
+if (scrollToTopBtn) {
+  // 1. Mostrar/Ocultar el botón al hacer scroll
+  window.addEventListener("scroll", () => {
+    // Muestra el botón si el scroll vertical es mayor a 300px (ajustable)
+    if (window.scrollY > 300) {
+      scrollToTopBtn.classList.add("show");
+    } else {
+      scrollToTopBtn.classList.remove("show");
+    }
+  });
+
+  // 2. Desplazamiento suave al hacer clic
+  scrollToTopBtn.addEventListener("click", (e) => {
+    e.preventDefault(); // Evita el salto instantáneo del enlace '#'
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Desplazamiento suave para PC y móvil
+    });
+  });
+} else {
+  console.warn("El elemento 'scroll-to-top' no se encontró en el DOM.");
+}
+
 // ...existing code...
 
 // =================== LIGHTBOX CON NAVEGACIÓN ===================
