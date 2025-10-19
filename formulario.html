@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitar Cotización - Copy Fast & Print</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/favicons/android-icon-192x192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="57x57"
+      href="/favicons/apple-icon-57x57.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="60x60"
+      href="/favicons/apple-icon-60x60.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="72x72"
+      href="/favicons/apple-icon-72x72.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="76x76"
+      href="/favicons/apple-icon-76x76.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="114x114"
+      href="/favicons/apple-icon-114x114.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="120x120"
+      href="/favicons/apple-icon-120x120.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="144x144"
+      href="/favicons/apple-icon-144x144.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="/favicons/apple-icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-icon-180x180.png"
+    />
+    <link rel="manifest" href="/favicons/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta
+      name="msapplication-TileImage"
+      content="/favicons/ms-icon-144x144.png"
+    />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/formulario.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
+  </head>
+  <body>
+    <header>
+      <nav class="navbar">
+        <div class="brand">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+        </div>
+        <ul class="menu" id="menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="diseño.html">Diseños</a></li>
+          <li><a href="acercade.html">Acerca de</a></li>
+          <li><a href="formulario.html" class="active">Cotización</a></li>
+          <li><a href="especificaciones.html">¿Como Funciona?</a></li>
+        </ul>
+        <div class="toggle_menu">
+          <i class="fas fa-bars" id="toggle_open"></i>
+          <i class="fas fa-close" id="toggle_close"></i>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section-heading">
+        <h2>Solicita tu <span>Cotización</span></h2>
+        <div class="divider"></div>
+        <p>
+          Completa el formulario y nos pondremos en contacto dentro de 24 horas
+        </p>
+      </section>
+
+      <div class="form-container">
+        <div class="form-wrapper">
+          <form id="cotizacionForm" class="cotizacion-form">
+            <!-- SECCIÓN 1: INFORMACIÓN PERSONAL -->
+            <fieldset class="form-section">
+              <legend>Tu Información</legend>
+
+              <div class="form-group">
+                <label for="nombre">Nombre Completo *</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  placeholder="Juan Pérez"
+                  required
+                />
+                <span class="error-message"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="correo@ejemplo.com"
+                  required
+                />
+                <span class="error-message"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="telefono">Teléfono / WhatsApp *</label>
+                <input
+                  type="tel"
+                  id="telefono"
+                  name="telefono"
+                  placeholder="+58 412-0766642"
+                  required
+                />
+                <span class="error-message"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="empresa">Empresa / Emprendimiento (Opcional)</label>
+                <input
+                  type="text"
+                  id="empresa"
+                  name="empresa"
+                  placeholder="Mi Negocio SAS"
+                />
+              </div>
+            </fieldset>
+
+            <!-- SECCIÓN 2: TIPO DE SERVICIO -->
+            <fieldset class="form-section">
+              <legend>Tipo de Servicio</legend>
+
+              <div class="form-group radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="servicio" value="dtf" required />
+                  <span class="radio-custom">
+                    <i class="fas fa-circle"></i>
+                  </span>
+                  DTF (Direct-to-Film)
+                </label>
+                <p class="option-desc">
+                  Ideal para camisetas de color, diseños detallados
+                </p>
+              </div>
+
+              <div class="form-group radio-group">
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="servicio"
+                    value="sublimacion"
+                    required
+                  />
+                  <span class="radio-custom">
+                    <i class="fas fa-circle"></i>
+                  </span>
+                  Sublimación
+                </label>
+                <p class="option-desc">
+                  Ideal para tazas, mousepads, fotos, diseños vibrantes
+                </p>
+              </div>
+
+              <div class="form-group radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="servicio" value="ambos" required />
+                  <span class="radio-custom">
+                    <i class="fas fa-circle"></i>
+                  </span>
+                  Ambos servicios
+                </label>
+                <p class="option-desc">
+                  Aún no sé cuál es mejor para mi proyecto
+                </p>
+              </div>
+            </fieldset>
+
+            <!-- SECCIÓN 3: DETALLES DEL PROYECTO -->
+            <fieldset class="form-section">
+              <legend>Detalles del Proyecto</legend>
+
+              <div class="form-group" id="prendasDTF" style="display: none">
+                <label for="prendaDTF">¿Qué prenda deseas? *</label>
+                <select id="prendaDTF" name="prendaDTF">
+                  <option value="">-- Selecciona una opción --</option>
+                  <option value="camiseta">Camiseta</option>
+                  <option value="sudadera">Sudadera</option>
+                  <option value="gorra">Gorra</option>
+                  <option value="otra">Otra prenda</option>
+                </select>
+              </div>
+
+              <div
+                class="form-group"
+                id="prendasSublimacion"
+                style="display: none"
+              >
+                <label for="prendaSublimacion">¿Qué producto deseas? *</label>
+                <select id="prendaSublimacion" name="prendaSublimacion">
+                  <option value="">-- Selecciona una opción --</option>
+                  <option value="taza">Taza</option>
+                  <option value="mousepad">Mousepad</option>
+                  <option value="cojin">Cojín</option>
+                  <option value="camiseta-blanca">Camiseta Blanca</option>
+                  <option value="otro">Otro producto</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="cantidad">Cantidad de Unidades *</label>
+                <input
+                  type="number"
+                  id="cantidad"
+                  name="cantidad"
+                  placeholder="1"
+                  min="1"
+                  required
+                />
+                <p class="hint">Ingresa la cantidad total que necesitas</p>
+              </div>
+
+              <div class="form-group">
+                <label for="descripcion">Descripción del Proyecto *</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  placeholder="Describe tu proyecto, ideas, colores, etc."
+                  rows="4"
+                  required
+                ></textarea>
+                <span class="error-message"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="archivo">Adjunta tu diseño (Opcional)</label>
+                <div class="file-input-wrapper">
+                  <input
+                    type="file"
+                    id="archivo"
+                    name="archivo"
+                    accept=".png,.jpg,.jpeg,.pdf,.psd,.ai"
+                  />
+                  <label for="archivo" class="file-label">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    PNG, JPG, PDF, PSD, AI (Máx. 50MB)
+                  </label>
+                  <span class="file-name"></span>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- SECCIÓN 4: PRESUPUESTO -->
+            <fieldset class="form-section">
+              <legend>Presupuesto Estimado</legend>
+
+              <div class="form-group">
+                <label for="presupuesto"
+                  >¿Cuál es tu rango de presupuesto? *</label
+                >
+                <select id="presupuesto" name="presupuesto" required>
+                  <option value="">-- Selecciona un rango --</option>
+                  <option value="menor-50k">Menor a $50.000</option>
+                  <option value="50k-100k">$50.000 - $100.000</option>
+                  <option value="100k-250k">$100.000 - $250.000</option>
+                  <option value="250k-500k">$250.000 - $500.000</option>
+                  <option value="mayor-500k">Mayor a $500.000</option>
+                  <option value="no-sé">No sé, asesoradme</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="fechaRequerida">¿Para cuándo lo necesitas? *</label>
+                <input
+                  type="date"
+                  id="fechaRequerida"
+                  name="fechaRequerida"
+                  required
+                />
+                <span class="error-message"></span>
+              </div>
+            </fieldset>
+
+            <!-- SECCIÓN 5: MENSAJE ADICIONAL -->
+            <fieldset class="form-section">
+              <legend>Información Adicional</legend>
+
+              <div class="form-group">
+                <label for="mensaje">¿Hay algo más que debamos saber?</label>
+                <textarea
+                  id="mensaje"
+                  name="mensaje"
+                  placeholder="Especificaciones adicionales, preferencias, etc."
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="terminos" required />
+                  <span class="checkbox-custom">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  Acepto los términos y condiciones
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="newsletter" />
+                  <span class="checkbox-custom">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  Deseo recibir ofertas y novedades
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- BOTONES -->
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Enviar Cotización
+              </button>
+              <button type="reset" class="btn-reset">
+                <i class="fas fa-redo"></i> Limpiar Formulario
+              </button>
+            </div>
+
+            <!-- MENSAJE DE ÉXITO -->
+            <div
+              id="successMessage"
+              class="success-message"
+              style="display: none"
+            >
+              <i class="fas fa-check-circle"></i>
+              <h3>¡Cotización Enviada!</h3>
+              <p>Recibirás una respuesta en tu email dentro de 24 horas.</p>
+              <a href="https://wa.me/+5804120766642" class="whatsapp-link">
+                <i class="fab fa-whatsapp"></i> También puedes contactarnos por
+                WhatsApp
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <!-- SIDEBAR CON INFORMACIÓN -->
+        <div class="form-sidebar">
+          <div class="info-box">
+            <h3><i class="fas fa-clock"></i> Tiempo de Respuesta</h3>
+            <p>Nos comprometemos a responder dentro de 24 horas</p>
+          </div>
+
+          <div class="info-box">
+            <h3><i class="fas fa-headset"></i> Soporte</h3>
+            <p>¿Dudas? Contáctanos por WhatsApp</p>
+            <a
+              href="https://wa.me/+5804120766642"
+              class="btn-small"
+              target="_blank"
+            >
+              Chatear
+            </a>
+          </div>
+
+          <div class="info-box">
+            <h3><i class="fas fa-lightbulb"></i> Consejos</h3>
+            <ul class="tips-list">
+              <li>Ten clara tu idea antes de enviar</li>
+              <li>Adjunta referencias o imágenes</li>
+              <li>Especifica cantidad exacta</li>
+              <li>Indica tu presupuesto aproximado</li>
+            </ul>
+          </div>
+
+          <div class="info-box highlight">
+            <h3><i class="fas fa-question-circle"></i> ¿No sé qué elegir?</h3>
+            <p>
+              Visita nuestra página "¿Cómo Funciona?" para conocer las
+              diferencias entre DTF y Sublimación
+            </p>
+            <a href="especificaciones.html" class="btn-small">Saber más</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
+      </div>
+    </footer>
+
+    <script src="js/formulario.js"></script>
+  </body>
+</html>
