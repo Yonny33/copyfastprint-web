@@ -1,0 +1,609 @@
+/* ========================================================================== */
+/* ESTILOS GLOBALES */
+/* ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Montserrat", Arial, sans-serif;
+  background-color: #f8f8f8;
+  color: #333;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+/* ========================================================================== */
+/* HEADER Y NAVBAR */
+/* ========================================================================== */
+
+header {
+  background-color: #fff;
+  padding: 1em 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2em;
+}
+
+.brand h2 {
+  font-size: 1.8em;
+  color: #222;
+  font-weight: 700;
+}
+
+.brand h2 span {
+  color: #c60e0f;
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 2em;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  font-size: 1.1em;
+  padding: 0.5em 0;
+  transition: color 0.3s ease-in-out;
+}
+
+.menu li a.active {
+  background-color: #c60e0f;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+}
+
+.menu li a:hover {
+  color: #c60e0f;
+}
+
+.toggle_menu {
+  display: none;
+  font-size: 1.8em;
+  cursor: pointer;
+  color: #555;
+}
+
+#toggle_close {
+  display: none;
+}
+
+/* ========================================================================== */
+/* MAIN CONTENT */
+/* ========================================================================== */
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2em 3em;
+}
+
+/* ========================================================================== */
+/* SECTION HEADING */
+/* ========================================================================== */
+
+.section-heading {
+  text-align: center;
+  padding: 3em 0 2em;
+}
+
+.section-heading h2 {
+  font-size: 2.5em;
+  color: #222;
+  margin-bottom: 0.5em;
+}
+
+.section-heading h2 span {
+  color: #c60e0f;
+}
+
+.divider {
+  width: 60px;
+  height: 4px;
+  background: #c60e0f;
+  margin: 0.5em auto 1.5em;
+  border-radius: 2px;
+}
+
+.section-heading p {
+  font-size: 1.1em;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ========================================================================== */
+/* TABS */
+/* ========================================================================== */
+
+.tabs-container {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  margin: 2em 0 3em;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: #f0f0f0;
+  border: 2px solid transparent;
+  padding: 0.8em 1.5em;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s;
+  color: #555;
+}
+
+.tab-btn.active {
+  background: #c60e0f;
+  color: #fff;
+  border-color: #c60e0f;
+}
+
+.tab-btn:hover {
+  border-color: #c60e0f;
+  color: #c60e0f;
+}
+
+/* ========================================================================== */
+/* TAB CONTENT */
+/* ========================================================================== */
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.5s;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================================================== */
+/* SPECS GRID */
+/* ========================================================================== */
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5em;
+  margin: 2em 0;
+}
+
+.spec-card {
+  background: #fff;
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border-top: 4px solid transparent;
+}
+
+.spec-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.spec-card.highlight-dtf {
+  border-top-color: #ff6b6b;
+}
+
+.spec-card.highlight-sublimacion {
+  border-top-color: #2196f3;
+}
+
+.spec-icon {
+  font-size: 2.5em;
+  margin-bottom: 0.8em;
+}
+
+.spec-card h3 {
+  font-size: 1.3em;
+  color: #222;
+  margin-bottom: 1em;
+}
+
+.spec-card p {
+  color: #666;
+  margin: 0.5em 0;
+  font-size: 0.95em;
+}
+
+.spec-card p strong {
+  color: #333;
+}
+
+.spec-card .desc {
+  font-size: 0.85em;
+  color: #999;
+  font-style: italic;
+  margin-top: 0.8em;
+}
+
+/* ========================================================================== */
+/* COMPARISON TABLE */
+/* ========================================================================== */
+
+.comparison-table {
+  background: #fff;
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  margin: 2em 0;
+  overflow-x: auto;
+}
+
+.comparison-table h3 {
+  font-size: 1.5em;
+  color: #222;
+  margin-bottom: 1.5em;
+}
+
+.comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 1em;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comparison-table th {
+  background: #f5f5f5;
+  font-weight: 700;
+  color: #222;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table td {
+  color: #666;
+}
+
+/* ========================================================================== */
+/* ALERT BOX */
+/* ========================================================================== */
+
+.alert-box {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.5em;
+  border-radius: 8px;
+  margin: 2em 0;
+  display: flex;
+  gap: 1em;
+}
+
+.alert-box i {
+  color: #ffc107;
+  font-size: 1.5em;
+  flex-shrink: 0;
+}
+
+.alert-box h4 {
+  color: #b26a00;
+  margin-bottom: 0.5em;
+}
+
+.alert-box p {
+  color: #856404;
+  font-size: 0.95em;
+}
+
+.alert-box.warning {
+  background: #f8d7da;
+  border-left-color: #f5c6cb;
+}
+
+.alert-box.warning i {
+  color: #721c24;
+}
+
+.alert-box.warning h4 {
+  color: #721c24;
+}
+
+.alert-box.warning p {
+  color: #721c24;
+}
+
+/* ========================================================================== */
+/* PRENDAS */
+/* ========================================================================== */
+
+.prendas-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2em;
+  margin: 2em 0;
+}
+
+.prenda-item {
+  background: #fff;
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+}
+
+.prenda-item:hover {
+  transform: translateY(-5px);
+}
+
+.prenda-item h3 {
+  font-size: 1.3em;
+  color: #222;
+  margin-bottom: 1.5em;
+  border-bottom: 2px solid #c60e0f;
+  padding-bottom: 0.8em;
+}
+
+.prenda-specs {
+  list-style: none;
+}
+
+.prenda-specs li {
+  padding: 0.6em 0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.prenda-specs i {
+  font-size: 1.1em;
+}
+
+.prenda-specs i.fa-check {
+  color: #28a745;
+}
+
+.prenda-specs i.fa-times {
+  color: #dc3545;
+}
+
+/* ========================================================================== */
+/* FOOTER */
+/* ========================================================================== */
+
+footer {
+  background-color: #333;
+  color: #eee;
+  text-align: center;
+  padding: 2em;
+  margin-top: 3em;
+}
+
+.footer-content h2 {
+  font-size: 1.8em;
+  color: #eee;
+  margin-bottom: 0.5em;
+}
+
+.footer-content h2 span {
+  color: #c60e0f;
+}
+
+.footer-content h5 {
+  font-size: 1em;
+  color: #bbb;
+  margin-bottom: 1.5em;
+  font-weight: 400;
+}
+
+.social-networks {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  margin-top: 1em;
+}
+
+.social-networks a {
+  color: #fff;
+  font-size: 1.8em;
+  transition: color 0.3s, transform 0.2s;
+}
+
+.social-networks a:hover {
+  color: #c60e0f;
+  transform: translateY(-3px);
+}
+
+/* ========================================================================== */
+/* RESPONSIVE DESIGN */
+/* ========================================================================== */
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 1.5em;
+  }
+
+  .brand h2 {
+    font-size: 1.6em;
+  }
+
+  .menu {
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    padding-top: 5em;
+    transition: right 0.3s ease-in-out;
+    align-items: flex-start;
+    gap: 1em;
+    z-index: 999;
+  }
+
+  .menu li a {
+    padding: 0.8em 1.5em;
+    width: 100%;
+    border-bottom: 1px solid #eee;
+  }
+
+  .menu.show-menu {
+    right: 0;
+  }
+
+  .toggle_menu {
+    display: block;
+  }
+
+  main {
+    padding: 0 1.5em 2em;
+  }
+
+  .section-heading h2 {
+    font-size: 1.8em;
+  }
+
+  .section-heading p {
+    font-size: 1em;
+  }
+
+  .tabs-container {
+    gap: 0.5em;
+  }
+
+  .tab-btn {
+    padding: 0.6em 1em;
+    font-size: 0.9em;
+  }
+
+  .specs-grid {
+    grid-template-columns: 1fr;
+    gap: 1em;
+  }
+
+  .comparison-table {
+    padding: 1em;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.8em;
+    font-size: 0.85em;
+  }
+
+  .prendas-container {
+    grid-template-columns: 1fr;
+    gap: 1.5em;
+  }
+
+  .prenda-item h3 {
+    font-size: 1.1em;
+  }
+
+  .alert-box {
+    flex-direction: column;
+  }
+
+  .alert-box i {
+    font-size: 1.2em;
+  }
+
+  footer {
+    padding: 1.5em;
+  }
+
+  .social-networks {
+    gap: 1em;
+  }
+
+  .social-networks a {
+    font-size: 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand h2 {
+    font-size: 1.4em;
+  }
+
+  .section-heading h2 {
+    font-size: 1.5em;
+  }
+
+  .tabs-container {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    width: 100%;
+  }
+
+  .spec-card {
+    padding: 1.5em 1em;
+  }
+
+  .spec-icon {
+    font-size: 2em;
+  }
+
+  .spec-card h3 {
+    font-size: 1.1em;
+  }
+
+  .comparison-table {
+    padding: 1em 0.5em;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.6em 0.4em;
+    font-size: 0.75em;
+  }
+
+  .footer-content h2 {
+    font-size: 1.4em;
+  }
+
+  .footer-content h5 {
+    font-size: 0.9em;
+  }
+}
