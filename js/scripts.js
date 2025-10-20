@@ -10,6 +10,7 @@ const toggleClose = document.getElementById("toggle_close");
 // Verificar que los elementos del menú existen antes de añadir escuchadores
 if (menu && toggleOpen && toggleClose) {
   // Agregar eventos a los botones de apertura y cierre
+  
   toggleOpen.addEventListener("click", toggleMenu);
   toggleClose.addEventListener("click", toggleMenu);
 
