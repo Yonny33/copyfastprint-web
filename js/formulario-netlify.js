@@ -96,12 +96,15 @@ if (scrollToTopBtn) {
 // CALCULADORA DE DIVISAS CON FASTFOREX API
 // ==========================================================================
 
+// **NOTA PROFESIONAL:** Por seguridad, la API Key NUNCA debe ser expuesta directamente en el código frontend
+// en un entorno de producción real. Se recomienda usar un proxy backend.
 const API_KEY = "3a8ce0acef-aaeef20681-t3vl30";
 const API_URL = "https://api.fastforex.io/fetch-multi";
 
 let exchangeRates = {};
 let lastUpdateTime = null;
 
+// Referencias del DOM
 const amountInput = document.getElementById("amount");
 const fromCurrencySelect = document.getElementById("fromCurrency");
 const toCurrencySelect = document.getElementById("toCurrency");
@@ -118,22 +121,23 @@ async function fetchExchangeRates() {
   try {
     loadingOverlay.style.display = "flex";
 
-    // Obtener tasas para nuestras monedas base
+    // Obtener tasas para nuestras monedas base, usando USD como base de la API
     const currencies = "COP,VES,USD,EUR";
     const response = await fetch(
       `${API_URL}?from=USD&to=${currencies}&api_key=${API_KEY}`
     );
 
     if (!response.ok) {
-      throw new Error("Error al obtener tasas de cambio");
+      throw new Error(`Error al obtener tasas: ${response.statusText}`);
     }
 
     const data = await response.json();
 
     if (data.results) {
-      // Construir objeto de tasas de cambio
+      // Construir objeto de tasas de cambio con base en USD
       const usdRates = data.results;
 
+      // Reconstruir las tasas para que cualquier moneda pueda ser la base
       exchangeRates = {
         USD: {
           COP: usdRates.COP || 4000,
@@ -182,32 +186,12 @@ async function fetchExchangeRates() {
 // Tasas de respaldo en caso de error de API
 function useFallbackRates() {
   exchangeRates = {
-    COP: {
-      USD: 0.00025,
-      EUR: 0.00023,
-      VES: 0.011,
-      COP: 1,
-    },
-    USD: {
-      COP: 4000,
-      EUR: 0.92,
-      VES: 44,
-      USD: 1,
-    },
-    EUR: {
-      COP: 4350,
-      USD: 1.09,
-      VES: 48,
-      EUR: 1,
-    },
-    VES: {
-      COP: 90,
-      USD: 0.023,
-      EUR: 0.021,
-      VES: 1,
-    },
+    COP: { USD: 0.00025, EUR: 0.00023, VES: 0.011, COP: 1 },
+    USD: { COP: 4000, EUR: 0.92, VES: 44, USD: 1 },
+    EUR: { COP: 4350, USD: 1.09, VES: 48, EUR: 1 },
+    VES: { COP: 90, USD: 0.023, EUR: 0.021, VES: 1 },
   };
-  lastUpdateTime = new Date();
+  lastUpdateTime = null; // Reiniciar para indicar que no es una actualización real
   lastUpdateDisplay.textContent = "Tasas aproximadas (no actualizadas)";
 }
 
@@ -233,11 +217,12 @@ function formatNumber(num, currency) {
     }).format(num);
     return formatted;
   } catch (error) {
+    // Fallback simple si el formato falla
     return `${currency} ${num.toFixed(2)}`;
   }
 }
 
-// Función para calcular conversión
+// Función principal para calcular la conversión
 function calculateConversion() {
   const amount = parseFloat(amountInput.value) || 0;
   const fromCurrency = fromCurrencySelect.value;
@@ -249,19 +234,22 @@ function calculateConversion() {
     return;
   }
 
-  if (!exchangeRates[fromCurrency]) {
+  if (
+    !exchangeRates[fromCurrency] ||
+    !exchangeRates[fromCurrency][toCurrency]
+  ) {
     exchangeRateDisplay.textContent = "Cargando tasas...";
     return;
   }
 
-  // Obtener tasa de cambio
+  // Obtener tasa de cambio y calcular
   const rate = exchangeRates[fromCurrency][toCurrency];
   const result = amount * rate;
 
   // Mostrar resultado
   resultAmount.textContent = formatNumber(result, toCurrency);
 
-  // Mostrar tasa con más decimales para tasas pequeñas
+  // Mostrar tasa con más decimales para tasas pequeñas (e.g., de COP a USD)
   const rateDisplay = rate < 0.01 ? rate.toFixed(6) : rate.toFixed(4);
   exchangeRateDisplay.textContent = `1 ${fromCurrency} = ${rateDisplay} ${toCurrency}`;
 }
@@ -278,9 +266,11 @@ function swapCurrencies() {
 calculateBtn.addEventListener("click", calculateConversion);
 swapBtn.addEventListener("click", swapCurrencies);
 refreshBtn.addEventListener("click", fetchExchangeRates);
+
+// Recalcular en tiempo real al cambiar la cantidad o las monedas
 amountInput.addEventListener("input", calculateConversion);
 fromCurrencySelect.addEventListener("change", calculateConversion);
 toCurrencySelect.addEventListener("change", calculateConversion);
 
-// Cargar tasas al iniciar
-fetchExchangeRates();
+// Cargar tasas al iniciar la aplicación (al cargar el DOM)
+document.addEventListener("DOMContentLoaded", fetchExchangeRates);

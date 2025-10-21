@@ -823,9 +823,10 @@ footer {
   padding: 2em;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  margin: 2em 0;
+  margin: 2em auto; /* Centrado en el cuerpo */
   max-width: 500px;
   position: relative;
+  font-family: "Arial", sans-serif; /* Se recomienda definir una fuente base */
 }
 
 .calculator-header {
@@ -901,7 +902,7 @@ footer {
   font-weight: 600;
   color: #333;
   transition: border-color 0.3s;
-  font-family: "Montserrat", sans-serif;
+  font-family: inherit; /* Usar la fuente del body si no se especifica otra */
 }
 
 .currency-input-group input:focus {
@@ -939,7 +940,7 @@ footer {
   color: #333;
   cursor: pointer;
   transition: border-color 0.3s;
-  font-family: "Montserrat", sans-serif;
+  font-family: inherit;
   background-color: #fff;
 }
 
