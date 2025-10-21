@@ -14,7 +14,6 @@ if (menu && toggleOpen && toggleClose) {
     menu.classList.toggle("show-menu");
     const isMenuOpen = menu.classList.contains("show-menu");
 
-    // Cambiar visibilidad de los iconos
     if (isMenuOpen) {
       toggleOpen.style.display = "none";
       toggleClose.style.display = "block";
@@ -49,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const prendasDTFDiv = document.getElementById("prendasDTF");
   const prendasSublimacionDiv = document.getElementById("prendasSublimacion");
 
-  // Mostrar/Ocultar campos según servicio
   if (servicioRadios.length > 0) {
     servicioRadios.forEach((radio) => {
       radio.addEventListener("change", function () {
@@ -78,9 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 const scrollToTopBtn = document.getElementById("scroll-to-top");
 
 if (scrollToTopBtn) {
-  // 1. Mostrar/Ocultar el botón al hacer scroll
   window.addEventListener("scroll", () => {
-    // Muestra el botón si el scroll vertical es mayor a 300px (ajustable)
     if (window.scrollY > 300) {
       scrollToTopBtn.classList.add("show");
     } else {
@@ -88,13 +84,11 @@ if (scrollToTopBtn) {
     }
   });
 
-  // 2. Desplazamiento suave al hacer clic
   scrollToTopBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Evita el salto instantáneo del enlace '#'
-
+    e.preventDefault();
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Desplazamiento suave para PC y móvil
+      behavior: "smooth",
     });
   });
 }
