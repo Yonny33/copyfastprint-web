@@ -814,19 +814,19 @@ footer {
   opacity: 1;
   visibility: visible;
 }
+
 /* ========================================================================== */
 /* CALCULADORA DE DIVISAS CON API */
 /* ========================================================================== */
 
 .currency-calculator {
   background: #fff;
-  padding: 2em;
+  padding: 1.5em; /* Ajustar padding para que coincida con .info-box */
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  margin: 2em auto; /* Centrado en el cuerpo */
-  max-width: 500px;
+  /* Ya no necesita margin: auto ni max-width, hereda el ancho del sidebar */
   position: relative;
-  font-family: "Arial", sans-serif; /* Se recomienda definir una fuente base */
+  font-family: inherit; /* Hereda la fuente 'Montserrat' del body */
 }
 
 .calculator-header {
