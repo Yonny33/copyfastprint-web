@@ -774,3 +774,43 @@ footer {
     font-size: 1.5em;
   }
 }
+
+/* ========================================================================== */
+/* ===  SECCIÓN: BOTÓN VOLVER ARRIBA (SCROLL TO TOP)  === */
+/* ========================================================================== */
+
+.scroll-to-top {
+  /* Fijo en la esquina inferior derecha */
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+
+  /* Diseño del botón */
+  background-color: #c60e0f; /* Color principal de tu marca (rojo/vinotinto) */
+  color: #fff;
+  width: 45px;
+  height: 45px;
+  line-height: 45px; /* Centra el icono verticalmente */
+  text-align: center;
+  border-radius: 50%;
+  font-size: 1.2em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 999;
+
+  /* Animación de visibilidad/transición */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.scroll-to-top:hover {
+  background-color: #9c0b0c; /* Tono más oscuro al pasar el ratón */
+  transform: translateY(-2px); /* Pequeño efecto de elevación */
+}
+
+/* Clase para mostrar el botón cuando el usuario hace scroll */
+.scroll-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
