@@ -37,34 +37,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
-// ==========================================================================
-// FUNCIONALIDAD BOTÓN "IR A ARRIBA"
-// ==========================================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-  const scrollToTopBtn = document.getElementById("scroll-to-top");
-
-  // 1. Mostrar/Ocultar el botón al hacer scroll
-  window.addEventListener("scroll", () => {
-    if (scrollToTopBtn) {
-      // Muestra el botón cuando el scroll vertical supera los 300px
-      if (window.scrollY > 300) {
-        scrollToTopBtn.style.display = "block";
-      } else {
-        scrollToTopBtn.style.display = "none";
-      }
-    }
-  });
-
-  // 2. Función de scroll suave al hacer clic
-  if (scrollToTopBtn) {
-    scrollToTopBtn.addEventListener("click", (e) => {
-      e.preventDefault(); // Evita el salto instantáneo
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth", // Desplazamiento suave
-      });
-    });
-  }
-});
