@@ -86,10 +86,22 @@ header {
   font-size: 1.8em;
   cursor: pointer;
   color: #555;
+  position: relative;
+  z-index: 1001;
+}
+
+.toggle_menu i {
+  cursor: pointer;
 }
 
 #toggle_close {
   display: none;
+  position: fixed;
+  top: 1.5em;
+  right: 1.5em;
+  z-index: 1001;
+  color: #555;
+  font-size: 1.8em;
 }
 
 /* ========================================================================== */

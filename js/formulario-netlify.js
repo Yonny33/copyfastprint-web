@@ -13,8 +13,16 @@ if (menu && toggleOpen && toggleClose) {
   function toggleMenu() {
     menu.classList.toggle("show-menu");
     const isMenuOpen = menu.classList.contains("show-menu");
-    toggleOpen.style.display = isMenuOpen ? "none" : "block";
-    toggleClose.style.display = isMenuOpen ? "block" : "none";
+
+    // Cambiar visibilidad de los iconos
+    if (isMenuOpen) {
+      toggleOpen.style.display = "none";
+      toggleClose.style.display = "block";
+    } else {
+      toggleOpen.style.display = "block";
+      toggleClose.style.display = "none";
+    }
+
     toggleOpen.setAttribute("aria-expanded", isMenuOpen);
     toggleClose.setAttribute("aria-expanded", isMenuOpen);
   }
@@ -42,21 +50,25 @@ document.addEventListener("DOMContentLoaded", function () {
   const prendasSublimacionDiv = document.getElementById("prendasSublimacion");
 
   // Mostrar/Ocultar campos según servicio
-  servicioRadios.forEach((radio) => {
-    radio.addEventListener("change", function () {
-      prendasDTFDiv.style.display = "none";
-      prendasSublimacionDiv.style.display = "none";
+  if (servicioRadios.length > 0) {
+    servicioRadios.forEach((radio) => {
+      radio.addEventListener("change", function () {
+        if (prendasDTFDiv) prendasDTFDiv.style.display = "none";
+        if (prendasSublimacionDiv) prendasSublimacionDiv.style.display = "none";
 
-      if (this.value === "dtf") {
-        prendasDTFDiv.style.display = "block";
-      } else if (this.value === "sublimacion") {
-        prendasSublimacionDiv.style.display = "block";
-      } else if (this.value === "ambos") {
-        prendasDTFDiv.style.display = "block";
-        prendasSublimacionDiv.style.display = "block";
-      }
+        if (this.value === "dtf") {
+          if (prendasDTFDiv) prendasDTFDiv.style.display = "block";
+        } else if (this.value === "sublimacion") {
+          if (prendasSublimacionDiv)
+            prendasSublimacionDiv.style.display = "block";
+        } else if (this.value === "ambos") {
+          if (prendasDTFDiv) prendasDTFDiv.style.display = "block";
+          if (prendasSublimacionDiv)
+            prendasSublimacionDiv.style.display = "block";
+        }
+      });
     });
-  });
+  }
 });
 
 // ==========================================================================

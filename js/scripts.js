@@ -10,7 +10,6 @@ const toggleClose = document.getElementById("toggle_close");
 // Verificar que los elementos del menú existen antes de añadir escuchadores
 if (menu && toggleOpen && toggleClose) {
   // Agregar eventos a los botones de apertura y cierre
-  
   toggleOpen.addEventListener("click", toggleMenu);
   toggleClose.addEventListener("click", toggleMenu);
 
@@ -22,13 +21,30 @@ if (menu && toggleOpen && toggleClose) {
     const isMenuOpen = menu.classList.contains("show-menu");
 
     // Controlar la visibilidad de los iconos de apertura/cierre
-    toggleOpen.style.display = isMenuOpen ? "none" : "block";
-    toggleClose.style.display = isMenuOpen ? "block" : "none";
+    if (isMenuOpen) {
+      toggleOpen.style.display = "none";
+      toggleClose.style.display = "block";
+    } else {
+      toggleOpen.style.display = "block";
+      toggleClose.style.display = "none";
+    }
 
     // Mejorar accesibilidad: actualizar el atributo aria-expanded
     toggleOpen.setAttribute("aria-expanded", isMenuOpen);
     toggleClose.setAttribute("aria-expanded", isMenuOpen);
   }
+
+  // Cerrar menú al hacer click en un enlace
+  const menuLinks = document.querySelectorAll(".menu li a");
+  menuLinks.forEach((link) => {
+    link.addEventListener("click", function () {
+      if (menu && menu.classList.contains("show-menu")) {
+        menu.classList.remove("show-menu");
+        toggleOpen.style.display = "block";
+        toggleClose.style.display = "none";
+      }
+    });
+  });
 } else {
   console.warn(
     "Algunos elementos del menú (ID: menu, toggle_open, toggle_close) no se encontraron en el DOM."
@@ -192,18 +208,24 @@ galleryImages.forEach((img, idx) => {
 });
 
 // Botón cerrar
-document.getElementById("lightbox-close").onclick = function () {
-  document.getElementById("lightbox-modal").style.display = "none";
-  document.body.style.overflow = "";
-};
+const lightboxClose = document.getElementById("lightbox-close");
+if (lightboxClose) {
+  lightboxClose.onclick = function () {
+    document.getElementById("lightbox-modal").style.display = "none";
+    document.body.style.overflow = "";
+  };
+}
 
 // Cerrar al hacer click fuera de la imagen
-document.getElementById("lightbox-modal").onclick = function (e) {
-  if (e.target === this) {
-    this.style.display = "none";
-    document.body.style.overflow = "";
-  }
-};
+const lightboxModal = document.getElementById("lightbox-modal");
+if (lightboxModal) {
+  lightboxModal.onclick = function (e) {
+    if (e.target === this) {
+      this.style.display = "none";
+      document.body.style.overflow = "";
+    }
+  };
+}
 
 // Navegación siguiente/anterior
 document.addEventListener("click", function (e) {
@@ -223,7 +245,7 @@ document.addEventListener("click", function (e) {
 // Opcional: navegación con flechas del teclado
 document.addEventListener("keydown", function (e) {
   const modal = document.getElementById("lightbox-modal");
-  if (modal.style.display === "flex") {
+  if (modal && modal.style.display === "flex") {
     if (e.key === "ArrowRight") {
       let next = (currentImgIndex + 1) % galleryImages.length;
       showLightboxImage(next);
