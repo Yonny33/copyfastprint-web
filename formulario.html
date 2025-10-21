@@ -87,7 +87,6 @@
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/index.min.js"></script>
   </head>
   <body>
     <header>
@@ -120,8 +119,24 @@
 
       <div class="form-container">
         <div class="form-wrapper">
-          <form name="cotizacion" netlify>
+          <!-- FORMULARIO CON NETLIFY FORMS -->
+          <form
+            name="cotizacion"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            class="cotizacion-form"
+          >
+            <!-- Campo oculto para Netlify -->
             <input type="hidden" name="form-name" value="cotizacion" />
+
+            <!-- Honeypot anti-spam -->
+            <p style="display: none">
+              <label
+                >No llenes esto si eres humano: <input name="bot-field"
+              /></label>
+            </p>
+
             <!-- SECCIÓN 1: INFORMACIÓN PERSONAL -->
             <fieldset class="form-section">
               <legend>Tu Información</legend>
@@ -135,7 +150,6 @@
                   placeholder="Juan Pérez"
                   required
                 />
-                <span class="error-message"></span>
               </div>
 
               <div class="form-group">
@@ -147,7 +161,6 @@
                   placeholder="correo@ejemplo.com"
                   required
                 />
-                <span class="error-message"></span>
               </div>
 
               <div class="form-group">
@@ -159,7 +172,6 @@
                   placeholder="+58 412-0766642"
                   required
                 />
-                <span class="error-message"></span>
               </div>
 
               <div class="form-group">
@@ -227,7 +239,7 @@
               <legend>Detalles del Proyecto</legend>
 
               <div class="form-group" id="prendasDTF" style="display: none">
-                <label for="prendaDTF">¿Qué prenda deseas? *</label>
+                <label for="prendaDTF">¿Qué prenda deseas?</label>
                 <select id="prendaDTF" name="prendaDTF">
                   <option value="">-- Selecciona una opción --</option>
                   <option value="camiseta">Camiseta</option>
@@ -242,7 +254,7 @@
                 id="prendasSublimacion"
                 style="display: none"
               >
-                <label for="prendaSublimacion">¿Qué producto deseas? *</label>
+                <label for="prendaSublimacion">¿Qué producto deseas?</label>
                 <select id="prendaSublimacion" name="prendaSublimacion">
                   <option value="">-- Selecciona una opción --</option>
                   <option value="taza">Taza</option>
@@ -275,24 +287,17 @@
                   rows="4"
                   required
                 ></textarea>
-                <span class="error-message"></span>
               </div>
 
               <div class="form-group">
                 <label for="archivo">Adjunta tu diseño (Opcional)</label>
-                <div class="file-input-wrapper">
-                  <input
-                    type="file"
-                    id="archivo"
-                    name="archivo"
-                    accept=".png,.jpg,.jpeg,.pdf,.psd,.ai"
-                  />
-                  <label for="archivo" class="file-label">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    PNG, JPG, PDF, PSD, AI (Máx. 50MB)
-                  </label>
-                  <span class="file-name"></span>
-                </div>
+                <input
+                  type="file"
+                  id="archivo"
+                  name="archivo"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                />
+                <p class="hint">PNG, JPG, PDF (Máx. 10MB)</p>
               </div>
             </fieldset>
 
@@ -311,7 +316,7 @@
                   <option value="100k-250k">$100.000 - $250.000</option>
                   <option value="250k-500k">$250.000 - $500.000</option>
                   <option value="mayor-500k">Mayor a $500.000</option>
-                  <option value="no-sé">No sé, asesoradme</option>
+                  <option value="no-se">No sé, asesoradme</option>
                 </select>
               </div>
 
@@ -323,7 +328,6 @@
                   name="fechaRequerida"
                   required
                 />
-                <span class="error-message"></span>
               </div>
             </fieldset>
 
@@ -343,14 +347,19 @@
 
               <div class="form-group checkbox-group">
                 <label class="checkbox-label">
-                  <input type="checkbox" name="terminos" required />
+                  <input
+                    type="checkbox"
+                    name="terminos"
+                    value="aceptado"
+                    required
+                  />
                   <span class="checkbox-custom">
                     <i class="fas fa-check"></i>
                   </span>
                   Acepto los términos y condiciones
                 </label>
                 <label class="checkbox-label">
-                  <input type="checkbox" name="newsletter" />
+                  <input type="checkbox" name="newsletter" value="si" />
                   <span class="checkbox-custom">
                     <i class="fas fa-check"></i>
                   </span>
@@ -367,21 +376,6 @@
               <button type="reset" class="btn-reset">
                 <i class="fas fa-redo"></i> Limpiar Formulario
               </button>
-            </div>
-
-            <!-- MENSAJE DE ÉXITO -->
-            <div
-              id="successMessage"
-              class="success-message"
-              style="display: none"
-            >
-              <i class="fas fa-check-circle"></i>
-              <h3>¡Cotización Enviada!</h3>
-              <p>Recibirás una respuesta en tu email dentro de 24 horas.</p>
-              <a href="https://wa.me/+5804120766642" class="whatsapp-link">
-                <i class="fab fa-whatsapp"></i> También puedes contactarnos por
-                WhatsApp
-              </a>
             </div>
           </form>
         </div>
@@ -449,6 +443,7 @@
         ></a>
       </div>
     </footer>
+
     <script src="js/formulario-netlify.js"></script>
   </body>
 </html>
