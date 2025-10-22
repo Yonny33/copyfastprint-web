@@ -485,13 +485,7 @@
             </div>
           </div>
           <script>
-            // CALCULADORA CON DETECCIÓN DE ENTORNO
-            const isProduction =
-              window.location.hostname !== "localhost" &&
-              window.location.hostname !== "127.0.0.1";
-            const API_URL_CALC = isProduction
-              ? "/.netlify/functions/get-rates"
-              : "https://api.fastforex.io/fetch-multi?from=USD&to=COP,VES,USD,EUR&api_key=3a8ce0acef-aaeef20681-t3vl30";
+            // CALCULADORA - SOLO NETLIFY FUNCTIONS (no peticiones directas)
 
             let exchangeRates = {};
             let lastUpdateTime = null;
@@ -511,45 +505,70 @@
               try {
                 loadingOverlay.style.display = "flex";
 
-                const response = await fetch(API_URL_CALC);
-                if (!response.ok) throw new Error("Error al obtener tasas");
+                console.log("🔄 Obteniendo tasas desde Netlify Function...");
+
+                // Solo funciona cuando está desplegado en Netlify
+                const response = await fetch("/.netlify/functions/get-rates");
+
+                if (!response.ok) {
+                  throw new Error(`Error: ${response.status}`);
+                }
 
                 const data = await response.json();
-                const usdRates = isProduction ? data.rates : data.results;
+                console.log("📊 Respuesta:", data);
 
-                if (usdRates) {
+                if (data.success && data.rates) {
+                  const usdRates = data.rates;
+
                   exchangeRates = {
                     USD: {
-                      COP: usdRates.COP || 4000,
-                      VES: usdRates.VES || 44,
-                      EUR: usdRates.EUR || 0.92,
+                      COP: parseFloat(usdRates.COP) || 3950,
+                      VES: parseFloat(usdRates.VES) || 46.5,
+                      EUR: parseFloat(usdRates.EUR) || 0.92,
                       USD: 1,
                     },
                     COP: {
-                      USD: 1 / (usdRates.COP || 4000),
-                      VES: (usdRates.VES || 44) / (usdRates.COP || 4000),
-                      EUR: (usdRates.EUR || 0.92) / (usdRates.COP || 4000),
+                      USD: 1 / (parseFloat(usdRates.COP) || 3950),
+                      VES:
+                        (parseFloat(usdRates.VES) || 46.5) /
+                        (parseFloat(usdRates.COP) || 3950),
+                      EUR:
+                        (parseFloat(usdRates.EUR) || 0.92) /
+                        (parseFloat(usdRates.COP) || 3950),
                       COP: 1,
                     },
                     VES: {
-                      USD: 1 / (usdRates.VES || 44),
-                      COP: (usdRates.COP || 4000) / (usdRates.VES || 44),
-                      EUR: (usdRates.EUR || 0.92) / (usdRates.VES || 44),
+                      USD: 1 / (parseFloat(usdRates.VES) || 46.5),
+                      COP:
+                        (parseFloat(usdRates.COP) || 3950) /
+                        (parseFloat(usdRates.VES) || 46.5),
+                      EUR:
+                        (parseFloat(usdRates.EUR) || 0.92) /
+                        (parseFloat(usdRates.VES) || 46.5),
                       VES: 1,
                     },
                     EUR: {
-                      USD: 1 / (usdRates.EUR || 0.92),
-                      COP: (usdRates.COP || 4000) / (usdRates.EUR || 0.92),
-                      VES: (usdRates.VES || 44) / (usdRates.EUR || 0.92),
+                      USD: 1 / (parseFloat(usdRates.EUR) || 0.92),
+                      COP:
+                        (parseFloat(usdRates.COP) || 3950) /
+                        (parseFloat(usdRates.EUR) || 0.92),
+                      VES:
+                        (parseFloat(usdRates.VES) || 46.5) /
+                        (parseFloat(usdRates.EUR) || 0.92),
                       EUR: 1,
                     },
                   };
+
                   lastUpdateTime = new Date();
                   updateLastUpdateDisplay();
                   calculateConversion();
+                  console.log("✅ Tasas actualizadas");
                 }
               } catch (error) {
-                console.error("Error:", error);
+                console.warn(
+                  "⚠️ Error obteniendo tasas (normal en local):",
+                  error.message
+                );
                 useFallbackRates();
               } finally {
                 loadingOverlay.style.display = "none";
@@ -557,13 +576,18 @@
             }
 
             function useFallbackRates() {
+              // Tasas de respaldo para desarrollo local
               exchangeRates = {
-                COP: { USD: 0.00025, EUR: 0.00023, VES: 0.011, COP: 1 },
-                USD: { COP: 4000, EUR: 0.92, VES: 44, USD: 1 },
-                EUR: { COP: 4350, USD: 1.09, VES: 48, EUR: 1 },
-                VES: { COP: 90, USD: 0.023, EUR: 0.021, VES: 1 },
+                COP: { USD: 0.000253, EUR: 0.000233, VES: 0.0118, COP: 1 },
+                USD: { COP: 3950, EUR: 0.92, VES: 46.5, USD: 1 },
+                EUR: { COP: 4293, USD: 1.087, VES: 50.54, EUR: 1 },
+                VES: { COP: 84.95, USD: 0.0215, EUR: 0.0198, VES: 1 },
               };
-              lastUpdateDisplay.textContent = "Tasas aproximadas";
+
+              lastUpdateDisplay.textContent =
+                "📍 Modo local - Tasas aproximadas";
+              lastUpdateDisplay.style.color = "#ff9800";
+              calculateConversion();
             }
 
             function updateLastUpdateDisplay() {
@@ -572,7 +596,8 @@
                   hour: "2-digit",
                   minute: "2-digit",
                 });
-                lastUpdateDisplay.textContent = `Actualizado: ${timeString}`;
+                lastUpdateDisplay.textContent = `✓ Actualizado: ${timeString}`;
+                lastUpdateDisplay.style.color = "#4caf50";
               }
             }
 
@@ -607,6 +632,7 @@
 
               const rate = exchangeRates[fromCurrency][toCurrency];
               const result = amount * rate;
+
               resultAmount.textContent = formatNumber(result, toCurrency);
               const rateDisplay =
                 rate < 0.01 ? rate.toFixed(6) : rate.toFixed(4);
@@ -626,6 +652,8 @@
             amountInput.addEventListener("input", calculateConversion);
             fromCurrencySelect.addEventListener("change", calculateConversion);
             toCurrencySelect.addEventListener("change", calculateConversion);
+
+            // Iniciar con tasas de respaldo (funcionará cuando esté en Netlify)
             fetchExchangeRates();
           </script>
           <div class="info-box">

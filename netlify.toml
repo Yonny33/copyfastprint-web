@@ -1,10 +1,2 @@
 [build]
-  # Esta es la carpeta donde Netlify buscará las funciones serverless.
-  # El nombre DEBE coincidir con la carpeta que creaste: netlify/functions
-  functions = "netlify/functions" 
-
-# Opcional: Esto le dice a Netlify cómo construir tu sitio. 
-# Si tu proyecto está en la raíz, no necesitas el 'publish'.
-
-# [build]
-#   publish = "."
+  functions = "netlify/functions"
