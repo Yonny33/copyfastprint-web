@@ -484,6 +484,142 @@
               </div>
             </div>
           </div>
+          <script>
+            // CALCULADORA CON NETLIFY FUNCTIONS
+            const API_URL_CALC = "/.netlify/functions/get-rates";
+            let exchangeRates = {};
+            let lastUpdateTime = null;
+
+            const amountInput = document.getElementById("amount");
+            const fromCurrencySelect = document.getElementById("fromCurrency");
+            const toCurrencySelect = document.getElementById("toCurrency");
+            const calculateBtn = document.getElementById("calculateBtn");
+            const swapBtn = document.getElementById("swapBtn");
+            const refreshBtn = document.getElementById("refreshRates");
+            const resultAmount = document.getElementById("resultAmount");
+            const exchangeRateDisplay = document.getElementById("exchangeRate");
+            const lastUpdateDisplay = document.getElementById("lastUpdate");
+            const loadingOverlay = document.getElementById("loadingOverlay");
+
+            async function fetchExchangeRates() {
+              try {
+                loadingOverlay.style.display = "flex";
+                const response = await fetch(API_URL_CALC);
+                if (!response.ok) throw new Error("Error al obtener tasas");
+                const data = await response.json();
+
+                if (data.success && data.rates) {
+                  const usdRates = data.rates;
+                  exchangeRates = {
+                    USD: {
+                      COP: usdRates.COP || 4000,
+                      VES: usdRates.VES || 44,
+                      EUR: usdRates.EUR || 0.92,
+                      USD: 1,
+                    },
+                    COP: {
+                      USD: 1 / (usdRates.COP || 4000),
+                      VES: (usdRates.VES || 44) / (usdRates.COP || 4000),
+                      EUR: (usdRates.EUR || 0.92) / (usdRates.COP || 4000),
+                      COP: 1,
+                    },
+                    VES: {
+                      USD: 1 / (usdRates.VES || 44),
+                      COP: (usdRates.COP || 4000) / (usdRates.VES || 44),
+                      EUR: (usdRates.EUR || 0.92) / (usdRates.VES || 44),
+                      VES: 1,
+                    },
+                    EUR: {
+                      USD: 1 / (usdRates.EUR || 0.92),
+                      COP: (usdRates.COP || 4000) / (usdRates.EUR || 0.92),
+                      VES: (usdRates.VES || 44) / (usdRates.EUR || 0.92),
+                      EUR: 1,
+                    },
+                  };
+                  lastUpdateTime = new Date();
+                  updateLastUpdateDisplay();
+                  calculateConversion();
+                }
+              } catch (error) {
+                console.error("Error:", error);
+                useFallbackRates();
+              } finally {
+                loadingOverlay.style.display = "none";
+              }
+            }
+
+            function useFallbackRates() {
+              exchangeRates = {
+                COP: { USD: 0.00025, EUR: 0.00023, VES: 0.011, COP: 1 },
+                USD: { COP: 4000, EUR: 0.92, VES: 44, USD: 1 },
+                EUR: { COP: 4350, USD: 1.09, VES: 48, EUR: 1 },
+                VES: { COP: 90, USD: 0.023, EUR: 0.021, VES: 1 },
+              };
+              lastUpdateDisplay.textContent = "Tasas aproximadas";
+            }
+
+            function updateLastUpdateDisplay() {
+              if (lastUpdateTime) {
+                const timeString = lastUpdateTime.toLocaleTimeString("es-CO", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+                lastUpdateDisplay.textContent = `Actualizado: ${timeString}`;
+              }
+            }
+
+            function formatNumber(num, currency) {
+              try {
+                return new Intl.NumberFormat("es-CO", {
+                  style: "currency",
+                  currency: currency,
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(num);
+              } catch (error) {
+                return `${currency} ${num.toFixed(2)}`;
+              }
+            }
+
+            function calculateConversion() {
+              const amount = parseFloat(amountInput.value) || 0;
+              const fromCurrency = fromCurrencySelect.value;
+              const toCurrency = toCurrencySelect.value;
+
+              if (amount <= 0) {
+                resultAmount.textContent = formatNumber(0, toCurrency);
+                exchangeRateDisplay.textContent = "Ingresa una cantidad válida";
+                return;
+              }
+
+              if (!exchangeRates[fromCurrency]) {
+                exchangeRateDisplay.textContent = "Cargando tasas...";
+                return;
+              }
+
+              const rate = exchangeRates[fromCurrency][toCurrency];
+              const result = amount * rate;
+              resultAmount.textContent = formatNumber(result, toCurrency);
+              const rateDisplay =
+                rate < 0.01 ? rate.toFixed(6) : rate.toFixed(4);
+              exchangeRateDisplay.textContent = `1 ${fromCurrency} = ${rateDisplay} ${toCurrency}`;
+            }
+
+            function swapCurrencies() {
+              const tempFrom = fromCurrencySelect.value;
+              fromCurrencySelect.value = toCurrencySelect.value;
+              toCurrencySelect.value = tempFrom;
+              calculateConversion();
+            }
+
+            calculateBtn.addEventListener("click", calculateConversion);
+            swapBtn.addEventListener("click", swapCurrencies);
+            refreshBtn.addEventListener("click", fetchExchangeRates);
+            amountInput.addEventListener("input", calculateConversion);
+            fromCurrencySelect.addEventListener("change", calculateConversion);
+            toCurrencySelect.addEventListener("change", calculateConversion);
+            fetchExchangeRates();
+          </script>
 
           <div class="info-box">
             <h3><i class="fas fa-lightbulb"></i> Consejos</h3>
