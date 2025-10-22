@@ -1,0 +1,8 @@
+{
+  "name": "copyfast-print-web",
+  "version": "1.0.0",
+  "description": "Copy Fast & Print website",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
