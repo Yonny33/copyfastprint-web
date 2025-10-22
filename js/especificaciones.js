@@ -1,55 +1,13 @@
 // ==========================================================================
-// FUNCIONALIDAD DEL MENÚ RESPONSIVE
+// ===  FUNCIONALIDAD: TABS Y ACORDEÓN (ESPECÍFICO DE especificaciones.html)  ===
 // ==========================================================================
 
-const menu = document.getElementById("menu");
-const toggleOpen = document.getElementById("toggle_open");
-const toggleClose = document.getElementById("toggle_close");
-
-if (menu && toggleOpen && toggleClose) {
-  toggleOpen.addEventListener("click", toggleMenu);
-  toggleClose.addEventListener("click", toggleMenu);
-
-  function toggleMenu() {
-    menu.classList.toggle("show-menu");
-    const isMenuOpen = menu.classList.contains("show-menu");
-
-    if (isMenuOpen) {
-      toggleOpen.style.display = "none";
-      toggleClose.style.display = "block";
-    } else {
-      toggleOpen.style.display = "block";
-      toggleClose.style.display = "none";
-    }
-
-    toggleOpen.setAttribute("aria-expanded", isMenuOpen);
-    toggleClose.setAttribute("aria-expanded", isMenuOpen);
-  }
-}
-
-// Cerrar menú al hacer click en un enlace
-const menuLinks = document.querySelectorAll(".menu li a");
-menuLinks.forEach((link) => {
-  link.addEventListener("click", function () {
-    if (menu && menu.classList.contains("show-menu")) {
-      menu.classList.remove("show-menu");
-      if (toggleOpen) toggleOpen.style.display = "block";
-      if (toggleClose) toggleClose.style.display = "none";
-    }
-  });
-});
-
-// ==========================================================================
-// FUNCIONALIDAD DE TABS
-// ==========================================================================
-
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
 
-  // Verificar que existan elementos
+  // Si no hay tabs, salir de la función
   if (tabButtons.length === 0 || tabContents.length === 0) {
-    console.warn("No se encontraron elementos de tabs");
     return;
   }
 
@@ -79,21 +37,4 @@ document.addEventListener("DOMContentLoaded", function () {
   if (tabButtons.length > 0) {
     tabButtons[0].click();
   }
-});
-
-// ==========================================================================
-// SCROLL SMOOTH
-// ==========================================================================
-
-document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  anchor.addEventListener("click", function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute("href"));
-    if (target) {
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  });
 });
