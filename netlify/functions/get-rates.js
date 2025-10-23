@@ -19,13 +19,13 @@ exports.handler = async function (event, context) {
   }
 
   // API Configuration
-  const API_KEY = process.env.FASTFOREX_API_KEY;
+const API_KEY = process.env.FASTFOREX_API_KEY;
   const API_URL = "https://api.fastforex.io/fetch-multi";
 
   try {
     console.log("🔄 Iniciando petición a FastForex API...");
 
-    const currencies = "COP,EUR";
+    const currencies = "COP,VES,EUR";
     const url = `${API_URL}?from=USD&to=${currencies}&api_key=${API_KEY}`;
 
     console.log("📡 URL:", url.replace(API_KEY, "HIDDEN"));
