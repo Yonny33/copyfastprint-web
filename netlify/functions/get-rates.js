@@ -25,7 +25,7 @@ exports.handler = async function (event, context) {
   try {
     console.log("🔄 Iniciando petición a FastForex API...");
 
-    const currencies = "COP,VES,EUR";
+    const currencies = "COP,EUR";
     const url = `${API_URL}?from=USD&to=${currencies}&api_key=${API_KEY}`;
 
     console.log("📡 URL:", url.replace(API_KEY, "HIDDEN"));
