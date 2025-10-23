@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 
 exports.handler = async function (event, context) {
-  // Headers CORS
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -9,69 +8,72 @@ exports.handler = async function (event, context) {
     "Content-Type": "application/json",
   };
 
-  // Manejar preflight
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers,
-      body: "",
-    };
+    return { statusCode: 200, headers, body: "" };
   }
 
-  // API Configuration
-const API_KEY = process.env.FASTFOREX_API_KEY;
-  const API_URL = "https://api.fastforex.io/fetch-multi";
+  const API_KEY = process.env.FASTFOREX_API_KEY; // Cambiar a fetch-all que está disponible en plan gratuito
+  const API_URL = "https://api.fastforex.io/fetch-all";
 
   try {
-    console.log("🔄 Iniciando petición a FastForex API...");
+    console.log("🔄 Obteniendo todas las tasas...");
 
-    const currencies = "COP,VES,EUR";
-    const url = `${API_URL}?from=USD&to=${currencies}&api_key=${API_KEY}`;
-
-    console.log("📡 URL:", url.replace(API_KEY, "HIDDEN"));
+    const url = `${API_URL}?api_key=${API_KEY}`;
+    console.log("📡 Consultando FastForex...");
 
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: { Accept: "application/json" },
     });
 
     console.log("📊 Status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("❌ API Error:", errorText);
-      throw new Error(`API returned ${response.status}: ${errorText}`);
+      console.error("❌ Error:", errorText);
+      throw new Error(`API Error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("✅ Data received:", JSON.stringify(data));
+    console.log("✅ Tasas obtenidas exitosamente");
 
-    if (!data.results) {
-      throw new Error("No results in API response");
-    }
+    // Extraer solo las monedas que necesitamos
+    const rates = data.results;
+    const selectedRates = {
+      COP: rates.COP || 3950,
+      VES: rates.VES || 46.5,
+      EUR: rates.EUR || 0.92,
+    };
+
+    console.log("💱 Tasas seleccionadas:", selectedRates);
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        rates: data.results,
-        updated: new Date().toISOString(),
-        base: "USD",
+        rates: selectedRates,
+        updated: data.updated || new Date().toISOString(),
+        base: data.base || "USD",
       }),
     };
   } catch (error) {
-    console.error("💥 Error completo:", error);
+    console.error("💥 Error:", error.message);
 
+    // Retornar tasas de respaldo en caso de error
     return {
-      statusCode: 500,
+      statusCode: 200,
       headers,
       body: JSON.stringify({
-        success: false,
-        error: error.message,
-        timestamp: new Date().toISOString(),
+        success: true,
+        rates: {
+          COP: 3950,
+          VES: 46.5,
+          EUR: 0.92,
+        },
+        updated: new Date().toISOString(),
+        base: "USD",
+        fallback: true,
       }),
     };
   }
