@@ -19,7 +19,7 @@ exports.handler = async function (event, context) {
   }
 
   // API Configuration
-  const API_KEY = "3a8ce0acef-aaeef20681-t3vl30";
+  const API_KEY = process.env.FASTFOREX_API_KEY;
   const API_URL = "https://api.fastforex.io/fetch-multi";
 
   try {
