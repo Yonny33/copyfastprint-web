@@ -38,6 +38,7 @@ exports.handler = async function (event, context) {
       "telefono",
       "descripcion",
       "montoTotal",
+      "divisa",
     ];
     const missingFields = requiredFields.filter((field) => !data[field]);
 
@@ -48,6 +49,19 @@ exports.handler = async function (event, context) {
         body: JSON.stringify({
           success: false,
           error: `Faltan campos requeridos: ${missingFields.join(", ")}`,
+        }),
+      };
+    }
+
+    // Validar divisa
+    const divisasValidas = ["COP", "USD", "VES", "EUR"];
+    if (!divisasValidas.includes(data.divisa)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: "Divisa no válida. Use: COP, USD, VES o EUR",
         }),
       };
     }
