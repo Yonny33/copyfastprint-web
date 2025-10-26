@@ -4,11 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel Administrativo - COPYFAST&PRINT</title>
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/formulario.css" />
     <link rel="stylesheet" href="css/especificaciones.css" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
     <style>
       .admin-container {
         max-width: 1600px;
@@ -89,7 +97,7 @@
       }
 
       .stat-box::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -98,9 +106,15 @@
         background: #c60e0f;
       }
 
-      .stat-box.green::before { background: #28a745; }
-      .stat-box.yellow::before { background: #ffc107; }
-      .stat-box.blue::before { background: #17a2b8; }
+      .stat-box.green::before {
+        background: #28a745;
+      }
+      .stat-box.yellow::before {
+        background: #ffc107;
+      }
+      .stat-box.blue::before {
+        background: #17a2b8;
+      }
 
       .stat-header {
         display: flex;
@@ -114,9 +128,15 @@
         color: #c60e0f;
       }
 
-      .stat-box.green .stat-icon { color: #28a745; }
-      .stat-box.yellow .stat-icon { color: #ffc107; }
-      .stat-box.blue .stat-icon { color: #17a2b8; }
+      .stat-box.green .stat-icon {
+        color: #28a745;
+      }
+      .stat-box.yellow .stat-icon {
+        color: #ffc107;
+      }
+      .stat-box.blue .stat-icon {
+        color: #17a2b8;
+      }
 
       .stat-value {
         font-size: 2.5em;
@@ -285,13 +305,14 @@
           <h2>COPY<span>FAST&</span>PRINT</h2>
         </div>
         <ul class="menu" id="menu">
-          <li><a href="index.html">Inicio</a></li>
           <li><a href="admin.html" class="active">Admin</a></li>
           <li><a href="registro.html">Registro Ventas</a></li>
           <li><a href="gastos.html">Gastos</a></li>
-          <li><a href="#" id="btnCerrarSesion" style="color: #c60e0f;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-          </a></li>
+          <li>
+            <a href="#" id="btnCerrarSesion" style="color: #c60e0f">
+              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+          </li>
         </ul>
         <div class="toggle_menu">
           <i class="fas fa-bars" id="toggle_open"></i>
@@ -303,7 +324,10 @@
     <main class="admin-container">
       <div class="admin-header">
         <h1><i class="fas fa-chart-line"></i> Panel Administrativo</h1>
-        <p>Gestión y control de ventas, gastos e inventario - <span id="fechaHoy"></span></p>
+        <p>
+          Gestión y control de ventas, gastos e inventario -
+          <span id="fechaHoy"></span>
+        </p>
       </div>
 
       <!-- Acciones Rápidas -->
@@ -357,7 +381,8 @@
           </div>
           <div class="stat-value" id="creditosPendientes">Bs. 0.00</div>
           <div class="stat-trend">
-            <i class="fas fa-users"></i> <span id="clientesPendientes">0</span> clientes
+            <i class="fas fa-users"></i>
+            <span id="clientesPendientes">0</span> clientes
           </div>
         </div>
 
@@ -388,7 +413,8 @@
             <div class="activity-item">
               <div class="activity-time">Hace 5 minutos</div>
               <div class="activity-description">
-                <strong>María González</strong> - Venta registrada: Bs. 450.00 (20 suéteres)
+                <strong>María González</strong> - Venta registrada: Bs. 450.00
+                (20 suéteres)
               </div>
             </div>
             <div class="activity-item">
@@ -458,27 +484,32 @@
     <script>
       // Mostrar fecha actual
       const hoy = new Date();
-      document.getElementById('fechaHoy').textContent = hoy.toLocaleDateString('es-VE', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      document.getElementById("fechaHoy").textContent = hoy.toLocaleDateString(
+        "es-VE",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      );
 
       // Botón cerrar sesión
-      document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-          sessionStorage.clear();
-          window.location.href = 'login-registro.html';
-        }
-      });
+      document
+        .getElementById("btnCerrarSesion")
+        ?.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+            sessionStorage.clear();
+            window.location.href = "login-registro.html";
+          }
+        });
 
       // Función para formatear VES
       function formatVES(numero) {
-        return `Bs. ${parseFloat(numero).toLocaleString('es-VE', {
+        return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
           minimumFractionDigits: 2,
-          maximumFractionDigits: 2
+          maximumFractionDigits: 2,
         })}`;
       }
 
@@ -486,21 +517,30 @@
       async function cargarDashboard() {
         // Aquí conectarías con tu base de datos
         // const datos = await fetch('/.netlify/functions/obtener-dashboard').then(r => r.json());
-        
+
         // Datos de ejemplo
         const datos = {
-          ventasDia: 2450.50,
-          ingresosMes: 45780.00,
-          creditosPendientes: 8930.00,
-          gastosDia: 650.00,
-          clientesPendientes: 12
+          ventasDia: 2450.5,
+          ingresosMes: 45780.0,
+          creditosPendientes: 8930.0,
+          gastosDia: 650.0,
+          clientesPendientes: 12,
         };
 
-        document.getElementById('ventasDia').textContent = formatVES(datos.ventasDia);
-        document.getElementById('ingresosMes').textContent = formatVES(datos.ingresosMes);
-        document.getElementById('creditosPendientes').textContent = formatVES(datos.creditosPendientes);
-        document.getElementById('gastosDia').textContent = formatVES(datos.gastosDia);
-        document.getElementById('clientesPendientes').textContent = datos.clientesPendientes;
+        document.getElementById("ventasDia").textContent = formatVES(
+          datos.ventasDia
+        );
+        document.getElementById("ingresosMes").textContent = formatVES(
+          datos.ingresosMes
+        );
+        document.getElementById("creditosPendientes").textContent = formatVES(
+          datos.creditosPendientes
+        );
+        document.getElementById("gastosDia").textContent = formatVES(
+          datos.gastosDia
+        );
+        document.getElementById("clientesPendientes").textContent =
+          datos.clientesPendientes;
       }
 
       // Cargar datos al iniciar
