@@ -16,13 +16,8 @@
     </script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Ventas y Clientes - COPYFAST&PRINT</title>
-    <meta
-      name="description"
-      content="Panel de registro interno para clientes, ventas y control de crédito de COPYFAST&PRINT."
-    />
+    <title>Acceso Restringido - COPYFAST&PRINT</title>
     <link
       rel="icon"
       type="image/png"
@@ -35,104 +30,216 @@
       sizes="32x32"
       href="/favicons/favicon-32x32.png"
     />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/favicons/android-icon-192x192.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="/favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="/favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/favicons/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="/favicons/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="/favicons/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/favicons/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/favicons/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/favicons/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link rel="manifest" href="/favicons/manifest.json" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta
-      name="msapplication-TileImage"
-      content="/favicons/ms-icon-144x144.png"
-    />
-    <meta name="theme-color" content="#ffffff" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/formulario.css" />
-    <link rel="stylesheet" href="css/especificaciones.css" />
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
     />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat", Arial, sans-serif;
+      }
+
+      .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+        padding: 2em;
+      }
+
+      .login-container {
+        background: #fff;
+        padding: 3em;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .login-logo {
+        margin-bottom: 2em;
+      }
+
+      .login-logo h2 {
+        font-size: 2em;
+        color: #222;
+        font-family: "Poppins", "Montserrat", sans-serif;
+        font-weight: 700;
+      }
+
+      .login-logo span {
+        color: #c60e0f;
+      }
+
+      .login-icon {
+        font-size: 4em;
+        color: #c60e0f;
+        margin-bottom: 1em;
+      }
+
+      .login-title {
+        font-size: 1.8em;
+        color: #222;
+        margin-bottom: 0.5em;
+        font-weight: 700;
+      }
+
+      .login-subtitle {
+        color: #666;
+        margin-bottom: 2em;
+        font-size: 0.95em;
+      }
+
+      .login-form {
+        text-align: left;
+      }
+
+      .form-group {
+        margin-bottom: 1.5em;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5em;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 1em;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 1.1em;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 1em 1em 1em 3em;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #c60e0f;
+        box-shadow: 0 0 0 3px rgba(198, 14, 15, 0.1);
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 1em;
+        background: #c60e0f;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+      }
+
+      .btn-login:hover {
+        background: #9c0b0c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(198, 14, 15, 0.3);
+      }
+
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1em;
+        border-radius: 8px;
+        margin-bottom: 1.5em;
+        display: none;
+        border-left: 4px solid #f5c6cb;
+      }
+
+      .error-message.show {
+        display: block;
+        animation: shake 0.5s;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+
+      .back-home {
+        margin-top: 2em;
+        padding-top: 2em;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .back-home a {
+        color: #c60e0f;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+
+      .back-home a:hover {
+        color: #9c0b0c;
+        text-decoration: underline;
+      }
+
+      .security-notice {
+        background: #e8f5e9;
+        padding: 1em;
+        border-radius: 8px;
+        margin-top: 1.5em;
+        font-size: 0.85em;
+        color: #2e7d32;
+        border-left: 3px solid #4caf50;
+        text-align: left;
+      }
+
+      @media (max-width: 480px) {
+        .login-container {
+          padding: 2em 1.5em;
+        }
+
+        .login-logo h2 {
+          font-size: 1.6em;
+        }
+
+        .login-title {
+          font-size: 1.4em;
+        }
+
+        .login-icon {
+          font-size: 3em;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Verificación de sesión -->
-    <script>
-      // Redirigir si no hay sesión activa
-      if (sessionStorage.getItem('sesionActiva') !== 'true') {
-        window.location.href = 'login-registro.html';
-      }
-
-      // Auto-logout después de 2 horas de inactividad
-      let inactivityTimer;
-      function resetTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-          sessionStorage.clear();
-          alert('⚠️ Sesión expirada por inactividad. Por favor, inicia sesión nuevamente.');
-          window.location.href = 'login-registro.html';
-        }, 2 * 60 * 60 * 1000); // 2 horas
-      }
-
-      // Detectar actividad del usuario
-      document.addEventListener('mousemove', resetTimer);
-      document.addEventListener('keypress', resetTimer);
-      document.addEventListener('click', resetTimer);
-      resetTimer();
-    </script>
-
     <!-- Google Tag Manager (noscript) -->
     <noscript>
       <iframe
@@ -143,273 +250,155 @@
       ></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div class="wrapper">
-      <header>
-        <nav class="navbar">
-          <div class="brand">
-            <h2>COPY<span>FAST&</span>PRINT</h2>
-          </div>
-          <ul class="menu" id="menu">
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="diseño.html">Diseños</a></li>
-            <li><a href="acercade.html">Acerca de</a></li>
-            <li><a href="formulario.html">Cotización</a></li>
-            <li><a href="especificaciones.html">¿Como Funciona?</a></li>
-            <li>
-              <a href="#" id="btnCerrarSesion" style="color: #c60e0f;">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-              </a>
-            </li>
-          </ul>
-          <!-- ✅ CORREGIDO: Clase "toggle_menu" en lugar de "toggle" -->
-          <div class="toggle_menu">
-            <i class="fas fa-bars" id="toggle_open"></i>
-            <i class="fas fa-times" id="toggle_close"></i>
-          </div>
-        </nav>
-      </header>
 
-      <main>
-        <section class="section-heading">
-          <h2>Registro de <span>Cliente y Venta</span></h2>
-          <div class="divider"></div>
-          <p>
-            <i class="fas fa-lock" style="color: #c60e0f;"></i>
-            <strong>Sistema Protegido</strong> - Introduce los detalles de la transacción. 
-            El sistema calculará automáticamente el crédito pendiente.
-          </p>
-        </section>
-
-        <div class="form-container">
-          <div class="form-wrapper">
-            <form id="registro-ventas-form" class="cotizacion-form">
-              <!-- SECCIÓN 1: DATOS DEL CLIENTE -->
-              <fieldset class="form-section">
-                <legend>Datos del Cliente</legend>
-
-                <div class="form-group">
-                  <label for="cedula">Cédula / ID (Identificador Único) *</label>
-                  <input
-                    type="text"
-                    id="cedula"
-                    name="cedula"
-                    required
-                    placeholder="Número de identificación"
-                  />
-                  <p class="hint">Ingresa el documento de identidad del cliente</p>
-                </div>
-
-                <div class="form-group">
-                  <label for="nombre">Nombre Completo *</label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    required
-                    placeholder="Nombre o Razón Social"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="telefono">Teléfono / WhatsApp *</label>
-                  <input
-                    type="tel"
-                    id="telefono"
-                    name="telefono"
-                    required
-                    placeholder="+57 300 123 4567"
-                  />
-                </div>
-              </fieldset>
-
-              <!-- SECCIÓN 2: DETALLES DE LA VENTA -->
-              <fieldset class="form-section">
-                <legend>Detalles de la Venta</legend>
-
-                <div class="form-group">
-                  <label for="descripcion">Producto / Descripción de la Venta *</label>
-                  <textarea
-                    id="descripcion"
-                    name="descripcion"
-                    rows="4"
-                    required
-                    placeholder="Ej: 15 camisetas sublimadas, 50 copias a color, diseño personalizado, etc."
-                  ></textarea>
-                </div>
-
-                <!-- Campo oculto para la divisa fija en VES -->
-                <input type="hidden" name="divisa" value="VES" />
-
-                <div class="form-group">
-                  <label for="montoTotal">Monto Total de la Venta (Bs.) *</label>
-                  <input
-                    type="number"
-                    id="montoTotal"
-                    name="montoTotal"
-                    required
-                    min="0.01"
-                    step="0.01"
-                    placeholder="500.00"
-                  />
-                  <p class="hint">🇻🇪 Valor en <strong>Bolívares Venezolanos (VES)</strong></p>
-                </div>
-
-                <div class="form-group">
-                  <label for="montoPagado">Monto Pagado al Contado (Bs.) *</label>
-                  <input
-                    type="number"
-                    id="montoPagado"
-                    name="montoPagado"
-                    required
-                    min="0"
-                    step="0.01"
-                    placeholder="200.00"
-                    value="0"
-                  />
-                  <p class="hint">Si pagó en su totalidad, ingresa el mismo valor del monto total</p>
-                </div>
-
-                <div class="alert-box">
-                  <i class="fas fa-info-circle"></i>
-                  <div>
-                    <h4>Cálculo Automático de Crédito</h4>
-                    <p>
-                      Si el <strong>Monto Pagado</strong> es menor al <strong>Monto Total</strong>, 
-                      la venta se registrará automáticamente como <strong>Crédito Pendiente</strong> 
-                      y se calculará el saldo por cobrar.
-                    </p>
-                  </div>
-                </div>
-              </fieldset>
-
-              <!-- BOTONES -->
-              <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                  <i class="fas fa-save"></i> Registrar Venta
-                </button>
-                <button type="reset" class="btn-reset">
-                  <i class="fas fa-redo"></i> Limpiar Formulario
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- SIDEBAR CON INFORMACIÓN -->
-          <div class="form-sidebar">
-            <div class="info-box highlight">
-              <h3><i class="fas fa-calculator"></i> Resumen de Crédito</h3>
-              <p>
-                El sistema calculará automáticamente en <strong>Bolívares (VES)</strong>:
-              </p>
-              <ul class="tips-list">
-                <li>Monto Total de la venta</li>
-                <li>Monto Pagado (Inicial)</li>
-                <li>Saldo Pendiente</li>
-                <li>Estado del Crédito</li>
-              </ul>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-flag"></i> Divisa</h3>
-              <p>
-                🇻🇪 Todas las transacciones se registran en <strong>Bolívares Venezolanos (VES)</strong>
-              </p>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
-              <p>
-                Los datos se almacenan de forma segura y solo son accesibles 
-                por personal autorizado de COPYFAST&PRINT.
-              </p>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-question-circle"></i> ¿Necesitas ayuda?</h3>
-              <p>
-                Contacta al administrador del sistema si tienes dudas sobre 
-                el registro de ventas.
-              </p>
-              <a
-                href="https://wa.me/+5804120766642"
-                class="btn-small"
-                target="_blank"
-              >
-                WhatsApp Soporte
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Loading Overlay -->
-        <div
-          id="loading-overlay"
-          class="loading-overlay"
-          style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column;"
-        >
-          <div class="spinner"></div>
-          <p style="margin-top: 1em; color: #666; font-weight: 600;">Registrando venta...</p>
-        </div>
-      </main>
-
-      <footer class="footer">
-        <div class="footer-content">
+    <div class="login-wrapper">
+      <div class="login-container">
+        <div class="login-logo">
           <h2>COPY<span>FAST&</span>PRINT</h2>
-          <h5>Tu Solución Integral en Impresión y Personalización</h5>
         </div>
-        <!-- ✅ CORREGIDO: Clase "social-networks" (antes era inconsistente) -->
-        <div class="social-networks">
-          <a href="https://www.instagram.com/copyfastprint/" target="_blank">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a
-            href="https://www.facebook.com/profile.php?id=61578120201237"
-            target="_blank"
-          >
-            <i class="fab fa-facebook"></i>
-          </a>
-          <a href="https://co.pinterest.com/copyfastprint/" target="_blank">
-            <i class="fab fa-pinterest"></i>
-          </a>
-          <a href="https://www.tiktok.com/@copyfastprint" target="_blank">
-            <i class="fab fa-tiktok"></i>
+
+        <div class="login-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+
+        <h1 class="login-title">Acceso Restringido</h1>
+        <p class="login-subtitle">
+          Sistema de Registro de Ventas - Solo Personal Autorizado 🇻🇪
+        </p>
+
+        <div class="error-message" id="errorMessage">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Error:</strong>
+          <span id="errorText">Credenciales incorrectas</span>
+        </div>
+
+        <form class="login-form" id="loginForm">
+          <div class="form-group">
+            <label for="usuario">Usuario</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input
+                type="text"
+                id="usuario"
+                name="usuario"
+                placeholder="Ingresa tu usuario"
+                required
+                autocomplete="username"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="input-wrapper">
+              <i class="fas fa-key"></i>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login">
+            <i class="fas fa-sign-in-alt"></i>
+            Iniciar Sesión
+          </button>
+        </form>
+
+        <div class="security-notice">
+          <i class="fas fa-shield-alt"></i>
+          <strong>Seguridad:</strong> Este sistema está protegido. Los intentos
+          de acceso no autorizados son registrados.
+        </div>
+
+        <div class="back-home">
+          <a href="index.html">
+            <i class="fas fa-arrow-left"></i> Volver al inicio
           </a>
         </div>
-      </footer>
+      </div>
     </div>
 
-    <a href="#" id="scroll-to-top" class="scroll-to-top">
-      <i class="fas fa-chevron-up"></i>
-    </a>
-
-    <script src="js/scripts.js"></script>
-    <script src="js/registro-ventas.js"></script>
     <script>
-      // Botón de cerrar sesión
-      document.getElementById('btnCerrarSesion').addEventListener('click', function(e) {
-        e.preventDefault();
-        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-          sessionStorage.clear();
-          window.location.href = 'login-registro.html';
-        }
-      });
+      // Obtener elementos del DOM
+      const loginForm = document.getElementById("loginForm");
+      const errorMessage = document.getElementById("errorMessage");
+      const errorText = document.getElementById("errorText");
 
-      // Mostrar nombre del usuario logueado
-      const usuario = sessionStorage.getItem('usuario');
-      if (usuario) {
-        const userInfo = document.createElement('div');
-        userInfo.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 999;';
-        userInfo.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 0.5em;">
-            <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
-            <div>
-              <strong style="display: block; color: #222;">Usuario:</strong>
-              <span style="color: #666;">${usuario}</span>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(userInfo);
+      if (loginForm) {
+        loginForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const usuario = document.getElementById("usuario").value;
+          const password = document.getElementById("password").value;
+
+          // 1. Mostrar animación/bloqueo de formulario (opcional)
+          loginForm.style.opacity = "0.5";
+          loginForm.style.pointerEvents = "none";
+
+          // 2. Enviar los datos al servidor (Netlify Function)
+          try {
+            const response = await fetch("/.netlify/functions/validar-login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ usuario, password }),
+            });
+
+            const result = await response.json();
+
+            // 3. Manejar la respuesta del servidor
+            if (response.ok && result.success) {
+              // Login exitoso
+              sessionStorage.setItem("sesionActiva", "true");
+              sessionStorage.setItem("usuario", usuario);
+              sessionStorage.setItem("loginTime", new Date().toISOString());
+
+              setTimeout(() => {
+                // Redirigir a registro de ventas
+                window.location.href = "registro.html";
+              }, 500);
+            } else {
+              // Login fallido
+              mostrarError(result.error || "Error de verificación.");
+              document.getElementById("password").value = "";
+              document.getElementById("password").focus();
+            }
+          } catch (error) {
+            console.error("Error de conexión:", error);
+            mostrarError(
+              "Error: No se pudo conectar con el servicio de login."
+            );
+          } finally {
+            // Restaurar estado del formulario si el login falló
+            if (window.location.href.indexOf("registro.html") === -1) {
+              loginForm.style.opacity = "1";
+              loginForm.style.pointerEvents = "auto";
+            }
+          }
+        });
+
+        function mostrarError(mensaje) {
+          errorText.textContent = mensaje;
+          errorMessage.classList.add("show");
+
+          setTimeout(() => {
+            errorMessage.classList.remove("show");
+          }, 3000);
+        }
       }
+
+      // Limpiar campos al cargar
+      document.getElementById("usuario").value = "";
+      document.getElementById("password").value = "";
+
+      // Focus automático en el campo de usuario
+      document.getElementById("usuario").focus();
     </script>
   </body>
 </html>
