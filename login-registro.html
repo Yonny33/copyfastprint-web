@@ -111,8 +111,8 @@
     <!-- Verificación de sesión -->
     <script>
       // Redirigir si no hay sesión activa
-      if (sessionStorage.getItem("sesionActiva") !== "true") {
-        window.location.href = "login-registro.html";
+      if (sessionStorage.getItem('sesionActiva') !== 'true') {
+        window.location.href = 'login-registro.html';
       }
 
       // Auto-logout después de 2 horas de inactividad
@@ -121,17 +121,15 @@
         clearTimeout(inactivityTimer);
         inactivityTimer = setTimeout(() => {
           sessionStorage.clear();
-          alert(
-            "⚠️ Sesión expirada por inactividad. Por favor, inicia sesión nuevamente."
-          );
-          window.location.href = "login-registro.html";
+          alert('⚠️ Sesión expirada por inactividad. Por favor, inicia sesión nuevamente.');
+          window.location.href = 'login-registro.html';
         }, 2 * 60 * 60 * 1000); // 2 horas
       }
 
       // Detectar actividad del usuario
-      document.addEventListener("mousemove", resetTimer);
-      document.addEventListener("keypress", resetTimer);
-      document.addEventListener("click", resetTimer);
+      document.addEventListener('mousemove', resetTimer);
+      document.addEventListener('keypress', resetTimer);
+      document.addEventListener('click', resetTimer);
       resetTimer();
     </script>
 
@@ -158,7 +156,7 @@
             <li><a href="formulario.html">Cotización</a></li>
             <li><a href="especificaciones.html">¿Como Funciona?</a></li>
             <li>
-              <a href="#" id="btnCerrarSesion" style="color: #c60e0f">
+              <a href="#" id="btnCerrarSesion" style="color: #c60e0f;">
                 <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
               </a>
             </li>
@@ -176,10 +174,9 @@
           <h2>Registro de <span>Cliente y Venta</span></h2>
           <div class="divider"></div>
           <p>
-            <i class="fas fa-lock" style="color: #c60e0f"></i>
-            <strong>Sistema Protegido</strong> - Introduce los detalles de la
-            transacción. El sistema calculará automáticamente el crédito
-            pendiente.
+            <i class="fas fa-lock" style="color: #c60e0f;"></i>
+            <strong>Sistema Protegido</strong> - Introduce los detalles de la transacción. 
+            El sistema calculará automáticamente el crédito pendiente.
           </p>
         </section>
 
@@ -191,9 +188,7 @@
                 <legend>Datos del Cliente</legend>
 
                 <div class="form-group">
-                  <label for="cedula"
-                    >Cédula / ID (Identificador Único) *</label
-                  >
+                  <label for="cedula">Cédula / ID (Identificador Único) *</label>
                   <input
                     type="text"
                     id="cedula"
@@ -201,9 +196,7 @@
                     required
                     placeholder="Número de identificación"
                   />
-                  <p class="hint">
-                    Ingresa el documento de identidad del cliente
-                  </p>
+                  <p class="hint">Ingresa el documento de identidad del cliente</p>
                 </div>
 
                 <div class="form-group">
@@ -234,9 +227,7 @@
                 <legend>Detalles de la Venta</legend>
 
                 <div class="form-group">
-                  <label for="descripcion"
-                    >Producto / Descripción de la Venta *</label
-                  >
+                  <label for="descripcion">Producto / Descripción de la Venta *</label>
                   <textarea
                     id="descripcion"
                     name="descripcion"
@@ -250,9 +241,7 @@
                 <input type="hidden" name="divisa" value="VES" />
 
                 <div class="form-group">
-                  <label for="montoTotal"
-                    >Monto Total de la Venta (Bs.) *</label
-                  >
+                  <label for="montoTotal">Monto Total de la Venta (Bs.) *</label>
                   <input
                     type="number"
                     id="montoTotal"
@@ -262,15 +251,11 @@
                     step="0.01"
                     placeholder="500.00"
                   />
-                  <p class="hint">
-                    🇻🇪 Valor en <strong>Bolívares Venezolanos (VES)</strong>
-                  </p>
+                  <p class="hint">🇻🇪 Valor en <strong>Bolívares Venezolanos (VES)</strong></p>
                 </div>
 
                 <div class="form-group">
-                  <label for="montoPagado"
-                    >Monto Pagado al Contado (Bs.) *</label
-                  >
+                  <label for="montoPagado">Monto Pagado al Contado (Bs.) *</label>
                   <input
                     type="number"
                     id="montoPagado"
@@ -281,10 +266,7 @@
                     placeholder="200.00"
                     value="0"
                   />
-                  <p class="hint">
-                    Si pagó en su totalidad, ingresa el mismo valor del monto
-                    total
-                  </p>
+                  <p class="hint">Si pagó en su totalidad, ingresa el mismo valor del monto total</p>
                 </div>
 
                 <div class="alert-box">
@@ -292,9 +274,8 @@
                   <div>
                     <h4>Cálculo Automático de Crédito</h4>
                     <p>
-                      Si el <strong>Monto Pagado</strong> es menor al
-                      <strong>Monto Total</strong>, la venta se registrará
-                      automáticamente como <strong>Crédito Pendiente</strong>
+                      Si el <strong>Monto Pagado</strong> es menor al <strong>Monto Total</strong>, 
+                      la venta se registrará automáticamente como <strong>Crédito Pendiente</strong> 
                       y se calculará el saldo por cobrar.
                     </p>
                   </div>
@@ -318,8 +299,7 @@
             <div class="info-box highlight">
               <h3><i class="fas fa-calculator"></i> Resumen de Crédito</h3>
               <p>
-                El sistema calculará automáticamente en
-                <strong>Bolívares (VES)</strong>:
+                El sistema calculará automáticamente en <strong>Bolívares (VES)</strong>:
               </p>
               <ul class="tips-list">
                 <li>Monto Total de la venta</li>
@@ -332,24 +312,23 @@
             <div class="info-box">
               <h3><i class="fas fa-flag"></i> Divisa</h3>
               <p>
-                🇻🇪 Todas las transacciones se registran en
-                <strong>Bolívares Venezolanos (VES)</strong>
+                🇻🇪 Todas las transacciones se registran en <strong>Bolívares Venezolanos (VES)</strong>
               </p>
             </div>
 
             <div class="info-box">
               <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
               <p>
-                Los datos se almacenan de forma segura y solo son accesibles por
-                personal autorizado de COPYFAST&PRINT.
+                Los datos se almacenan de forma segura y solo son accesibles 
+                por personal autorizado de COPYFAST&PRINT.
               </p>
             </div>
 
             <div class="info-box">
               <h3><i class="fas fa-question-circle"></i> ¿Necesitas ayuda?</h3>
               <p>
-                Contacta al administrador del sistema si tienes dudas sobre el
-                registro de ventas.
+                Contacta al administrador del sistema si tienes dudas sobre 
+                el registro de ventas.
               </p>
               <a
                 href="https://wa.me/+5804120766642"
@@ -366,25 +345,10 @@
         <div
           id="loading-overlay"
           class="loading-overlay"
-          style="
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          "
+          style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column;"
         >
           <div class="spinner"></div>
-          <p style="margin-top: 1em; color: #666; font-weight: 600">
-            Registrando venta...
-          </p>
+          <p style="margin-top: 1em; color: #666; font-weight: 600;">Registrando venta...</p>
         </div>
       </main>
 
@@ -422,22 +386,19 @@
     <script src="js/registro-ventas.js"></script>
     <script>
       // Botón de cerrar sesión
-      document
-        .getElementById("btnCerrarSesion")
-        .addEventListener("click", function (e) {
-          e.preventDefault();
-          if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-            sessionStorage.clear();
-            window.location.href = "login-registro.html";
-          }
-        });
+      document.getElementById('btnCerrarSesion').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+          sessionStorage.clear();
+          window.location.href = 'login-registro.html';
+        }
+      });
 
       // Mostrar nombre del usuario logueado
-      const usuario = sessionStorage.getItem("usuario");
+      const usuario = sessionStorage.getItem('usuario');
       if (usuario) {
-        const userInfo = document.createElement("div");
-        userInfo.style.cssText =
-          "position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 999;";
+        const userInfo = document.createElement('div');
+        userInfo.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 999;';
         userInfo.innerHTML = `
           <div style="display: flex; align-items: center; gap: 0.5em;">
             <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>

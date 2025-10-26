@@ -1,4 +1,6 @@
 // netlify/functions/registrar-venta.js
+// Sistema de Registro de Ventas - COPYFAST&PRINT (Venezuela)
+// Divisa: Bolívares Venezolanos (VES) 🇻🇪
 
 exports.handler = async function (event, context) {
   // Configurar CORS
@@ -38,7 +40,6 @@ exports.handler = async function (event, context) {
       "telefono",
       "descripcion",
       "montoTotal",
-      "divisa",
     ];
     const missingFields = requiredFields.filter((field) => !data[field]);
 
@@ -53,15 +54,14 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // Validar divisa
-    const divisasValidas = ["COP", "USD", "VES", "EUR"];
-    if (!divisasValidas.includes(data.divisa)) {
+    // Asegurar que la divisa sea VES
+    if (data.divisa && data.divisa !== "VES") {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: "Divisa no válida. Use: COP, USD, VES o EUR",
+          error: "Este sistema solo acepta transacciones en Bolívares (VES)",
         }),
       };
     }
@@ -103,6 +103,7 @@ exports.handler = async function (event, context) {
       },
       venta: {
         descripcion: data.descripcion,
+        divisa: data.divisa,
         montoTotal: montoTotal.toFixed(2),
         montoPagado: montoPagado.toFixed(2),
         montoPendiente: data.montoPendiente,

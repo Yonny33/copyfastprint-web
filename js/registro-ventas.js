@@ -1,5 +1,5 @@
 // ==========================================================================
-// ===  LÓGICA DEL FORMULARIO DE REGISTRO DE VENTAS  ===
+// ===  LÓGICA DEL FORMULARIO DE REGISTRO DE VENTAS (VES)  ===
 // ==========================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,39 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingOverlay = document.getElementById("loading-overlay");
   const montoTotalInput = document.getElementById("montoTotal");
   const montoPagadoInput = document.getElementById("montoPagado");
-  const divisaSelect = document.getElementById("divisa");
-  const divisaHint = document.getElementById("divisaHint");
 
-  // Mapeo de símbolos de divisa
-  const divisaSymbols = {
-    COP: { symbol: "$", name: "Pesos Colombianos (COP)", flag: "🇨🇴" },
-    USD: { symbol: "$", name: "Dólares Americanos (USD)", flag: "🇺🇸" },
-    VES: { symbol: "Bs.", name: "Bolívares Venezolanos (VES)", flag: "🇻🇪" },
-    EUR: { symbol: "€", name: "Euros (EUR)", flag: "🇪🇺" },
-  };
-
-  // Actualizar hint cuando cambie la divisa
-  if (divisaSelect && divisaHint) {
-    divisaSelect.addEventListener("change", function () {
-      const selectedDivisa = this.value;
-      const divisaInfo = divisaSymbols[selectedDivisa];
-      divisaHint.innerHTML = `${divisaInfo.flag} Valor en <strong>${divisaInfo.name}</strong>`;
-
-      // Actualizar placeholder con símbolo correcto
-      if (selectedDivisa === "COP") {
-        montoTotalInput.placeholder = "150000";
-        montoPagadoInput.placeholder = "50000";
-      } else if (selectedDivisa === "USD") {
-        montoTotalInput.placeholder = "50.00";
-        montoPagadoInput.placeholder = "20.00";
-      } else if (selectedDivisa === "VES") {
-        montoTotalInput.placeholder = "500.00";
-        montoPagadoInput.placeholder = "200.00";
-      } else if (selectedDivisa === "EUR") {
-        montoTotalInput.placeholder = "45.00";
-        montoPagadoInput.placeholder = "20.00";
-      }
-    });
+  // Función para formatear números en VES
+  function formatVES(numero) {
+    return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   }
 
   // Función para mostrar loading
@@ -102,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const payload = {
         ...data,
+        divisa: "VES",
         montoTotal: montoTotal.toFixed(2),
         montoPagado: montoPagado.toFixed(2),
         montoPendiente: montoPendiente.toFixed(2),
@@ -126,27 +101,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 6. Manejar la respuesta
         if (response.ok && result.success) {
-          // Obtener símbolo de la divisa
-          const divisaSeleccionada = document.getElementById("divisa").value;
-          const simbolo = divisaSymbols[divisaSeleccionada].symbol;
-
-          // Mostrar mensaje de éxito
+          // Mostrar mensaje de éxito con formato VES
           alert(
             `✅ Venta registrada con éxito!\n\n` +
               `Estado: ${estadoCredito}\n` +
-              `Divisa: ${divisaSeleccionada}\n` +
-              `Monto Total: ${simbolo}${montoTotal.toFixed(2)}\n` +
-              `Monto Pagado: ${simbolo}${montoPagado.toFixed(2)}\n` +
-              `Saldo Pendiente: ${simbolo}${montoPendiente.toFixed(2)}`
+              `Divisa: Bolívares (VES) 🇻🇪\n` +
+              `Monto Total: ${formatVES(montoTotal)}\n` +
+              `Monto Pagado: ${formatVES(montoPagado)}\n` +
+              `Saldo Pendiente: ${formatVES(montoPendiente)}`
           );
 
           // Limpiar el formulario
           formulario.reset();
-
-          // Restaurar hint a COP (valor por defecto)
-          if (divisaHint) {
-            divisaHint.innerHTML = `🇨🇴 Valor en <strong>Pesos Colombianos (COP)</strong>`;
-          }
 
           // Opcional: Redirigir a una página de éxito
           // setTimeout(() => {
