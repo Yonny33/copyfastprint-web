@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control de Gastos - COPYFAST&PRINT</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/formulario.css" />
+    <link rel="stylesheet" href="css/especificaciones.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
+  </head>
+  <body>
+    <!-- Verificación de sesión -->
+    <script>
+      if (sessionStorage.getItem("sesionActiva") !== "true") {
+        window.location.href = "login-registro.html";
+      }
+    </script>
+
+    <header>
+      <nav class="navbar">
+        <div class="brand">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+        </div>
+        <ul class="menu" id="menu">
+          <li><a href="admin.html">Admin</a></li>
+          <li><a href="registro.html">Registro Ventas</a></li>
+          <li><a href="gastos.html" class="active">Gastos</a></li>
+          <li>
+            <a href="#" id="btnCerrarSesion" style="color: #c60e0f">
+              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+        <div class="toggle_menu">
+          <i class="fas fa-bars" id="toggle_open"></i>
+          <i class="fas fa-times" id="toggle_close"></i>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section-heading">
+        <h2>Control de <span>Gastos</span></h2>
+        <div class="divider"></div>
+        <p>
+          Registra y gestiona todos los egresos del negocio en Bolívares (VES)
+          🇻🇪
+        </p>
+      </section>
+
+      <div class="form-container">
+        <div class="form-wrapper">
+          <form id="gastos-form" class="cotizacion-form">
+            <fieldset class="form-section">
+              <legend>Información del Gasto</legend>
+
+              <div class="form-group">
+                <label for="categoria">Categoría del Gasto *</label>
+                <select id="categoria" name="categoria" required>
+                  <option value="">-- Selecciona una categoría --</option>
+                  <option value="materiales">📦 Materiales e Insumos</option>
+                  <option value="servicios">
+                    💡 Servicios (Luz, Agua, Internet)
+                  </option>
+                  <option value="mantenimiento">
+                    🔧 Mantenimiento y Reparaciones
+                  </option>
+                  <option value="transporte">
+                    🚗 Transporte y Combustible
+                  </option>
+                  <option value="nomina">👥 Nómina y Salarios</option>
+                  <option value="alquiler">🏠 Alquiler y Arriendo</option>
+                  <option value="marketing">📢 Marketing y Publicidad</option>
+                  <option value="otros">📝 Otros Gastos</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="descripcionGasto">Descripción del Gasto *</label>
+                <textarea
+                  id="descripcionGasto"
+                  name="descripcion"
+                  rows="3"
+                  required
+                  placeholder="Ej: Compra de 5 tintas para impresora, Pago de luz del mes, etc."
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="montoGasto">Monto del Gasto (Bs.) *</label>
+                <input
+                  type="number"
+                  id="montoGasto"
+                  name="monto"
+                  required
+                  min="0.01"
+                  step="0.01"
+                  placeholder="250.00"
+                />
+                <p class="hint">🇻🇪 Ingresa el monto en Bolívares (VES)</p>
+              </div>
+
+              <div class="form-group">
+                <label for="fechaGasto">Fecha del Gasto *</label>
+                <input type="date" id="fechaGasto" name="fecha" required />
+              </div>
+
+              <div class="form-group">
+                <label for="proveedor">Proveedor / Beneficiario</label>
+                <input
+                  type="text"
+                  id="proveedor"
+                  name="proveedor"
+                  placeholder="Nombre del proveedor (opcional)"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="metodoPago">Método de Pago *</label>
+                <select id="metodoPago" name="metodoPago" required>
+                  <option value="">-- Selecciona --</option>
+                  <option value="efectivo">💵 Efectivo</option>
+                  <option value="transferencia">
+                    🏦 Transferencia Bancaria
+                  </option>
+                  <option value="pago-movil">📱 Pago Móvil</option>
+                  <option value="tarjeta">💳 Tarjeta de Débito/Crédito</option>
+                  <option value="otro">🔄 Otro</option>
+                </select>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="recurrente" value="si" />
+                  <span class="checkbox-custom">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  Este es un gasto recurrente (mensual)
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Registrar Gasto
+              </button>
+              <button type="reset" class="btn-reset">
+                <i class="fas fa-redo"></i> Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="form-sidebar">
+          <div class="info-box highlight">
+            <h3><i class="fas fa-chart-pie"></i> Resumen del Día</h3>
+            <p><strong>Total de Gastos Hoy:</strong></p>
+            <div
+              style="
+                font-size: 1.8em;
+                color: #c60e0f;
+                font-weight: 700;
+                margin: 0.5em 0;
+              "
+            >
+              <span id="totalGastosDia">Bs. 0.00</span>
+            </div>
+            <p style="font-size: 0.85em; color: #666">
+              <i class="fas fa-receipt"></i>
+              <span id="cantidadGastos">0</span> gastos registrados
+            </p>
+          </div>
+
+          <div class="info-box">
+            <h3><i class="fas fa-calendar-month"></i> Resumen del Mes</h3>
+            <ul class="tips-list">
+              <li>Total gastado: <strong id="totalMes">Bs. 0.00</strong></li>
+              <li>
+                Categoría más alta: <strong id="categoriaMayor">-</strong>
+              </li>
+              <li>
+                Promedio diario: <strong id="promedioDia">Bs. 0.00</strong>
+              </li>
+            </ul>
+          </div>
+
+          <div class="info-box">
+            <h3><i class="fas fa-lightbulb"></i> Consejos</h3>
+            <ul class="tips-list">
+              <li>Registra gastos inmediatamente</li>
+              <li>Guarda los comprobantes físicos</li>
+              <li>Revisa el resumen mensual</li>
+              <li>Planifica gastos recurrentes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Gastos del Día -->
+      <div style="max-width: 1400px; margin: 3em auto; padding: 0 2em">
+        <div class="ventas-table">
+          <h3><i class="fas fa-list"></i> Gastos de Hoy</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Categoría</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+                <th>Método de Pago</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="gastosTableBody">
+              <tr>
+                <td
+                  colspan="6"
+                  style="text-align: center; padding: 2em; color: #999"
+                >
+                  No hay gastos registrados hoy
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div
+        id="loading-overlay"
+        class="loading-overlay"
+        style="
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(255, 255, 255, 0.95);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+        "
+      >
+        <div class="spinner"></div>
+        <p style="margin-top: 1em; color: #666; font-weight: 600">
+          Registrando gasto...
+        </p>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Control de Gastos - Sistema Administrativo</h5>
+      </div>
+    </footer>
+
+    <script src="js/scripts.js"></script>
+    <script>
+      // Establecer fecha actual por defecto
+      document.getElementById("fechaGasto").valueAsDate = new Date();
+
+      // Botón cerrar sesión
+      document
+        .getElementById("btnCerrarSesion")
+        ?.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+            sessionStorage.clear();
+            window.location.href = "login-registro.html";
+          }
+        });
+
+      // Función para formatear VES
+      function formatVES(numero) {
+        return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+
+      // Manejar envío del formulario
+      const gastosForm = document.getElementById("gastos-form");
+      const loadingOverlay = document.getElementById("loading-overlay");
+
+      if (gastosForm) {
+        gastosForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Mostrar loading
+          loadingOverlay.style.display = "flex";
+
+          // Recolectar datos
+          const formData = new FormData(gastosForm);
+          const data = Object.fromEntries(formData);
+
+          const payload = {
+            ...data,
+            monto: parseFloat(data.monto).toFixed(2),
+            divisa: "VES",
+            usuario: sessionStorage.getItem("usuario"),
+            fechaRegistro: new Date().toISOString(),
+          };
+
+          console.log("📊 Gasto a registrar:", payload);
+
+          try {
+            const response = await fetch(
+              "/.netlify/functions/registrar-gasto",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              alert(
+                `✅ Gasto registrado exitosamente!\n\nMonto: ${formatVES(
+                  data.monto
+                )}\nCategoría: ${data.categoria}`
+              );
+              gastosForm.reset();
+              document.getElementById("fechaGasto").valueAsDate = new Date();
+              cargarGastosDia();
+            } else {
+              throw new Error(result.error || "Error al registrar");
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert(`⚠️ Error al registrar el gasto:\n${error.message}`);
+          } finally {
+            loadingOverlay.style.display = "none";
+          }
+        });
+      }
+
+      // Cargar gastos del día
+      async function cargarGastosDia() {
+        // Aquí conectarías con la base de datos
+        // const gastos = await fetch('/.netlify/functions/obtener-gastos-dia').then(r => r.json());
+
+        // Datos de ejemplo
+        const gastos = [
+          {
+            id: 1,
+            hora: "10:30 AM",
+            categoria: "materiales",
+            descripcion: "Compra de 3 tintas para impresora Epson",
+            monto: 180.0,
+            metodoPago: "transferencia",
+          },
+          {
+            id: 2,
+            hora: "02:15 PM",
+            categoria: "servicios",
+            descripcion: "Pago de servicio de internet mensual",
+            monto: 95.0,
+            metodoPago: "pago-movil",
+          },
+        ];
+
+        const tbody = document.getElementById("gastosTableBody");
+
+        if (gastos.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align: center; padding: 2em; color: #999;">No hay gastos registrados hoy</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = gastos
+          .map(
+            (gasto) => `
+          <tr>
+            <td>${gasto.hora}</td>
+            <td><span style="text-transform: capitalize;">${getCategoriaIcon(
+              gasto.categoria
+            )} ${gasto.categoria}</span></td>
+            <td>${gasto.descripcion}</td>
+            <td><strong>${formatVES(gasto.monto)}</strong></td>
+            <td>${getMetodoPagoLabel(gasto.metodoPago)}</td>
+            <td>
+              <button onclick="eliminarGasto(${
+                gasto.id
+              })" style="background: #dc3545; color: #fff; border: none; padding: 0.5em 1em; border-radius: 5px; cursor: pointer;">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+
+        // Actualizar resumen
+        const totalDia = gastos.reduce((sum, g) => sum + g.monto, 0);
+        document.getElementById("totalGastosDia").textContent =
+          formatVES(totalDia);
+        document.getElementById("cantidadGastos").textContent = gastos.length;
+      }
+
+      function getCategoriaIcon(categoria) {
+        const iconos = {
+          materiales: "📦",
+          servicios: "💡",
+          mantenimiento: "🔧",
+          transporte: "🚗",
+          nomina: "👥",
+          alquiler: "🏠",
+          marketing: "📢",
+          otros: "📝",
+        };
+        return iconos[categoria] || "📝";
+      }
+
+      function getMetodoPagoLabel(metodo) {
+        const labels = {
+          efectivo: "💵 Efectivo",
+          transferencia: "🏦 Transferencia",
+          "pago-movil": "📱 Pago Móvil",
+          tarjeta: "💳 Tarjeta",
+          otro: "🔄 Otro",
+        };
+        return labels[metodo] || metodo;
+      }
+
+      function eliminarGasto(id) {
+        if (confirm("¿Estás seguro de eliminar este gasto?")) {
+          // Llamar a función para eliminar
+          console.log("Eliminando gasto:", id);
+          cargarGastosDia();
+        }
+      }
+
+      // Cargar datos al iniciar
+      cargarGastosDia();
+
+      // Cargar resumen del mes (simulado)
+      document.getElementById("totalMes").textContent = formatVES(3450.0);
+      document.getElementById("categoriaMayor").textContent = "Materiales";
+      document.getElementById("promedioDia").textContent = formatVES(115.0);
+    </script>
+  </body>
+</html>

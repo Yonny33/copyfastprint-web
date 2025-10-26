@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Administrativo - COPYFAST&PRINT</title>
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/formulario.css" />
+    <link rel="stylesheet" href="css/especificaciones.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
+    <style>
+      .admin-container {
+        max-width: 1600px;
+        margin: 2em auto;
+        padding: 0 2em;
+      }
+
+      .admin-header {
+        background: linear-gradient(135deg, #c60e0f 0%, #9c0b0c 100%);
+        color: #fff;
+        padding: 2em;
+        border-radius: 12px;
+        margin-bottom: 2em;
+        box-shadow: 0 4px 15px rgba(198, 14, 15, 0.2);
+      }
+
+      .admin-header h1 {
+        margin: 0 0 0.5em 0;
+        font-size: 2.2em;
+      }
+
+      .admin-header p {
+        margin: 0;
+        opacity: 0.9;
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1em;
+        margin-bottom: 2em;
+      }
+
+      .action-btn {
+        background: #fff;
+        padding: 1.5em;
+        border-radius: 12px;
+        text-align: center;
+        text-decoration: none;
+        color: #222;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+        border: 2px solid transparent;
+      }
+
+      .action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        border-color: #c60e0f;
+      }
+
+      .action-btn i {
+        font-size: 2.5em;
+        color: #c60e0f;
+        margin-bottom: 0.5em;
+        display: block;
+      }
+
+      .action-btn span {
+        font-weight: 600;
+        font-size: 1.1em;
+      }
+
+      .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5em;
+        margin-bottom: 3em;
+      }
+
+      .stat-box {
+        background: #fff;
+        padding: 2em;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: #c60e0f;
+      }
+
+      .stat-box.green::before { background: #28a745; }
+      .stat-box.yellow::before { background: #ffc107; }
+      .stat-box.blue::before { background: #17a2b8; }
+
+      .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1em;
+      }
+
+      .stat-icon {
+        font-size: 2em;
+        color: #c60e0f;
+      }
+
+      .stat-box.green .stat-icon { color: #28a745; }
+      .stat-box.yellow .stat-icon { color: #ffc107; }
+      .stat-box.blue .stat-icon { color: #17a2b8; }
+
+      .stat-value {
+        font-size: 2.5em;
+        font-weight: 700;
+        color: #222;
+        margin: 0.2em 0;
+      }
+
+      .stat-label {
+        color: #666;
+        font-size: 0.95em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-trend {
+        font-size: 0.85em;
+        margin-top: 0.5em;
+      }
+
+      .trend-up {
+        color: #28a745;
+      }
+
+      .trend-down {
+        color: #dc3545;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2em;
+        margin-bottom: 2em;
+      }
+
+      .card {
+        background: #fff;
+        padding: 2em;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5em;
+        padding-bottom: 1em;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .card-title {
+        font-size: 1.4em;
+        color: #222;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+      }
+
+      .card-title i {
+        color: #c60e0f;
+      }
+
+      .btn-link {
+        color: #c60e0f;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9em;
+        transition: color 0.3s;
+      }
+
+      .btn-link:hover {
+        color: #9c0b0c;
+        text-decoration: underline;
+      }
+
+      .activity-item {
+        padding: 1em;
+        border-left: 3px solid #e0e0e0;
+        margin-bottom: 1em;
+        background: #f9f9f9;
+        border-radius: 0 8px 8px 0;
+      }
+
+      .activity-time {
+        color: #999;
+        font-size: 0.85em;
+        margin-bottom: 0.3em;
+      }
+
+      .activity-description {
+        color: #333;
+        font-weight: 500;
+      }
+
+      .pending-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1em;
+        background: #fff3cd;
+        border-radius: 8px;
+        margin-bottom: 0.8em;
+        border-left: 4px solid #ffc107;
+      }
+
+      .pending-info {
+        flex: 1;
+      }
+
+      .pending-name {
+        font-weight: 600;
+        color: #222;
+      }
+
+      .pending-amount {
+        color: #856404;
+        font-size: 0.9em;
+      }
+
+      .btn-whatsapp {
+        background: #25d366;
+        color: #fff;
+        padding: 0.5em 1em;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9em;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .btn-whatsapp:hover {
+        background: #1ebe57;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 1024px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .stats-overview {
+          grid-template-columns: 1fr;
+        }
+
+        .quick-actions {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Verificación de sesión -->
+    <script>
+      if (sessionStorage.getItem("sesionActiva") !== "true") {
+        window.location.href = "login-registro.html";
+      }
+    </script>
+
+    <header>
+      <nav class="navbar">
+        <div class="brand">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+        </div>
+        <ul class="menu" id="menu">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="admin.html" class="active">Admin</a></li>
+          <li><a href="registro.html">Registro Ventas</a></li>
+          <li><a href="gastos.html">Gastos</a></li>
+          <li><a href="#" id="btnCerrarSesion" style="color: #c60e0f;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+          </a></li>
+        </ul>
+        <div class="toggle_menu">
+          <i class="fas fa-bars" id="toggle_open"></i>
+          <i class="fas fa-times" id="toggle_close"></i>
+        </div>
+      </nav>
+    </header>
+
+    <main class="admin-container">
+      <div class="admin-header">
+        <h1><i class="fas fa-chart-line"></i> Panel Administrativo</h1>
+        <p>Gestión y control de ventas, gastos e inventario - <span id="fechaHoy"></span></p>
+      </div>
+
+      <!-- Acciones Rápidas -->
+      <div class="quick-actions">
+        <a href="registro.html" class="action-btn">
+          <i class="fas fa-plus-circle"></i>
+          <span>Nueva Venta</span>
+        </a>
+        <a href="gastos.html" class="action-btn">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>Registrar Gasto</span>
+        </a>
+        <a href="reportes.html" class="action-btn">
+          <i class="fas fa-file-chart-line"></i>
+          <span>Ver Reportes</span>
+        </a>
+        <a href="inventario.html" class="action-btn">
+          <i class="fas fa-boxes"></i>
+          <span>Inventario</span>
+        </a>
+      </div>
+
+      <!-- Estadísticas Generales -->
+      <div class="stats-overview">
+        <div class="stat-box">
+          <div class="stat-header">
+            <span class="stat-label">Ventas del Día</span>
+            <i class="fas fa-shopping-cart stat-icon"></i>
+          </div>
+          <div class="stat-value" id="ventasDia">Bs. 0.00</div>
+          <div class="stat-trend trend-up">
+            <i class="fas fa-arrow-up"></i> +15% vs ayer
+          </div>
+        </div>
+
+        <div class="stat-box green">
+          <div class="stat-header">
+            <span class="stat-label">Ingresos del Mes</span>
+            <i class="fas fa-dollar-sign stat-icon"></i>
+          </div>
+          <div class="stat-value" id="ingresosMes">Bs. 0.00</div>
+          <div class="stat-trend trend-up">
+            <i class="fas fa-arrow-up"></i> +28% vs mes anterior
+          </div>
+        </div>
+
+        <div class="stat-box yellow">
+          <div class="stat-header">
+            <span class="stat-label">Créditos Pendientes</span>
+            <i class="fas fa-clock stat-icon"></i>
+          </div>
+          <div class="stat-value" id="creditosPendientes">Bs. 0.00</div>
+          <div class="stat-trend">
+            <i class="fas fa-users"></i> <span id="clientesPendientes">0</span> clientes
+          </div>
+        </div>
+
+        <div class="stat-box blue">
+          <div class="stat-header">
+            <span class="stat-label">Gastos del Día</span>
+            <i class="fas fa-receipt stat-icon"></i>
+          </div>
+          <div class="stat-value" id="gastosDia">Bs. 0.00</div>
+          <div class="stat-trend trend-down">
+            <i class="fas fa-arrow-down"></i> -5% vs ayer
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de Contenido -->
+      <div class="content-grid">
+        <!-- Actividad Reciente -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-history"></i>
+              Actividad Reciente
+            </h3>
+            <a href="registro.html" class="btn-link">Ver todas →</a>
+          </div>
+          <div id="actividadReciente">
+            <div class="activity-item">
+              <div class="activity-time">Hace 5 minutos</div>
+              <div class="activity-description">
+                <strong>María González</strong> - Venta registrada: Bs. 450.00 (20 suéteres)
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-time">Hace 1 hora</div>
+              <div class="activity-description">
+                <strong>Gasto registrado</strong> - Compra de tinta: Bs. 180.00
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-time">Hace 3 horas</div>
+              <div class="activity-description">
+                <strong>Juan Pérez</strong> - Abono a crédito: Bs. 200.00
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Créditos Por Cobrar -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-exclamation-triangle"></i>
+              Créditos Por Cobrar
+            </h3>
+          </div>
+          <div id="creditosPorCobrar">
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-name">Ana Rodríguez</div>
+                <div class="pending-amount">Debe: Bs. 350.00</div>
+              </div>
+              <a href="#" class="btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Recordar
+              </a>
+            </div>
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-name">Carlos Mendoza</div>
+                <div class="pending-amount">Debe: Bs. 180.00</div>
+              </div>
+              <a href="#" class="btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Recordar
+              </a>
+            </div>
+            <div class="pending-item">
+              <div class="pending-info">
+                <div class="pending-name">Empresa ABC</div>
+                <div class="pending-amount">Debe: Bs. 1,200.00</div>
+              </div>
+              <a href="#" class="btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Recordar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Sistema de Gestión Administrativa - Venezuela 🇻🇪</h5>
+      </div>
+    </footer>
+
+    <script src="js/scripts.js"></script>
+    <script>
+      // Mostrar fecha actual
+      const hoy = new Date();
+      document.getElementById('fechaHoy').textContent = hoy.toLocaleDateString('es-VE', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Botón cerrar sesión
+      document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+          sessionStorage.clear();
+          window.location.href = 'login-registro.html';
+        }
+      });
+
+      // Función para formatear VES
+      function formatVES(numero) {
+        return `Bs. ${parseFloat(numero).toLocaleString('es-VE', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}`;
+      }
+
+      // Cargar datos del dashboard (simulado - conectar con base de datos)
+      async function cargarDashboard() {
+        // Aquí conectarías con tu base de datos
+        // const datos = await fetch('/.netlify/functions/obtener-dashboard').then(r => r.json());
+        
+        // Datos de ejemplo
+        const datos = {
+          ventasDia: 2450.50,
+          ingresosMes: 45780.00,
+          creditosPendientes: 8930.00,
+          gastosDia: 650.00,
+          clientesPendientes: 12
+        };
+
+        document.getElementById('ventasDia').textContent = formatVES(datos.ventasDia);
+        document.getElementById('ingresosMes').textContent = formatVES(datos.ingresosMes);
+        document.getElementById('creditosPendientes').textContent = formatVES(datos.creditosPendientes);
+        document.getElementById('gastosDia').textContent = formatVES(datos.gastosDia);
+        document.getElementById('clientesPendientes').textContent = datos.clientesPendientes;
+      }
+
+      // Cargar datos al iniciar
+      cargarDashboard();
+    </script>
+  </body>
+</html>
