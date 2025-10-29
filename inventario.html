@@ -4,12 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventario y Stock - COPYFAST&PRINT</title>
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/formulario.css" />
     <link rel="stylesheet" href="css/especificaciones.css" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
-    
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
+
     <style>
       /* Estilos específicos para inventario */
       .admin-container {
@@ -18,14 +26,14 @@
         padding: 0 2em;
       }
       .inventory-controls {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5em;
-          padding: 1em;
-          background: #fff;
-          border-radius: 8px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5em;
+        padding: 1em;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       }
       .inventory-table-container {
         overflow-x: auto;
@@ -38,7 +46,8 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         overflow: hidden;
       }
-      .inventory-table th, .inventory-table td {
+      .inventory-table th,
+      .inventory-table td {
         padding: 1em 1.5em;
         text-align: left;
         border-bottom: 1px solid #eee;
@@ -96,7 +105,7 @@
           <li><a href="registro.html">Ventas</a></li>
           <li><a href="gastos.html">Gastos</a></li>
           <li><a href="reportes.html">Reportes</a></li>
-          <li class="active"><a href="inventario.html">Inventario</a></li>
+          <li><a href="inventario.html" class="active">Inventario</a></li>
           <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
         </ul>
         <div class="toggle-menu">
@@ -108,13 +117,26 @@
 
     <div class="admin-container">
       <div class="section-heading">
-        <h1 style="color: #c60e0f"><i class="fas fa-boxes"></i> Inventario y Stock</h1>
+        <h1 style="color: #c60e0f">
+          <i class="fas fa-boxes"></i> Inventario y Stock
+        </h1>
         <p>Control de materiales, insumos y productos terminados.</p>
       </div>
 
       <div class="inventory-controls">
-          <input type="text" placeholder="Buscar material o código..." style="padding: 0.5em; border: 1px solid #ccc; border-radius: 5px; width: 300px;">
-          <button class="btn-add"><i class="fas fa-plus-circle"></i> Agregar Material</button>
+        <input
+          type="text"
+          placeholder="Buscar material o código..."
+          style="
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+          "
+        />
+        <button class="btn-add">
+          <i class="fas fa-plus-circle"></i> Agregar Material
+        </button>
       </div>
 
       <div class="inventory-table-container">
@@ -130,8 +152,7 @@
               <th>Acciones</th>
             </tr>
           </thead>
-          <tbody id="inventario-body">
-            </tbody>
+          <tbody id="inventario-body"></tbody>
         </table>
       </div>
     </div>
