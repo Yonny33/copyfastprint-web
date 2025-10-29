@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reportes y Análisis - COPYFAST&PRINT</title>
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/formulario.css" />
+    <link rel="stylesheet" href="css/especificaciones.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+      /* Estilos específicos para reportes, adaptando el patrón de admin.html */
+      .admin-container {
+        max-width: 1600px;
+        margin: 2em auto;
+        padding: 0 2em;
+      }
+      .report-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 2em;
+        margin-top: 2em;
+      }
+      .chart-card {
+        background: #fff;
+        padding: 1.5em;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      if (sessionStorage.getItem("sesionActiva") !== "true") {
+        window.location.href = "login-registro.html";
+      }
+    </script>
+
+    <header>
+      <nav class="navbar">
+        <div class="brand">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+        </div>
+        <ul class="menu" id="menu">
+          <li><a href="admin.html">Dashboard</a></li>
+          <li><a href="registro.html">Ventas</a></li>
+          <li><a href="gastos.html">Gastos</a></li>
+          <li class="active"><a href="reportes.html">Reportes</a></li>
+          <li><a href="inventario.html">Inventario</a></li>
+          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
+        </ul>
+        <div class="toggle-menu">
+          <i class="fas fa-bars" id="toggle_open"></i>
+          <i class="fas fa-times" id="toggle_close" style="display: none"></i>
+        </div>
+      </nav>
+    </header>
+
+    <div class="admin-container">
+      <div class="section-heading">
+        <h1 style="color: #c60e0f">
+          <i class="fas fa-chart-line"></i> Reportes y Análisis
+        </h1>
+        <p>Visualización de métricas financieras y operativas del negocio.</p>
+      </div>
+
+      <div class="report-grid">
+        <div class="chart-card">
+          <h3>Ventas vs. Gastos (Últimos 6 meses)</h3>
+          <canvas id="ventasGastosChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Top 5 Categorías de Gasto</h3>
+          <canvas id="gastosCategoriaChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Estado de Créditos Pendientes</h3>
+          <canvas id="creditosChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Ventas por Tipo de Servicio</h3>
+          <canvas id="servicioChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/scripts.js"></script>
+    <script src="js/reportes.js"></script>
+  </body>
+</html>
