@@ -3,8 +3,8 @@
 // Las credenciales deben almacenarse de forma segura
 // en las variables de entorno de Netlify (Configuración -> Build & deploy -> Environment)
 // NO las dejes aquí directamente, aunque por ahora es mejor que en el frontend.
-const USUARIO_SEGURO = process.env.LOGIN_USUARIO || "cf_admin";
-const PASSWORD_SEGURO = process.env.LOGIN_PASSWORD || "copiassublimacion2024*";
+const USUARIO_SEGURO = process.env.LOGIN_USUARIO || "cfp_admin";
+const PASSWORD_SEGURO = process.env.LOGIN_PASSWORD || "copiassublimaciondtf2024*";
 
 // Define un manejador de peticiones para Netlify
 exports.handler = async (event, context) => {
