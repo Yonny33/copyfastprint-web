@@ -1,16 +1,76 @@
 // netlify/functions/registrar-gasto.js
 const fetch = require("node-fetch");
 
-// Variables de entorno
-const API_KEY = process.env.AIRTABLE_API_KEY;
-const BASE_ID = process.env.AIRTABLE_BASE_ID;
-const TABLE_NAME = process.env.AIRTABLE_TABLE_GASTOS; // << USAMOS LA TABLA GASTOS
-const AIRTABLE_API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+// ==========================================================================
+// 🔑 CONFIGURACIÓN DE AIRTABLE
+// ==========================================================================
+const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+// Usamos el nombre de tabla que nos indicaste: "Gastos"
+const AIRTABLE_TABLE_NAME = "Gastos";
+
+// ==========================================================================
+// 💾 FUNCIÓN AUXILIAR: Guardar en Airtable
+// ==========================================================================
+async function guardarEnAirtable(gasto) {
+  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
+    throw new Error(
+      "Error de configuración del servidor: Las claves de Airtable no están configuradas."
+    );
+  }
+
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_TABLE_NAME
+  )}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      records: [
+        {
+          fields: {
+            // Mapeo de campos de 'gasto' a los campos de la tabla 'Gastos' en Airtable
+            "ID Gasto": gasto.id,
+            "Fecha Registro": gasto.fechaRegistro,
+            Categoría: gasto.categoria,
+            Descripción: gasto.descripcion,
+            Monto: parseFloat(gasto.monto), // Aseguramos que es un número
+            "Fecha del Gasto": gasto.fecha, // Fecha del formulario
+            "Método Pago": gasto.metodoPago,
+            Proveedor: gasto.proveedor,
+            Recurrente: gasto.recurrente ? "Sí" : "No", // Convertir booleano a texto
+            Divisa: gasto.divisa,
+            Usuario: gasto.usuario,
+          },
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorDetails = await response.json().catch(() => response.statusText);
+    throw new Error(
+      `Error al guardar en Airtable. Código: ${
+        response.status
+      }. Detalles: ${JSON.stringify(errorDetails)}`
+    );
+  }
+
+  return await response.json();
+}
+
+// ==========================================================================
+// 🚀 EXPORTACIÓN DEL HANDLER PRINCIPAL
+// ==========================================================================
 
 exports.handler = async function (event, context) {
   const headers = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Content-Type": "application/json",
   };
@@ -24,19 +84,6 @@ exports.handler = async function (event, context) {
       statusCode: 405,
       headers,
       body: JSON.stringify({ error: "Método no permitido" }),
-    };
-  }
-
-  // 0. Verificar la configuración de Airtable
-  if (!API_KEY || !BASE_ID || !TABLE_NAME) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error:
-          "Error de configuración: Faltan variables de entorno de Airtable.",
-      }),
     };
   }
 
@@ -76,76 +123,44 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // 2. Preparar datos para Airtable (Estructura de la tabla)
+    // 2. Preparar datos para guardar
     const gasto = {
       id: `GASTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       fechaRegistro: new Date().toISOString(),
       categoria: data.categoria,
       descripcion: data.descripcion,
-      monto: monto, // Airtable espera un número
+      monto: monto.toFixed(2),
       fecha: data.fecha,
       metodoPago: data.metodoPago,
       proveedor: data.proveedor || null,
-      recurrente: data.recurrente === "si" || false,
+      recurrente: data.recurrente === "si",
       divisa: "VES",
       usuario: data.usuario || "admin",
     };
 
-    // 3. 🎯 Guardar en Airtable
-    const airtableResponse = await fetch(AIRTABLE_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        records: [
-          {
-            fields: {
-              id: gasto.id,
-              fechaRegistro: gasto.fechaRegistro,
-              categoria: gasto.categoria,
-              descripcion: gasto.descripcion,
-              monto: gasto.monto,
-              fecha: gasto.fecha,
-              metodoPago: gasto.metodoPago,
-              proveedor: gasto.proveedor,
-              recurrente: gasto.recurrente,
-              divisa: gasto.divisa,
-              usuario: gasto.usuario,
-            },
-          },
-        ],
-      }),
-    });
+    console.log("💸 Gasto registrado:", gasto);
 
-    const airtableResult = await airtableResponse.json();
+    // 3. Guardar en Airtable
+    await guardarEnAirtable(gasto);
 
-    if (!airtableResponse.ok) {
-      console.error("❌ Error de Airtable:", airtableResult);
-      throw new Error(
-        airtableResult.error?.message || "Error al guardar el gasto en Airtable"
-      );
-    }
-
+    // 4. Respuesta de éxito
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Gasto registrado exitosamente en Airtable",
-        gastoId: gasto.id,
-        airtableRecordId: airtableResult.records[0]?.id,
+        message: "Gasto registrado exitosamente",
+        gasto: gasto,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en registrar-gasto:", error);
+    console.error("❌ Error en la función registrar-gasto:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: "Error interno del servidor al intentar guardar el gasto.",
+        error: "Error interno del servidor",
         details: error.message,
       }),
     };

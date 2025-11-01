@@ -1,15 +1,12 @@
 // netlify/functions/registrar-venta.js
-// Sistema de Registro de Ventas - COPYFAST&PRINT (Venezuela)
-// Divisa: Bolívares Venezolanos (VES) 🇻🇪
-
-const fetch = require("node-fetch"); // Requerido para hacer la petición a la API de Airtable
+const fetch = require("node-fetch");
 
 // ==========================================================================
 // 🔑 CONFIGURACIÓN DE AIRTABLE
 // ==========================================================================
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-// ❗ Asegúrate de que el nombre de tu tabla sea exactamente este:
+// Usamos el nombre de tabla que nos indicaste: "Ventas"
 const AIRTABLE_TABLE_NAME = "Ventas";
 
 // ==========================================================================
@@ -37,17 +34,17 @@ async function guardarEnAirtable(venta) {
         {
           fields: {
             // Mapeo de campos de 'venta' a los campos de la tabla 'Ventas' en Airtable
-            "ID Venta": venta.id, // Campo de texto/ID en Airtable
-            "Fecha Registro": venta.fechaRegistro, // Campo de fecha/DateTime
+            "ID Venta": venta.id,
+            "Fecha Registro": venta.fechaRegistro,
             "Cédula Cliente": venta.cliente.cedula,
             "Nombre Cliente": venta.cliente.nombre,
             "Teléfono Cliente": venta.cliente.telefono,
             Descripción: venta.descripcion,
-            "Monto Total": venta.montoTotal, // Campo de número/moneda
-            "Monto Pagado": venta.montoPagado, // Campo de número/moneda
-            "Monto Pendiente": venta.montoPendiente, // Campo de número/moneda
-            "Estado Crédito": venta.estadoCredito, // Campo de selección simple (o fórmula)
-            "Método Pago": venta.metodoPago, // Campo de selección simple
+            "Monto Total": parseFloat(venta.montoTotal), // Aseguramos que es un número
+            "Monto Pagado": parseFloat(venta.montoPagado), // Aseguramos que es un número
+            "Monto Pendiente": parseFloat(venta.montoPendiente), // Aseguramos que es un número
+            "Estado Crédito": venta.estadoCredito,
+            "Método Pago": venta.metodoPago,
             Usuario: venta.usuario,
           },
         },
@@ -183,7 +180,7 @@ exports.handler = async function (event, context) {
       montoPendiente: montoPendiente.toFixed(2),
       estadoCredito: estadoCredito,
       metodoPago: data.metodoPago,
-      usuario: data.usuario || "admin", // Asignar un usuario por defecto si no viene
+      usuario: data.usuario || "admin",
     };
 
     console.log("💰 Venta registrada:", venta);
