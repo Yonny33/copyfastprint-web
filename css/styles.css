@@ -1039,3 +1039,41 @@ header {
   opacity: 1;
   visibility: visible;
 }
+/* Estilos para las celdas de acciones */
+.actions-cell {
+  white-space: nowrap; /* Evita saltos de línea en los botones */
+  text-align: center;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 0.4em;
+  margin: 0 0.2em;
+  border-radius: 4px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Botón de Editar */
+.edit-btn {
+  color: #2196f3; /* Azul */
+}
+
+.edit-btn:hover {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+/* Botón de Eliminar */
+.delete-btn {
+  color: #f44336; /* Rojo */
+}
+
+.delete-btn:hover {
+  background: rgba(244, 67, 54, 0.1);
+}

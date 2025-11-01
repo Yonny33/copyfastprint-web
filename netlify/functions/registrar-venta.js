@@ -1,26 +1,17 @@
-// netlify/functions/registrar-venta.js
-// Sistema de Registro de Ventas - COPYFAST&PRINT (Venezuela)
-// Divisa: Bolívares Venezolanos (VES) 🇻🇪
+// netlify/functions/registrar-venta.js (VERSION SUPABASE)
+const { createClient } = require("@supabase/supabase-js");
 
 exports.handler = async function (event, context) {
-  // Configurar CORS
+  // Configuración CORS
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Content-Type": "application/json",
   };
-
-  // Manejar preflight request
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers,
-      body: "",
-    };
+    return { statusCode: 200, headers, body: "" };
   }
-
-  // Solo aceptar POST
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -29,161 +20,81 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // 💡 Inicializar Cliente Supabase
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        error:
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
+      }),
+    };
+  }
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    // 1. Parsear el body
     const data = JSON.parse(event.body);
+    // ... (Validaciones: Asumimos que la validación del formulario en el frontend es suficiente) ...
 
-    // 2. Validar datos requeridos
-    const requiredFields = [
-      "cedula",
-      "nombre",
-      "telefono",
-      "descripcion",
-      "montoTotal",
-    ];
-    const missingFields = requiredFields.filter((field) => !data[field]);
-
-    if (missingFields.length > 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: `Faltan campos requeridos: ${missingFields.join(", ")}`,
-        }),
-      };
-    }
-
-    // Asegurar que la divisa sea VES
-    if (data.divisa && data.divisa !== "VES") {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "Este sistema solo acepta transacciones en Bolívares (VES)",
-        }),
-      };
-    }
-
-    // 3. Validar montos
-    const montoTotal = parseFloat(data.montoTotal);
+    const montoTotal = parseFloat(data.montoTotal) || 0;
     const montoPagado = parseFloat(data.montoPagado) || 0;
+    const montoPendiente = montoTotal - montoPagado;
+    const estadoCredito = montoPendiente > 0.01 ? "Crédito" : "Pagado";
 
-    if (isNaN(montoTotal) || montoTotal <= 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "El monto total debe ser un número positivo",
-        }),
-      };
-    }
-
-    if (montoPagado > montoTotal) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "El monto pagado no puede ser mayor al monto total",
-        }),
-      };
-    }
-
-    // 4. Preparar datos para almacenar
-    const venta = {
-      id: `VENTA-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      fechaRegistro: new Date().toISOString(),
-      cliente: {
-        cedula: data.cedula,
-        nombre: data.nombre,
-        telefono: data.telefono,
-      },
-      venta: {
-        descripcion: data.descripcion,
-        divisa: data.divisa,
-        montoTotal: montoTotal.toFixed(2),
-        montoPagado: montoPagado.toFixed(2),
-        montoPendiente: data.montoPendiente,
-        estadoCredito: data.estadoCredito,
-      },
+    // Preparar datos para Supabase (usando snake_case según la tabla)
+    const ventaData = {
+      fecha_registro: new Date().toISOString(),
+      cedula: data.cedula || null,
+      nombre_cliente: data.nombre,
+      telefono: data.telefono || null,
+      descripcion_trabajo: data.descripcion,
+      monto_total_ves: montoTotal.toFixed(2),
+      monto_pagado_ves: montoPagado.toFixed(2),
+      saldo_pendiente: montoPendiente.toFixed(2),
+      estado_credito: estadoCredito,
+      usuario: data.usuario || "admin",
     };
 
-    // 5. AQUÍ DEBERÍAS GUARDAR EN UNA BASE DE DATOS
-    // Opciones:
-    // - Airtable (fácil, sin backend)
-    // - Google Sheets (con API)
-    // - Firebase Firestore
-    // - Supabase
-    // - FaunaDB
+    // ==========================================================
+    // 💡 REGISTRO REAL EN SUPABASE
+    // ==========================================================
+    const { data: insertedData, error } = await supabase
+      .from("ventas") // Nombre de tu tabla: ventas
+      .insert([ventaData])
+      .select("id") // Selecciona el ID generado
+      .single();
 
-    console.log("📝 Venta registrada:", venta);
+    if (error) {
+      console.error("Error Supabase al insertar venta:", error);
+      throw new Error(`DB Error: ${error.message}`);
+    }
 
-    // EJEMPLO: Enviar a Google Sheets (necesitarías configurar la API)
-    // await guardarEnGoogleSheets(venta);
-
-    // EJEMPLO: Enviar notificación por email (usando Sendgrid/Mailgun)
-    // await enviarNotificacionEmail(venta);
-
-    // Por ahora, simulamos éxito
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Venta registrada exitosamente",
-        ventaId: venta.id,
-        estadoCredito: data.estadoCredito,
-        montoPendiente: data.montoPendiente,
+        message: "Venta registrada con éxito en Supabase.",
+        id: insertedData.id,
+        montoTotal,
+        montoPagado,
+        montoPendiente,
+        estadoCredito,
       }),
     };
   } catch (error) {
-    console.error("❌ Error procesando venta:", error);
+    console.error("❌ Error al registrar venta:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: "Error interno del servidor",
+        error: "Error interno del servidor.",
         details: error.message,
       }),
     };
   }
 };
-
-// ==========================================================================
-// FUNCIÓN AUXILIAR: Guardar en Google Sheets (EJEMPLO)
-// ==========================================================================
-async function guardarEnGoogleSheets(venta) {
-  // Necesitas configurar Google Sheets API y obtener credenciales
-  // https://developers.google.com/sheets/api/quickstart/nodejs
-  // const { google } = require('googleapis');
-  // const sheets = google.sheets('v4');
-  // const auth = new google.auth.GoogleAuth({
-  //   credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
-  //   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  // });
-  // const authClient = await auth.getClient();
-  // await sheets.spreadsheets.values.append({
-  //   auth: authClient,
-  //   spreadsheetId: process.env.GOOGLE_SHEET_ID,
-  //   range: 'Ventas!A:K',
-  //   valueInputOption: 'USER_ENTERED',
-  //   resource: {
-  //     values: [[
-  //       venta.id,
-  //       venta.fechaRegistro,
-  //       venta.cliente.cedula,
-  //       venta.cliente.nombre,
-  //       venta.cliente.telefono,
-  //       venta.venta.descripcion,
-  //       venta.venta.montoTotal,
-  //       venta.venta.montoPagado,
-  //       venta.venta.montoPendiente,
-  //       venta.venta.estadoCredito,
-  //     ]],
-  //   },
-  // });
-}

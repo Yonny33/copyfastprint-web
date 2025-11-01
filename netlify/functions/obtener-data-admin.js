@@ -1,4 +1,6 @@
 // netlify/functions/obtener-data-admin.js
+const { createClient } = require("@supabase/supabase-js");
+
 exports.handler = async function (event, context) {
   const headers = {
     "Access-Control-Allow-Origin": "*",
@@ -10,7 +12,6 @@ exports.handler = async function (event, context) {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
-
   if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
@@ -19,114 +20,74 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // 💡 Inicializar Cliente Supabase
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        error:
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
+      }),
+    };
+  }
+  // Usamos la Service Key para que pueda leer, filtrar y ordenar sin problemas
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   try {
-    const { type } = event.queryStringParameters;
+    // Ejecutar las tres consultas en paralelo para mayor velocidad
+    const [
+      { data: ventas, error: errorVentas },
+      { data: gastos, error: errorGastos },
+      { data: inventario, error: errorInventario },
+    ] = await Promise.all([
+      // 1. Obtener ventas del último año (o las 500 más recientes)
+      supabase
+        .from("ventas")
+        .select("*")
+        .order("fecha_registro", { ascending: false })
+        .limit(500),
+      // 2. Obtener gastos del último año (o los 500 más recientes)
+      supabase
+        .from("gastos")
+        .select("*")
+        .order("fecha_registro", { ascending: false })
+        .limit(500),
+      // 3. Obtener todo el inventario
+      supabase
+        .from("inventario")
+        .select("*")
+        .order("material", { ascending: true }),
+    ]);
 
-    if (!type) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          error: "Falta el parámetro 'type' (reporte o inventario)",
-        }),
-      };
-    }
+    if (errorVentas) throw new Error(errorVentas.message);
+    if (errorGastos) throw new Error(errorGastos.message);
+    if (errorInventario) throw new Error(errorInventario.message);
 
-    let data = {};
-
-    // ==========================================================
-    // SIMULACIÓN DE DATOS DE REPORTE
-    // ==========================================================
-    if (type === "reporte") {
-      data = {
-        success: true,
-        reporteMensual: {
-          labels: ["Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre"],
-          ventas: [8500, 12000, 15500, 14000, 18200, 20100],
-          gastos: [3500, 4100, 5800, 4900, 6100, 7500],
-        },
-        gastosCategoria: [
-          { categoria: "Materiales", monto: 4500 },
-          { categoria: "Nómina", monto: 2500 },
-          { categoria: "Servicios", monto: 1200 },
-          { categoria: "Mantenimiento", monto: 900 },
-          { categoria: "Marketing", monto: 500 },
-        ],
-        creditosPendientes: 8930.0, // De admin.html
-        ventasPorServicio: {
-          labels: ["DTF", "Sublimación", "Copias/Impresión"],
-          valores: [40, 35, 25], // Porcentaje de ventas
-        },
-      };
-    }
-
-    // ==========================================================
-    // SIMULACIÓN DE DATOS DE INVENTARIO
-    // ==========================================================
-    else if (type === "inventario") {
-      data = {
-        success: true,
-        items: [
-          {
-            codigo: "MAT-001",
-            material: "Tinta de Sublimación (Litro)",
-            tipo: "Insumo",
-            stock: 15,
-            unidad: "Litros",
-            stockMinimo: 5,
-          },
-          {
-            codigo: "MAT-002",
-            material: "Papel DTF (Metro)",
-            tipo: "Insumo",
-            stock: 2,
-            unidad: "Metros",
-            stockMinimo: 10,
-          },
-          {
-            codigo: "PROD-010",
-            material: "Taza Blanca 11oz",
-            tipo: "Producto",
-            stock: 120,
-            unidad: "Unidades",
-            stockMinimo: 50,
-          },
-          {
-            codigo: "PROD-011",
-            material: "Camiseta Poliéster S",
-            tipo: "Producto",
-            stock: 5,
-            unidad: "Unidades",
-            stockMinimo: 20,
-          },
-          {
-            codigo: "MAT-003",
-            material: "Filamento PLA Negro",
-            tipo: "Insumo",
-            stock: 30,
-            unidad: "Metros",
-            stockMinimo: 15,
-          },
-        ],
-      };
-    }
-
-    // AQUÍ: Conexión real a la base de datos (Google Sheets, Airtable, etc.)
-    // La función que uses debe filtrar y devolver solo los datos pedidos por 'type'.
-
+    // Devolver los datos consolidados
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        success: true,
+        data: {
+          ventas: ventas,
+          gastos: gastos,
+          inventario: inventario,
+        },
+      }),
     };
   } catch (error) {
-    console.error("Error en la función Netlify:", error);
+    console.error("❌ Error al obtener datos de Supabase:", error.message);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
         error: "Error interno del servidor al obtener datos.",
+        details: error.message,
       }),
     };
   }
