@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <!-- Google Tag Manager -->
     <script>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
@@ -14,7 +13,6 @@
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-5Q94FLN3");
     </script>
-    <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -92,325 +90,195 @@
       sizes="180x180"
       href="/favicons/apple-icon-180x180.png"
     />
-    <link rel="manifest" href="/favicons/manifest.json" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta
-      name="msapplication-TileImage"
-      content="/favicons/ms-icon-144x144.png"
-    />
-    <meta name="theme-color" content="#ffffff" />
+
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/formulario.css" />
-    <link rel="stylesheet" href="css/especificaciones.css" />
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
     />
   </head>
   <body>
-    <!-- Verificación de sesión -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="loader"></div>
+      <p>Registrando venta...</p>
+    </div>
+
     <script>
-      // Redirigir si no hay sesión activa
+      // Verifica la sesión antes de cargar el contenido
       if (sessionStorage.getItem("sesionActiva") !== "true") {
         window.location.href = "login-registro.html";
       }
-
-      // Auto-logout después de 2 horas de inactividad
-      let inactivityTimer;
-      function resetTimer() {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = setTimeout(() => {
-          sessionStorage.clear();
-          alert(
-            "⚠️ Sesión expirada por inactividad. Por favor, inicia sesión nuevamente."
-          );
-          window.location.href = "login-registro.html";
-        }, 2 * 60 * 60 * 1000); // 2 horas
-      }
-
-      // Detectar actividad del usuario
-      document.addEventListener("mousemove", resetTimer);
-      document.addEventListener("keypress", resetTimer);
-      document.addEventListener("click", resetTimer);
-      resetTimer();
     </script>
 
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-      <iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <div class="wrapper">
-      <header>
-        <nav class="navbar">
-          <div class="brand">
-            <h2>COPY<span>FAST&</span>PRINT</h2>
-          </div>
-          <ul class="menu" id="menu">
-            <li><a href="admin.html">Admin</a></li>
-            <li><a href="registro.html" class="active">Registro Ventas</a></li>
-            <li><a href="gastos.html" >Gastos</a></li>
-            <li>
-              <a href="#" id="btnCerrarSesion" style="color: #c60e0f">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-              </a>
-            </li>
-          </ul>
-          <!-- ✅ CORREGIDO: Clase "toggle_menu" en lugar de "toggle" -->
-          <div class="toggle_menu">
-            <i class="fas fa-bars" id="toggle_open"></i>
-            <i class="fas fa-times" id="toggle_close"></i>
-          </div>
-        </nav>
-      </header>
+    <header>
+      <nav class="navbar">
+        <div class="brand">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+        </div>
+        <ul class="menu" id="menu">
+          <li><a href="admin.html">Admin</a></li>
+          <li><a href="registro.html">Registro Ventas</a></li>
+          <li><a href="gastos.html">Control de Gastos</a></li>
+          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
+        </ul>
+        <div class="menu-toggle" id="menu_toggle">
+          <i class="fas fa-bars" id="toggle_open"></i>
+          <i class="fas fa-times" id="toggle_close" style="display: none"></i>
+        </div>
+      </nav>
+    </header>
 
-      <main>
-        <section class="section-heading">
-          <h2>Registro de <span>Cliente y Venta</span></h2>
-          <div class="divider"></div>
+    <div class="container main-content">
+      <div class="form-wrapper">
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>📝 Registro de Venta y Clientes</h2>
+            <p>
+              Completa los datos de la venta y del cliente para realizar el
+              registro.
+            </p>
+          </div>
+
+          <form id="registro-ventas-form" class="form-grid">
+            <div class="form-separator full-width">
+              <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
+            </div>
+            <div class="form-group">
+              <label for="cedula">Cédula / RIF *</label>
+              <input type="text" id="cedula" name="cedula" required />
+            </div>
+            <div class="form-group">
+              <label for="nombre">Nombre / Razón Social *</label>
+              <input type="text" id="nombre" name="nombre" required />
+            </div>
+            <div class="form-group">
+              <label for="telefono">Teléfono *</label>
+              <input type="tel" id="telefono" name="telefono" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email (Opcional)</label>
+              <input type="email" id="email" name="email" />
+            </div>
+
+            <div class="form-separator full-width">
+              <h3><i class="fas fa-receipt"></i> Detalle de la Venta</h3>
+            </div>
+            <div class="form-group full-width">
+              <label for="descripcion"
+                >Descripción del Servicio/Producto *</label
+              >
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label for="tipoServicio">Tipo de Servicio</label>
+              <select id="tipoServicio" name="tipoServicio">
+                <option value="Sublimacion">Sublimación</option>
+                <option value="DTF">DTF</option>
+                <option value="Impresion">Impresión/Fotocopia</option>
+                <option value="Diseno">Diseño Gráfico</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="montoTotal">Monto Total (Bs.) *</label>
+              <input
+                type="number"
+                id="montoTotal"
+                name="montoTotal"
+                step="0.01"
+                min="0.01"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="montoPagado">Monto Pagado (Bs.) *</label>
+              <input
+                type="number"
+                id="montoPagado"
+                name="montoPagado"
+                step="0.01"
+                min="0"
+                required
+              />
+              <span id="pago-error" class="error-message"></span>
+            </div>
+            <div class="form-group">
+              <label for="metodoPago">Método de Pago *</label>
+              <select id="metodoPago" name="metodoPago" required>
+                <option value="">Selecciona una</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Pago-Movil">Pago Móvil</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Credito">Crédito</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="fechaVenta">Fecha de Venta *</label>
+              <input type="date" id="fechaVenta" name="fechaVenta" required />
+            </div>
+
+            <div class="form-group full-width">
+              <button type="submit" class="calculate-btn">
+                <i class="fas fa-save"></i> Registrar Venta
+              </button>
+              <button type="reset" class="btn-secondary">
+                <i class="fas fa-trash-alt"></i> Limpiar Formulario
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div class="info-column">
+        <div class="info-box highlight">
+          <h3><i class="fas fa-info-circle"></i> Venta a Crédito</h3>
           <p>
-            <i class="fas fa-lock" style="color: #c60e0f"></i>
-            <strong>Sistema Protegido</strong> - Introduce los detalles de la
-            transacción. El sistema calculará automáticamente el crédito
+            Si el **Monto Pagado** es menor al **Monto Total**, la venta se
+            registrará automáticamente como **Venta a Crédito** con el saldo
             pendiente.
           </p>
-        </section>
-
-        <div class="form-container">
-          <div class="form-wrapper">
-            <form id="registro-ventas-form" class="cotizacion-form">
-              <!-- SECCIÓN 1: DATOS DEL CLIENTE -->
-              <fieldset class="form-section">
-                <legend>Datos del Cliente</legend>
-
-                <div class="form-group">
-                  <label for="cedula"
-                    >Cédula / ID (Identificador Único) *</label
-                  >
-                  <input
-                    type="text"
-                    id="cedula"
-                    name="cedula"
-                    required
-                    placeholder="Número de identificación"
-                  />
-                  <p class="hint">
-                    Ingresa el documento de identidad del cliente
-                  </p>
-                </div>
-
-                <div class="form-group">
-                  <label for="nombre">Nombre Completo *</label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    name="nombre"
-                    required
-                    placeholder="Nombre o Razón Social"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="telefono">Teléfono / WhatsApp *</label>
-                  <input
-                    type="tel"
-                    id="telefono"
-                    name="telefono"
-                    required
-                    placeholder="+57 300 123 4567"
-                  />
-                </div>
-              </fieldset>
-
-              <!-- SECCIÓN 2: DETALLES DE LA VENTA -->
-              <fieldset class="form-section">
-                <legend>Detalles de la Venta</legend>
-
-                <div class="form-group">
-                  <label for="descripcion"
-                    >Producto / Descripción de la Venta *</label
-                  >
-                  <textarea
-                    id="descripcion"
-                    name="descripcion"
-                    rows="4"
-                    required
-                    placeholder="Ej: 15 camisetas sublimadas, 50 copias a color, diseño personalizado, etc."
-                  ></textarea>
-                </div>
-
-                <!-- Campo oculto para la divisa fija en VES -->
-                <input type="hidden" name="divisa" value="VES" />
-
-                <div class="form-group">
-                  <label for="montoTotal"
-                    >Monto Total de la Venta (Bs.) *</label
-                  >
-                  <input
-                    type="number"
-                    id="montoTotal"
-                    name="montoTotal"
-                    required
-                    min="0.01"
-                    step="0.01"
-                    placeholder="500.00"
-                  />
-                  <p class="hint">
-                    🇻🇪 Valor en <strong>Bolívares Venezolanos (VES)</strong>
-                  </p>
-                </div>
-
-                <div class="form-group">
-                  <label for="montoPagado"
-                    >Monto Pagado al Contado (Bs.) *</label
-                  >
-                  <input
-                    type="number"
-                    id="montoPagado"
-                    name="montoPagado"
-                    required
-                    min="0"
-                    step="0.01"
-                    placeholder="200.00"
-                    value="0"
-                  />
-                  <p class="hint">
-                    Si pagó en su totalidad, ingresa el mismo valor del monto
-                    total
-                  </p>
-                </div>
-
-                <div class="alert-box">
-                  <i class="fas fa-info-circle"></i>
-                  <div>
-                    <h4>Cálculo Automático de Crédito</h4>
-                    <p>
-                      Si el <strong>Monto Pagado</strong> es menor al
-                      <strong>Monto Total</strong>, la venta se registrará
-                      automáticamente como <strong>Crédito Pendiente</strong>
-                      y se calculará el saldo por cobrar.
-                    </p>
-                  </div>
-                </div>
-              </fieldset>
-
-              <!-- BOTONES -->
-              <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                  <i class="fas fa-save"></i> Registrar Venta
-                </button>
-                <button type="reset" class="btn-reset">
-                  <i class="fas fa-redo"></i> Limpiar Formulario
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <!-- SIDEBAR CON INFORMACIÓN -->
-          <div class="form-sidebar">
-            <div class="info-box highlight">
-              <h3><i class="fas fa-calculator"></i> Resumen de Crédito</h3>
-              <p>
-                El sistema calculará automáticamente en
-                <strong>Bolívares (VES)</strong>:
-              </p>
-              <ul class="tips-list">
-                <li>Monto Total de la venta</li>
-                <li>Monto Pagado (Inicial)</li>
-                <li>Saldo Pendiente</li>
-                <li>Estado del Crédito</li>
-              </ul>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-flag"></i> Divisa</h3>
-              <p>
-                🇻🇪 Todas las transacciones se registran en
-                <strong>Bolívares Venezolanos (VES)</strong>
-              </p>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
-              <p>
-                Los datos se almacenan de forma segura y solo son accesibles por
-                personal autorizado de COPYFAST&PRINT.
-              </p>
-            </div>
-
-            <div class="info-box">
-              <h3><i class="fas fa-question-circle"></i> ¿Necesitas ayuda?</h3>
-              <p>
-                Contacta al administrador del sistema si tienes dudas sobre el
-                registro de ventas.
-              </p>
-              <a
-                href="https://wa.me/+5804120766642"
-                class="btn-small"
-                target="_blank"
-              >
-                WhatsApp Soporte
-              </a>
-            </div>
-          </div>
         </div>
 
-        <!-- Loading Overlay -->
-        <div
-          id="loading-overlay"
-          class="loading-overlay"
-          style="
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-          "
-        >
-          <div class="spinner"></div>
-          <p style="margin-top: 1em; color: #666; font-weight: 600">
-            Registrando venta...
+        <div class="info-box info">
+          <h3><i class="fas fa-check"></i> Campos Requeridos</h3>
+          <p>
+            Los campos marcados con un asterisco (<span class="required">*</span
+            >) son obligatorios para el registro.
           </p>
         </div>
-      </main>
-
-      <footer class="footer">
-        <div class="footer-content">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
-          <h5>Tu Solución Integral en Impresión y Personalización</h5>
-        </div>
-        <!-- ✅ CORREGIDO: Clase "social-networks" (antes era inconsistente) -->
-        <div class="social-networks">
-          <a href="https://www.instagram.com/copyfastprint/" target="_blank">
-            <i class="fab fa-instagram"></i>
-          </a>
-          <a
-            href="https://www.facebook.com/profile.php?id=61578120201237"
-            target="_blank"
-          >
-            <i class="fab fa-facebook"></i>
-          </a>
-          <a href="https://co.pinterest.com/copyfastprint/" target="_blank">
-            <i class="fab fa-pinterest"></i>
-          </a>
-          <a href="https://www.tiktok.com/@copyfastprint" target="_blank">
-            <i class="fab fa-tiktok"></i>
-          </a>
-        </div>
-      </footer>
+      </div>
     </div>
+
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
+      </div>
+    </footer>
 
     <a href="#" id="scroll-to-top" class="scroll-to-top">
       <i class="fas fa-chevron-up"></i>
@@ -440,8 +308,8 @@
           <div style="display: flex; align-items: center; gap: 0.5em;">
             <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
             <div>
-              <strong style="display: block; color: #222;">Usuario:</strong>
-              <span style="color: #666;">${usuario}</span>
+              <strong style="display: block; color: #333;">Usuario: ${usuario}</strong>
+              <small style="color: #666;">Sesión iniciada</small>
             </div>
           </div>
         `;

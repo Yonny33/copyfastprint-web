@@ -23,7 +23,7 @@
       <div class="loader"></div>
       <p>Cargando datos...</p>
     </div>
-    <!-- Verificación de sesión -->
+
     <script>
       if (sessionStorage.getItem("sesionActiva") !== "true") {
         window.location.href = "login-registro.html";
@@ -38,646 +38,291 @@
         <ul class="menu" id="menu">
           <li><a href="admin.html">Admin</a></li>
           <li><a href="registro.html">Registro Ventas</a></li>
-          <li><a href="gastos.html" class="active">Gastos</a></li>
-          <li>
-            <a href="#" id="btnCerrarSesion" style="color: #c60e0f">
-              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-            </a>
-          </li>
+          <li><a href="gastos.html">Control de Gastos</a></li>
+          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
         </ul>
-        <div class="toggle_menu">
+        <div class="menu-toggle" id="menu_toggle">
           <i class="fas fa-bars" id="toggle_open"></i>
-          <i class="fas fa-times" id="toggle_close"></i>
+          <i class="fas fa-times" id="toggle_close" style="display: none"></i>
         </div>
       </nav>
     </header>
 
-    <main>
-      <section class="section-heading">
-        <h2>Control de <span>Gastos</span></h2>
-        <div class="divider"></div>
+    <main class="admin-container">
+      <div class="section-heading">
+        <h2>📊 Control de Gastos Diarios</h2>
         <p>
-          Registra y gestiona todos los egresos del negocio en Bolívares (VES)
-          🇻🇪
+          Panel de administración y seguimiento de egresos. Los datos que ves a
+          continuación corresponden al
+          <strong>día actual</strong>.
         </p>
-      </section>
+      </div>
 
-      <div class="form-container">
-        <div class="form-wrapper">
-          <form id="gastos-form" class="cotizacion-form">
-            <fieldset class="form-section">
-              <legend>Información del Gasto</legend>
-
-              <div class="form-group">
-                <label for="categoria">Categoría del Gasto *</label>
-                <select id="categoria" name="categoria" required>
-                  <option value="">-- Selecciona una categoría --</option>
-                  <option value="materiales">📦 Materiales e Insumos</option>
-                  <option value="servicios">
-                    💡 Servicios (Luz, Agua, Internet)
-                  </option>
-                  <option value="mantenimiento">
-                    🔧 Mantenimiento y Reparaciones
-                  </option>
-                  <option value="transporte">
-                    🚗 Transporte y Combustible
-                  </option>
-                  <option value="nomina">👥 Nómina y Salarios</option>
-                  <option value="alquiler">🏠 Alquiler y Arriendo</option>
-                  <option value="marketing">📢 Marketing y Publicidad</option>
-                  <option value="otros">📝 Otros Gastos</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="descripcionGasto">Descripción del Gasto *</label>
-                <textarea
-                  id="descripcionGasto"
-                  name="descripcion"
-                  rows="3"
-                  required
-                  placeholder="Ej: Compra de 5 tintas para impresora, Pago de luz del mes, etc."
-                ></textarea>
-              </div>
-
-              <div class="form-group">
-                <label for="montoGasto">Monto del Gasto (Bs.) *</label>
-                <input
-                  type="number"
-                  id="montoGasto"
-                  name="monto"
-                  required
-                  min="0.01"
-                  step="0.01"
-                  placeholder="250.00"
-                />
-                <p class="hint">🇻🇪 Ingresa el monto en Bolívares (VES)</p>
-              </div>
-
-              <div class="form-group">
-                <label for="fechaGasto">Fecha del Gasto *</label>
-                <input type="date" id="fechaGasto" name="fecha" required />
-              </div>
-
-              <div class="form-group">
-                <label for="proveedor">Proveedor / Beneficiario</label>
-                <input
-                  type="text"
-                  id="proveedor"
-                  name="proveedor"
-                  placeholder="Nombre del proveedor (opcional)"
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="metodoPago">Método de Pago *</label>
-                <select id="metodoPago" name="metodoPago" required>
-                  <option value="">-- Selecciona --</option>
-                  <option value="efectivo">💵 Efectivo</option>
-                  <option value="transferencia">
-                    🏦 Transferencia Bancaria
-                  </option>
-                  <option value="pago-movil">📱 Pago Móvil</option>
-                  <option value="tarjeta">💳 Tarjeta de Débito/Crédito</option>
-                  <option value="otro">🔄 Otro</option>
-                </select>
-              </div>
-
-              <div class="form-group checkbox-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" name="recurrente" value="si" />
-                  <span class="checkbox-custom">
-                    <i class="fas fa-check"></i>
-                  </span>
-                  Este es un gasto recurrente (mensual)
-                </label>
-              </div>
-            </fieldset>
-
-            <div class="form-actions">
-              <button type="submit" class="btn-submit">
-                <i class="fas fa-save"></i> Registrar Gasto
-              </button>
-              <button type="reset" class="btn-reset">
-                <i class="fas fa-redo"></i> Limpiar
-              </button>
-            </div>
-          </form>
+      <div class="dashboard-grid">
+        <div class="stat-card red">
+          <i class="fas fa-money-bill-wave"></i>
+          <div>
+            <h4>Total Gastos (Hoy)</h4>
+            <p class="stat-value" id="totalGastosDia">Bs. 0,00</p>
+          </div>
         </div>
-
-        <!-- Sidebar -->
-        <div class="form-sidebar">
-          <div class="info-box highlight">
-            <h3><i class="fas fa-chart-pie"></i> Resumen del Día</h3>
-            <p><strong>Total de Gastos Hoy:</strong></p>
-            <div
-              style="
-                font-size: 1.8em;
-                color: #c60e0f;
-                font-weight: 700;
-                margin: 0.5em 0;
-              "
-            >
-              <span id="totalGastosDia">Bs. 0.00</span>
-            </div>
-            <p style="font-size: 0.85em; color: #666">
-              <i class="fas fa-receipt"></i>
-              <span id="cantidadGastos">0</span> gastos registrados
-            </p>
+        <div class="stat-card dark-red">
+          <i class="fas fa-list-alt"></i>
+          <div>
+            <h4>Cantidad de Gastos (Hoy)</h4>
+            <p class="stat-value" id="cantidadGastos">0</p>
           </div>
-
-          <div class="info-box">
-            <h3><i class="fas fa-calendar-month"></i> Resumen del Mes</h3>
-            <ul class="tips-list">
-              <li>Total gastado: <strong id="totalMes">Bs. 0.00</strong></li>
-              <li>
-                Categoría más alta: <strong id="categoriaMayor">-</strong>
-              </li>
-              <li>
-                Promedio diario: <strong id="promedioDia">Bs. 0.00</strong>
-              </li>
-            </ul>
-          </div>
-
-          <div class="info-box">
-            <h3><i class="fas fa-lightbulb"></i> Consejos</h3>
-            <ul class="tips-list">
-              <li>Registra gastos inmediatamente</li>
-              <li>Guarda los comprobantes físicos</li>
-              <li>Revisa el resumen mensual</li>
-              <li>Planifica gastos recurrentes</li>
-            </ul>
+        </div>
+        <div class="stat-card gray">
+          <i class="fas fa-calendar-alt"></i>
+          <div>
+            <h4>Total Gastos (Mes)</h4>
+            <p class="stat-value" id="totalGastosMes">Bs. 0,00</p>
           </div>
         </div>
       </div>
 
-      <!-- Tabla de Gastos del Día -->
-      <div style="max-width: 1400px; margin: 3em auto; padding: 0 2em">
-        <div class="ventas-table">
-          <h3><i class="fas fa-list"></i> Gastos de Hoy</h3>
-          <table>
+      <section class="form-section">
+        <h3>➕ Registrar Nuevo Gasto</h3>
+        <form id="registro-gasto-form" class="form-grid">
+          <div class="form-group">
+            <label for="fecha">Fecha del Gasto *</label>
+            <input type="date" id="fecha" name="fecha" required />
+          </div>
+          <div class="form-group">
+            <label for="monto">Monto (Bs.) *</label>
+            <input
+              type="number"
+              id="monto"
+              name="monto"
+              step="0.01"
+              min="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="categoria">Categoría *</label>
+            <select id="categoria" name="categoria" required>
+              <option value="">Selecciona una</option>
+              <option value="Materiales">Materiales</option>
+              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Transporte">Transporte / Flete</option>
+              <option value="Nomina">Nómina / Sueldos</option>
+              <option value="Alquiler">Alquiler / Renta</option>
+              <option value="Marketing">Marketing / Publicidad</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="metodoPago">Método de Pago *</label>
+            <select id="metodoPago" name="metodoPago" required>
+              <option value="">Selecciona una</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Pago-Movil">Pago Móvil</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="proveedor">Proveedor (Opcional)</label>
+            <input type="text" id="proveedor" name="proveedor" />
+          </div>
+          <div class="form-group full-width">
+            <label for="descripcion">Descripción *</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+
+          <button type="submit" class="calculate-btn full-width">
+            <i class="fas fa-plus-circle"></i> Registrar Gasto
+          </button>
+        </form>
+      </section>
+
+      <section class="table-section">
+        <h3>📜 Detalle de Gastos del Día</h3>
+        <div class="table-responsive">
+          <table class="data-table">
             <thead>
               <tr>
-                <th>Hora</th>
+                <th>Fecha</th>
+                <th>Monto (Bs.)</th>
                 <th>Categoría</th>
                 <th>Descripción</th>
-                <th>Monto</th>
-                <th>Método de Pago</th>
+                <th>Método</th>
+                <th>Proveedor</th>
                 <th>Acciones</th>
               </tr>
             </thead>
-            <tbody id="gastosTableBody">
-              <tr>
-                <td
-                  colspan="6"
-                  style="text-align: center; padding: 2em; color: #999"
-                >
-                  No hay gastos registrados hoy
-                </td>
-              </tr>
-            </tbody>
+            <tbody id="gastos-list"></tbody>
           </table>
         </div>
-      </div>
-
-      <!-- Loading Overlay -->
-      <div
-        id="loading-overlay"
-        class="loading-overlay"
-        style="
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(255, 255, 255, 0.95);
-          z-index: 9999;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-        "
-      >
-        <div class="spinner"></div>
-        <p style="margin-top: 1em; color: #666; font-weight: 600">
-          Registrando gasto...
-        </p>
-      </div>
+      </section>
     </main>
+
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('edit-modal')"
+          >&times;</span
+        >
+        <h3>✏️ Editar Gasto</h3>
+        <form id="edit-gasto-form" class="form-grid">
+          <input type="hidden" id="edit-gasto-id" name="id" />
+
+          <div class="form-group">
+            <label for="edit-fecha">Fecha del Gasto *</label>
+            <input type="date" id="edit-fecha" name="fecha" required />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-monto">Monto (Bs.) *</label>
+            <input
+              type="number"
+              id="edit-monto"
+              name="monto"
+              step="0.01"
+              min="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="edit-categoria">Categoría *</label>
+            <select id="edit-categoria" name="categoria" required>
+              <option value="Materiales">Materiales</option>
+              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Transporte">Transporte / Flete</option>
+              <option value="Nomina">Nómina / Sueldos</option>
+              <option value="Alquiler">Alquiler / Renta</option>
+              <option value="Marketing">Marketing / Publicidad</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="edit-descripcion">Descripción *</label>
+            <textarea
+              id="edit-descripcion"
+              name="descripcion"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-metodoPago">Método de Pago *</label>
+            <select id="edit-metodoPago" name="metodo_pago" required>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Pago-Movil">Pago Móvil</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-proveedor">Proveedor (Opcional)</label>
+            <input type="text" id="edit-proveedor" name="proveedor" />
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <style>
+      .modal {
+        display: none; /* Oculto por defecto */
+        position: fixed;
+        z-index: 2000; /* Asegura que esté por encima de todo */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto; /* 5% desde arriba y centrado */
+        padding: 30px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 12px;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .modal-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 1;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+      }
+      .modal-close:hover,
+      .modal-close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
 
     <footer class="footer">
       <div class="footer-content">
         <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Control de Gastos - Sistema Administrativo</h5>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
       </div>
     </footer>
 
+    <a href="#" id="scroll-to-top" class="scroll-to-top">
+      <i class="fas fa-chevron-up"></i>
+    </a>
+
     <script src="js/scripts.js"></script>
+    <script src="js/registro-gasto.js"></script>
     <script src="js/gastos.js"></script>
     <script>
-      // Establecer fecha actual por defecto
-      document.getElementById("fechaGasto").valueAsDate = new Date();
-
-      // Botón cerrar sesión
+      // Botón de cerrar sesión
       document
         .getElementById("btnCerrarSesion")
-        ?.addEventListener("click", function (e) {
+        .addEventListener("click", function (e) {
           e.preventDefault();
           if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
             sessionStorage.clear();
             window.location.href = "login-registro.html";
           }
         });
-
-      // Función para formatear VES
-      function formatVES(numero) {
-        return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`;
-      }
-
-      // Manejar envío del formulario
-      const gastosForm = document.getElementById("gastos-form");
-      const loadingOverlay = document.getElementById("loading-overlay");
-
-      if (gastosForm) {
-        gastosForm.addEventListener("submit", async function (e) {
-          e.preventDefault();
-
-          // Mostrar loading
-          loadingOverlay.style.display = "flex";
-
-          // Recolectar datos
-          const formData = new FormData(gastosForm);
-          const data = Object.fromEntries(formData);
-
-          const payload = {
-            ...data,
-            monto: parseFloat(data.monto).toFixed(2),
-            divisa: "VES",
-            usuario: sessionStorage.getItem("usuario"),
-            fechaRegistro: new Date().toISOString(),
-          };
-
-          console.log("📊 Gasto a registrar:", payload);
-
-          try {
-            const response = await fetch(
-              "/.netlify/functions/registrar-gasto",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              }
-            );
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-              alert(
-                `✅ Gasto registrado exitosamente!\n\nMonto: ${formatVES(
-                  data.monto
-                )}\nCategoría: ${data.categoria}`
-              );
-              gastosForm.reset();
-              document.getElementById("fechaGasto").valueAsDate = new Date();
-              cargarGastosDia();
-            } else {
-              throw new Error(result.error || "Error al registrar");
-            }
-          } catch (error) {
-            console.error("Error:", error);
-            alert(`⚠️ Error al registrar el gasto:\n${error.message}`);
-          } finally {
-            loadingOverlay.style.display = "none";
-          }
-        });
-      }
-
-      // Cargar gastos del día
-      async function cargarGastosDia() {
-        // Aquí conectarías con la base de datos
-        // const gastos = await fetch('/.netlify/functions/obtener-gastos-dia').then(r => r.json());
-
-        // Datos de ejemplo
-        const gastos = [
-          {
-            id: 1,
-            hora: "10:30 AM",
-            categoria: "materiales",
-            descripcion: "Compra de 3 tintas para impresora Epson",
-            monto: 180.0,
-            metodoPago: "transferencia",
-          },
-          {
-            id: 2,
-            hora: "02:15 PM",
-            categoria: "servicios",
-            descripcion: "Pago de servicio de internet mensual",
-            monto: 95.0,
-            metodoPago: "pago-movil",
-          },
-        ];
-
-        const tbody = document.getElementById("gastosTableBody");
-
-        if (gastos.length === 0) {
-          tbody.innerHTML =
-            '<tr><td colspan="6" style="text-align: center; padding: 2em; color: #999;">No hay gastos registrados hoy</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = gastos
-          .map(
-            (gasto) => `
-          <tr>
-            <td>${gasto.hora}</td>
-            <td><span style="text-transform: capitalize;">${getCategoriaIcon(
-              gasto.categoria
-            )} ${gasto.categoria}</span></td>
-            <td>${gasto.descripcion}</td>
-            <td><strong>${formatVES(gasto.monto)}</strong></td>
-            <td>${getMetodoPagoLabel(gasto.metodoPago)}</td>
-            <td>
-              <button onclick="eliminarGasto(${
-                gasto.id
-              })" style="background: #dc3545; color: #fff; border: none; padding: 0.5em 1em; border-radius: 5px; cursor: pointer;">
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `
-          )
-          .join("");
-
-        // Actualizar resumen
-        const totalDia = gastos.reduce((sum, g) => sum + g.monto, 0);
-        document.getElementById("totalGastosDia").textContent =
-          formatVES(totalDia);
-        document.getElementById("cantidadGastos").textContent = gastos.length;
-      }
-
-      function getCategoriaIcon(categoria) {
-        const iconos = {
-          materiales: "📦",
-          servicios: "💡",
-          mantenimiento: "🔧",
-          transporte: "🚗",
-          nomina: "👥",
-          alquiler: "🏠",
-          marketing: "📢",
-          otros: "📝",
-        };
-        return iconos[categoria] || "📝";
-      }
-
-      function getMetodoPagoLabel(metodo) {
-        const labels = {
-          efectivo: "💵 Efectivo",
-          transferencia: "🏦 Transferencia",
-          "pago-movil": "📱 Pago Móvil",
-          tarjeta: "💳 Tarjeta",
-          otro: "🔄 Otro",
-        };
-        return labels[metodo] || metodo;
-      }
-
-      function eliminarGasto(id) {
-        if (confirm("¿Estás seguro de eliminar este gasto?")) {
-          // Llamar a función para eliminar
-          console.log("Eliminando gasto:", id);
-          cargarGastosDia();
-        }
-      }
-
-      // Cargar datos al iniciar
-      cargarGastosDia();
-
-      // Cargar resumen del mes (simulado)
-      document.getElementById("totalMes").textContent = formatVES(3450.0);
-      document.getElementById("categoriaMayor").textContent = "Materiales";
-      document.getElementById("promedioDia").textContent = formatVES(115.0);
     </script>
-    <div id="edit-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('edit-modal')"
-          >&times;</span
-        >
-        <h3>Editar Registro de Gasto</h3>
-        <form id="edit-gasto-form" class="form-container">
-          <input type="hidden" id="edit-gasto-id" name="id" />
-
-          <div class="form-group">
-            <label for="edit-fecha">Fecha del Gasto</label>
-            <input type="date" id="edit-fecha" name="fecha" required />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-monto">Monto (VES)</label>
-            <input
-              type="number"
-              id="edit-monto"
-              name="monto"
-              step="0.01"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-categoria">Categoría</label>
-            <select id="edit-categoria" name="categoria" required>
-              <option value="Materiales">Materiales</option>
-              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
-              <option value="Mantenimiento">Mantenimiento y Reparación</option>
-              <option value="Transporte">Transporte / Envíos</option>
-              <option>Nomina</option>
-              <option>Alquiler</option>
-              <option>Marketing</option>
-              <option value="Otros">Otros</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-descripcion">Descripción</label>
-            <textarea
-              id="edit-descripcion"
-              name="descripcion"
-              rows="2"
-              required
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-metodoPago">Método de Pago</label>
-            <select id="edit-metodoPago" name="metodo_pago" required>
-              <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Pago-Movil">Pago Móvil</option>
-              <option value="Tarjeta">Tarjeta</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-proveedor">Proveedor (Opcional)</label>
-            <input type="text" id="edit-proveedor" name="proveedor" />
-          </div>
-
-          <button type="submit" class="calculate-btn">
-            <i class="fas fa-save"></i> Guardar Cambios
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <style>
-      .modal {
-        display: none; /* Oculto por defecto */
-        position: fixed;
-        z-index: 2000; /* Asegura que esté por encima de todo */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-        padding-top: 60px;
-      }
-      .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto; /* 5% desde arriba y centrado */
-        padding: 30px;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 500px;
-        border-radius: 12px;
-        position: relative;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-      .close-btn {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      .close-btn:hover,
-      .close-btn:focus {
-        color: #c60e0f;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    </style>
-    <div id="edit-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('edit-modal')"
-          >&times;</span
-        >
-        <h3>Editar Registro de Gasto</h3>
-        <form id="edit-gasto-form" class="form-container">
-          <input type="hidden" id="edit-gasto-id" name="id" />
-
-          <div class="form-group">
-            <label for="edit-fecha">Fecha del Gasto</label>
-            <input type="date" id="edit-fecha" name="fecha" required />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-monto">Monto (VES)</label>
-            <input
-              type="number"
-              id="edit-monto"
-              name="monto"
-              step="0.01"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-categoria">Categoría</label>
-            <select id="edit-categoria" name="categoria" required>
-              <option value="Materiales">Materiales</option>
-              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
-              <option value="Mantenimiento">Mantenimiento y Reparación</option>
-              <option value="Transporte">Transporte / Envíos</option>
-              <option>Nomina</option>
-              <option>Alquiler</option>
-              <option>Marketing</option>
-              <option value="Otros">Otros</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-descripcion">Descripción</label>
-            <textarea
-              id="edit-descripcion"
-              name="descripcion"
-              rows="2"
-              required
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-metodoPago">Método de Pago</label>
-            <select id="edit-metodoPago" name="metodo_pago" required>
-              <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Pago-Movil">Pago Móvil</option>
-              <option value="Tarjeta">Tarjeta</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-proveedor">Proveedor (Opcional)</label>
-            <input type="text" id="edit-proveedor" name="proveedor" />
-          </div>
-
-          <button type="submit" class="calculate-btn">
-            <i class="fas fa-save"></i> Guardar Cambios
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <style>
-      .modal {
-        display: none; /* Oculto por defecto */
-        position: fixed;
-        z-index: 2000; /* Asegura que esté por encima de todo */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-        padding-top: 60px;
-      }
-      .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto; /* 5% desde arriba y centrado */
-        padding: 30px;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 500px;
-        border-radius: 12px;
-        position: relative;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-      .close-btn {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      .close-btn:hover,
-      .close-btn:focus {
-        color: #c60e0f;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    </style>
   </body>
 </html>
