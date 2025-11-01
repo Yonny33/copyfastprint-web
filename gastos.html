@@ -19,6 +19,10 @@
     />
   </head>
   <body>
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="loader"></div>
+      <p>Cargando datos...</p>
+    </div>
     <!-- Verificación de sesión -->
     <script>
       if (sessionStorage.getItem("sesionActiva") !== "true") {
@@ -456,64 +460,79 @@
       document.getElementById("promedioDia").textContent = formatVES(115.0);
     </script>
     <div id="edit-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('edit-modal')">&times;</span>
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('edit-modal')"
+          >&times;</span
+        >
         <h3>Editar Registro de Gasto</h3>
         <form id="edit-gasto-form" class="form-container">
-            <input type="hidden" id="edit-gasto-id" name="id">
+          <input type="hidden" id="edit-gasto-id" name="id" />
 
-            <div class="form-group">
-                <label for="edit-fecha">Fecha del Gasto</label>
-                <input type="date" id="edit-fecha" name="fecha" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-monto">Monto (VES)</label>
-                <input type="number" id="edit-monto" name="monto" step="0.01" required>
-            </div>
+          <div class="form-group">
+            <label for="edit-fecha">Fecha del Gasto</label>
+            <input type="date" id="edit-fecha" name="fecha" required />
+          </div>
 
-            <div class="form-group">
-                <label for="edit-categoria">Categoría</label>
-                <select id="edit-categoria" name="categoria" required>
-                    <option value="Materiales">Materiales</option>
-                    <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
-                    <option value="Mantenimiento">Mantenimiento y Reparación</option>
-                    <option value="Transporte">Transporte / Envíos</option>
-                    <option>Nomina</option>
-                    <option>Alquiler</option>
-                    <option>Marketing</option>
-                    <option value="Otros">Otros</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-descripcion">Descripción</label>
-                <textarea id="edit-descripcion" name="descripcion" rows="2" required></textarea>
-            </div>
+          <div class="form-group">
+            <label for="edit-monto">Monto (VES)</label>
+            <input
+              type="number"
+              id="edit-monto"
+              name="monto"
+              step="0.01"
+              required
+            />
+          </div>
 
-            <div class="form-group">
-                <label for="edit-metodoPago">Método de Pago</label>
-                <select id="edit-metodoPago" name="metodo_pago" required>
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Pago-Movil">Pago Móvil</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-proveedor">Proveedor (Opcional)</label>
-                <input type="text" id="edit-proveedor" name="proveedor">
-            </div>
+          <div class="form-group">
+            <label for="edit-categoria">Categoría</label>
+            <select id="edit-categoria" name="categoria" required>
+              <option value="Materiales">Materiales</option>
+              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
+              <option value="Mantenimiento">Mantenimiento y Reparación</option>
+              <option value="Transporte">Transporte / Envíos</option>
+              <option>Nomina</option>
+              <option>Alquiler</option>
+              <option>Marketing</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
 
-            <button type="submit" class="calculate-btn"><i class="fas fa-save"></i> Guardar Cambios</button>
+          <div class="form-group">
+            <label for="edit-descripcion">Descripción</label>
+            <textarea
+              id="edit-descripcion"
+              name="descripcion"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-metodoPago">Método de Pago</label>
+            <select id="edit-metodoPago" name="metodo_pago" required>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Pago-Movil">Pago Móvil</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-proveedor">Proveedor (Opcional)</label>
+            <input type="text" id="edit-proveedor" name="proveedor" />
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
         </form>
+      </div>
     </div>
-</div>
 
-<style>
-    .modal {
+    <style>
+      .modal {
         display: none; /* Oculto por defecto */
         position: fixed;
         z-index: 2000; /* Asegura que esté por encima de todo */
@@ -522,92 +541,108 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0, 0, 0, 0.4);
         padding-top: 60px;
-    }
-    .modal-content {
+      }
+      .modal-content {
         background-color: #fefefe;
         margin: 5% auto; /* 5% desde arriba y centrado */
         padding: 30px;
         border: 1px solid #888;
-        width: 90%; 
+        width: 90%;
         max-width: 500px;
         border-radius: 12px;
         position: relative;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    .close-btn {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .close-btn {
         color: #aaa;
         float: right;
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-    }
-    .close-btn:hover,
-    .close-btn:focus {
+      }
+      .close-btn:hover,
+      .close-btn:focus {
         color: #c60e0f;
         text-decoration: none;
         cursor: pointer;
-    }
-</style><div id="edit-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('edit-modal')">&times;</span>
+      }
+    </style>
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('edit-modal')"
+          >&times;</span
+        >
         <h3>Editar Registro de Gasto</h3>
         <form id="edit-gasto-form" class="form-container">
-            <input type="hidden" id="edit-gasto-id" name="id">
+          <input type="hidden" id="edit-gasto-id" name="id" />
 
-            <div class="form-group">
-                <label for="edit-fecha">Fecha del Gasto</label>
-                <input type="date" id="edit-fecha" name="fecha" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-monto">Monto (VES)</label>
-                <input type="number" id="edit-monto" name="monto" step="0.01" required>
-            </div>
+          <div class="form-group">
+            <label for="edit-fecha">Fecha del Gasto</label>
+            <input type="date" id="edit-fecha" name="fecha" required />
+          </div>
 
-            <div class="form-group">
-                <label for="edit-categoria">Categoría</label>
-                <select id="edit-categoria" name="categoria" required>
-                    <option value="Materiales">Materiales</option>
-                    <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
-                    <option value="Mantenimiento">Mantenimiento y Reparación</option>
-                    <option value="Transporte">Transporte / Envíos</option>
-                    <option>Nomina</option>
-                    <option>Alquiler</option>
-                    <option>Marketing</option>
-                    <option value="Otros">Otros</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-descripcion">Descripción</label>
-                <textarea id="edit-descripcion" name="descripcion" rows="2" required></textarea>
-            </div>
+          <div class="form-group">
+            <label for="edit-monto">Monto (VES)</label>
+            <input
+              type="number"
+              id="edit-monto"
+              name="monto"
+              step="0.01"
+              required
+            />
+          </div>
 
-            <div class="form-group">
-                <label for="edit-metodoPago">Método de Pago</label>
-                <select id="edit-metodoPago" name="metodo_pago" required>
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Pago-Movil">Pago Móvil</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                    <option value="Otro">Otro</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit-proveedor">Proveedor (Opcional)</label>
-                <input type="text" id="edit-proveedor" name="proveedor">
-            </div>
+          <div class="form-group">
+            <label for="edit-categoria">Categoría</label>
+            <select id="edit-categoria" name="categoria" required>
+              <option value="Materiales">Materiales</option>
+              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
+              <option value="Mantenimiento">Mantenimiento y Reparación</option>
+              <option value="Transporte">Transporte / Envíos</option>
+              <option>Nomina</option>
+              <option>Alquiler</option>
+              <option>Marketing</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
 
-            <button type="submit" class="calculate-btn"><i class="fas fa-save"></i> Guardar Cambios</button>
+          <div class="form-group">
+            <label for="edit-descripcion">Descripción</label>
+            <textarea
+              id="edit-descripcion"
+              name="descripcion"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-metodoPago">Método de Pago</label>
+            <select id="edit-metodoPago" name="metodo_pago" required>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Pago-Movil">Pago Móvil</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-proveedor">Proveedor (Opcional)</label>
+            <input type="text" id="edit-proveedor" name="proveedor" />
+          </div>
+
+          <button type="submit" class="calculate-btn">
+            <i class="fas fa-save"></i> Guardar Cambios
+          </button>
         </form>
+      </div>
     </div>
-</div>
 
-<style>
-    .modal {
+    <style>
+      .modal {
         display: none; /* Oculto por defecto */
         position: fixed;
         z-index: 2000; /* Asegura que esté por encima de todo */
@@ -616,33 +651,33 @@
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0, 0, 0, 0.4);
         padding-top: 60px;
-    }
-    .modal-content {
+      }
+      .modal-content {
         background-color: #fefefe;
         margin: 5% auto; /* 5% desde arriba y centrado */
         padding: 30px;
         border: 1px solid #888;
-        width: 90%; 
+        width: 90%;
         max-width: 500px;
         border-radius: 12px;
         position: relative;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    .close-btn {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .close-btn {
         color: #aaa;
         float: right;
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
-    }
-    .close-btn:hover,
-    .close-btn:focus {
+      }
+      .close-btn:hover,
+      .close-btn:focus {
         color: #c60e0f;
         text-decoration: none;
         cursor: pointer;
-    }
-</style>
+      }
+    </style>
   </body>
 </html>

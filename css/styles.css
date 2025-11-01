@@ -349,6 +349,41 @@ header {
   color: #666;
 }
 
+/* Ejemplo de CSS para el loading-overlay (si no lo tienes) */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex; /* Asegúrate de que esto esté en tu CSS o en el inline style */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000; /* Debe estar por encima de todo */
+}
+
+/* Estilo simple del spinner */
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #c60e0f; /* Color de tu marca */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* ========================================================================== */
 /* === SECCIÓN 5: PÁGINA DE DISEÑO (DISEÑO.HTML) === */
 /* ========================================================================== */

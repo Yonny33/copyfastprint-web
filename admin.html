@@ -292,6 +292,10 @@
     </style>
   </head>
   <body>
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="loader"></div>
+      <p>Cargando datos...</p>
+    </div>
     <!-- Verificación de sesión -->
     <script>
       if (sessionStorage.getItem("sesionActiva") !== "true") {
