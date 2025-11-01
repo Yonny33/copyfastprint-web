@@ -1,10 +1,10 @@
-// netlify/functions/registrar-gasto.js
+// netlify/functions/registrar-inventario.js
 const fetch = require("node-fetch");
 
 // Variables de entorno
 const API_KEY = process.env.AIRTABLE_API_KEY;
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
-const TABLE_NAME = process.env.AIRTABLE_TABLE_GASTOS; // << USAMOS LA TABLA GASTOS
+const TABLE_NAME = process.env.AIRTABLE_TABLE_INVENTARIOS; // << USAMOS LA TABLA INVENTARIOS
 const AIRTABLE_API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
 
 exports.handler = async function (event, context) {
@@ -45,11 +45,12 @@ exports.handler = async function (event, context) {
 
     // 1. Validaciones
     const requiredFields = [
-      "categoria",
-      "descripcion",
-      "monto",
-      "fecha",
-      "metodoPago",
+      "tipoMovimiento",
+      "codigoProducto",
+      "nombreProducto",
+      "cantidad",
+      "costoUnitario",
+      "unidadMedida",
     ];
     const missingFields = requiredFields.filter((field) => !data[field]);
 
@@ -64,30 +65,40 @@ exports.handler = async function (event, context) {
       };
     }
 
-    const monto = parseFloat(data.monto);
-    if (isNaN(monto) || monto <= 0) {
+    const cantidad = parseInt(data.cantidad);
+    const costoUnitario = parseFloat(data.costoUnitario);
+
+    if (
+      isNaN(cantidad) ||
+      cantidad === 0 ||
+      isNaN(costoUnitario) ||
+      costoUnitario < 0
+    ) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: "El monto debe ser un número positivo",
+          error:
+            "La cantidad debe ser un número entero y el costo unitario debe ser positivo o cero.",
         }),
       };
     }
 
-    // 2. Preparar datos para Airtable (Estructura de la tabla)
-    const gasto = {
-      id: `GASTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    // 2. Preparar datos para Airtable
+    const costoTotal = cantidad * costoUnitario;
+
+    const movimiento = {
+      id: `INV-TRANS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       fechaRegistro: new Date().toISOString(),
-      categoria: data.categoria,
-      descripcion: data.descripcion,
-      monto: monto, // Airtable espera un número
-      fecha: data.fecha,
-      metodoPago: data.metodoPago,
-      proveedor: data.proveedor || null,
-      recurrente: data.recurrente === "si" || false,
-      divisa: "VES",
+      tipoMovimiento: data.tipoMovimiento,
+      codigoProducto: data.codigoProducto,
+      nombreProducto: data.nombreProducto,
+      cantidad: cantidad,
+      unidadMedida: data.unidadMedida,
+      costoUnitario: costoUnitario,
+      costoTotal: costoTotal,
+      notas: data.notas || "",
       usuario: data.usuario || "admin",
     };
 
@@ -102,17 +113,17 @@ exports.handler = async function (event, context) {
         records: [
           {
             fields: {
-              id: gasto.id,
-              fechaRegistro: gasto.fechaRegistro,
-              categoria: gasto.categoria,
-              descripcion: gasto.descripcion,
-              monto: gasto.monto,
-              fecha: gasto.fecha,
-              metodoPago: gasto.metodoPago,
-              proveedor: gasto.proveedor,
-              recurrente: gasto.recurrente,
-              divisa: gasto.divisa,
-              usuario: gasto.usuario,
+              id: movimiento.id,
+              fechaRegistro: movimiento.fechaRegistro,
+              tipoMovimiento: movimiento.tipoMovimiento,
+              codigoProducto: movimiento.codigoProducto,
+              nombreProducto: movimiento.nombreProducto,
+              cantidad: movimiento.cantidad,
+              unidadMedida: movimiento.unidadMedida,
+              costoUnitario: movimiento.costoUnitario,
+              costoTotal: movimiento.costoTotal,
+              notas: movimiento.notas,
+              usuario: movimiento.usuario,
             },
           },
         ],
@@ -124,7 +135,7 @@ exports.handler = async function (event, context) {
     if (!airtableResponse.ok) {
       console.error("❌ Error de Airtable:", airtableResult);
       throw new Error(
-        airtableResult.error?.message || "Error al guardar el gasto en Airtable"
+        airtableResult.error?.message || "Error al guardar en Airtable"
       );
     }
 
@@ -133,19 +144,20 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Gasto registrado exitosamente en Airtable",
-        gastoId: gasto.id,
+        message: "Movimiento de inventario registrado exitosamente en Airtable",
+        movimientoId: movimiento.id,
         airtableRecordId: airtableResult.records[0]?.id,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en registrar-gasto:", error);
+    console.error("❌ Error en registrar-inventario:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: "Error interno del servidor al intentar guardar el gasto.",
+        error:
+          "Error interno del servidor al intentar guardar el movimiento de inventario.",
         details: error.message,
       }),
     };
