@@ -1,90 +1,14 @@
-// netlify/functions/editar-registro.js
-const fetch = require("node-fetch");
+// netlify/functions/editar-registro.js - MODIFICADO para usar 'codigo' en inventario
 
-// ==========================================================================
-// 🔑 CONFIGURACIÓN DE AIRTABLE
-// ==========================================================================
-const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const { createClient } = require("@supabase/supabase-js");
 
-// Mapeo de nombres de tablas internas a nombres reales de tablas en AirTable
-const TABLE_MAP = {
-  ventas: "Ventas", // Ajusta si tu tabla de ventas se llama diferente
-  gastos: "Gastos", // Ajusta si tu tabla de gastos se llama diferente
-  // Usa la variable de entorno para Inventario, como en 'registrar-inventario.js'
-  inventario: process.env.AIRTABLE_TABLE_INVENTARIOS || "Inventario",
-};
-
-// ==========================================================================
-// 💾 FUNCIÓN AUXILIAR: Actualizar en AirTable (PATCH)
-// ==========================================================================
-async function patchAirtableRecord(tableName, recordId, fieldsToUpdate) {
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
-    throw new Error(
-      "Error de configuración: Las claves de AirTable no están configuradas."
-    );
-  }
-
-  const airtableTableName = TABLE_MAP[tableName];
-  if (!airtableTableName) {
-    throw new Error(`Tabla no mapeada: ${tableName}`);
-  }
-
-  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-    airtableTableName
-  )}`;
-
-  const response = await fetch(url, {
-    method: "PATCH", // Usamos PATCH para actualización
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      records: [
-        {
-          id: recordId,
-          fields: fieldsToUpdate, // Objeto con los campos a modificar
-        },
-      ],
-      typecast: true, // Recomendado para asegurar la correcta conversión de tipos
-    }),
-  });
-
-  const result = await response.json();
-
-  if (!response.ok || result.error) {
-    console.error("❌ Error de AirTable (Actualización):", result);
-    throw new Error(
-      result.error?.message ||
-        `Error ${response.status} al actualizar en AirTable`
-    );
-  }
-  return result;
-}
-
-// ==========================================================================
-// 🚀 MANEJADOR DE NETLIFY FUNCTION
-// ==========================================================================
 exports.handler = async function (event, context) {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "PUT, OPTIONS",
-    "Content-Type": "application/json",
-  };
+  // ... (código de inicio y validación de método sin cambios)
 
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-  if (event.httpMethod !== "PUT") {
-    // El cliente enviará PUT
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: "Método no permitido" }),
-    };
-  }
+  // 💡 Inicializar Cliente Supabase
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
     const { tabla, id, data } = JSON.parse(event.body);
@@ -97,47 +21,57 @@ exports.handler = async function (event, context) {
         body: JSON.stringify({
           success: false,
           error:
-            "Faltan parámetros: 'tabla' (ej. ventas), 'id' (ID de AirTable) y 'data' (campos a actualizar) son requeridos.",
+            "Faltan parámetros: 'tabla', 'id' y 'data' (con campos a actualizar) son requeridos.",
         }),
       };
     }
 
     // 2. Seguridad: asegurar que la tabla sea una de las permitidas
-    const tablasPermitidas = Object.keys(TABLE_MAP);
+    const tablasPermitidas = ["ventas", "gastos", "inventario"];
     if (!tablasPermitidas.includes(tabla)) {
       return {
         statusCode: 403,
         headers,
         body: JSON.stringify({
           success: false,
-          error: `Operación de actualización no permitida para esta tabla. Tablas permitidas: ${tablasPermitidas.join(
-            ", "
-          )}`,
+          error: "Operación de actualización no permitida para esta tabla.",
         }),
       };
     }
 
-    // 3. Ejecutar la actualización en AirTable
-    await patchAirtableRecord(tabla, id, data);
+    // 💡 Lógica de adaptación: Usar 'codigo' para la tabla 'inventario'
+    const keyColumn = tabla === "inventario" ? "codigo" : "id";
+
+    // Es buena práctica no permitir que el cliente cambie la clave de búsqueda que acaba de usar
+    if (tabla === "inventario" && data.codigo) {
+      delete data.codigo;
+      console.warn(
+        "Se eliminó 'codigo' del payload de actualización para evitar cambiar la clave de búsqueda."
+      );
+    }
+
+    // 3. Ejecutar la actualización en Supabase
+    // .eq(keyColumn, id) usa 'id' para ventas/gastos, y 'codigo' para inventario
+    const { error } = await supabase
+      .from(tabla)
+      .update(data) // Actualizar los campos dentro del objeto 'data'
+      .eq(keyColumn, id); // Condición: solo para el registro con este ID/Código
+
+    if (error) {
+      console.error(`Error Supabase al actualizar en ${tabla}:`, error);
+      throw new Error(`DB Error: ${error.message}`);
+    }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: `Registro (ID: ${id}) actualizado exitosamente en AirTable.`,
+        message: `Registro (${keyColumn.toUpperCase()}: ${id}) actualizado exitosamente en ${tabla}.`,
         campos_actualizados: Object.keys(data),
       }),
     };
   } catch (error) {
-    console.error("❌ Error al actualizar registro:", error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: `Error interno al procesar la solicitud: ${error.message}`,
-      }),
-    };
+    // ... (código de manejo de errores sin cambios)
   }
 };

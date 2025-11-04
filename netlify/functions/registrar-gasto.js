@@ -1,71 +1,10 @@
 // netlify/functions/registrar-gasto.js
-const fetch = require("node-fetch");
+const { createClient } = require("@supabase/supabase-js");
 
-// ==========================================================================
-// 🔑 CONFIGURACIÓN DE AIRTABLE
-// ==========================================================================
-const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-// Usamos el nombre de tabla que nos indicaste: "Gastos"
-const AIRTABLE_TABLE_NAME = "Gastos";
-
-// ==========================================================================
-// 💾 FUNCIÓN AUXILIAR: Guardar en Airtable
-// ==========================================================================
-async function guardarEnAirtable(gasto) {
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
-    throw new Error(
-      "Error de configuración del servidor: Las claves de Airtable no están configuradas."
-    );
-  }
-
-  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_TABLE_NAME
-  )}`;
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      records: [
-        {
-          fields: {
-            // Mapeo de campos de 'gasto' a los campos de la tabla 'Gastos' en Airtable
-            "ID Gasto": gasto.id,
-            "Fecha Registro": gasto.fechaRegistro,
-            Categoría: gasto.categoria,
-            Descripción: gasto.descripcion,
-            Monto: parseFloat(gasto.monto), // Aseguramos que es un número
-            "Fecha del Gasto": gasto.fecha, // Fecha del formulario
-            "Método Pago": gasto.metodoPago,
-            Proveedor: gasto.proveedor,
-            Recurrente: gasto.recurrente ? "Sí" : "No", // Convertir booleano a texto
-            Divisa: gasto.divisa,
-            Usuario: gasto.usuario,
-          },
-        },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorDetails = await response.json().catch(() => response.statusText);
-    throw new Error(
-      `Error al guardar en Airtable. Código: ${
-        response.status
-      }. Detalles: ${JSON.stringify(errorDetails)}`
-    );
-  }
-
-  return await response.json();
-}
-
-// ==========================================================================
-// 🚀 EXPORTACIÓN DEL HANDLER PRINCIPAL
-// ==========================================================================
+// 💡 Inicializar Cliente Supabase (Service Role Key)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -78,7 +17,6 @@ exports.handler = async function (event, context) {
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
-
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -87,18 +25,35 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // 0. Verificar configuración de Supabase
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error:
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
+      }),
+    };
+  }
+
   try {
     const data = JSON.parse(event.body);
 
-    // 1. Validaciones
+    // 1. Validar campos requeridos
     const requiredFields = [
+      "fecha",
       "categoria",
       "descripcion",
       "monto",
-      "fecha",
       "metodoPago",
+      "usuario",
     ];
-    const missingFields = requiredFields.filter((field) => !data[field]);
+
+    const missingFields = requiredFields.filter(
+      (field) => !data[field] && data[field] !== 0
+    );
 
     if (missingFields.length > 0) {
       return {
@@ -106,7 +61,7 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: `Faltan campos: ${missingFields.join(", ")}`,
+          error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
         }),
       };
     }
@@ -123,25 +78,34 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // 2. Preparar datos para guardar
-    const gasto = {
+    // 2. Preparar datos para guardar (Mapeo a la tabla 'gastos')
+    const gastoSupabase = {
       id: `GASTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      fechaRegistro: new Date().toISOString(),
+      // fecha_registro se establece automáticamente por el DEFAULT now() de la DB
+      fecha: data.fecha,
       categoria: data.categoria,
       descripcion: data.descripcion,
       monto: monto.toFixed(2),
-      fecha: data.fecha,
-      metodoPago: data.metodoPago,
+      metodo_pago: data.metodoPago,
       proveedor: data.proveedor || null,
-      recurrente: data.recurrente === "si",
-      divisa: "VES",
+      recurrente: data.recurrente === "si" || data.recurrente === true,
+      divisa: data.divisa || "VES",
       usuario: data.usuario || "admin",
     };
 
-    console.log("💸 Gasto registrado:", gasto);
+    console.log("💸 Gasto a Supabase:", gastoSupabase);
 
-    // 3. Guardar en Airtable
-    await guardarEnAirtable(gasto);
+    // 3. Insertar en Supabase
+    const { data: insertedData, error } = await supabase
+      .from("gastos") // Nombre de la tabla
+      .insert([gastoSupabase])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("❌ Error de Supabase al registrar el gasto:", error);
+      throw new Error(`DB Error: ${error.message}`);
+    }
 
     // 4. Respuesta de éxito
     return {
@@ -149,19 +113,19 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Gasto registrado exitosamente",
-        gasto: gasto,
+        message: "Gasto registrado exitosamente en Supabase",
+        gasto: insertedData,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en la función registrar-gasto:", error);
+    console.error("❌ Error en registrar-gasto.js:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: "Error interno del servidor",
-        details: error.message,
+        error:
+          "Error interno del servidor al registrar el gasto: " + error.message,
       }),
     };
   }

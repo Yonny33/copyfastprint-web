@@ -1,82 +1,5 @@
 // netlify/functions/obtener-data-admin.js
-const fetch = require("node-fetch");
-
-const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-
-// Definición de tablas y campos para un fetch limpio
-const TABLES_CONFIG = {
-  // Limitar a 500 ventas y gastos (las más recientes) es una práctica de rendimiento
-  ventas: {
-    name: "Ventas",
-    sort: '[{field: "fechaRegistro", direction: "desc"}]',
-    maxRecords: 500,
-  },
-  gastos: {
-    name: "Gastos",
-    sort: '[{field: "fechaRegistro", direction: "desc"}]',
-    maxRecords: 500,
-  },
-  // Traer todo el inventario
-  inventario: {
-    name: process.env.AIRTABLE_TABLE_INVENTARIOS || "Inventario",
-    sort: '[{field: "material", direction: "asc"}]',
-    maxRecords: 9999,
-  },
-};
-
-/**
- * Función que maneja la paginación de Airtable para traer todos los registros.
- */
-async function fetchAllRecords(tableConfig) {
-  const { name, sort, maxRecords } = tableConfig;
-  const allRecords = [];
-  let offset = null; // Token de paginación de AirTable
-
-  while (true) {
-    // Construye la URL con paginación y ordenamiento
-    let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-      name
-    )}?pageSize=100&maxRecords=${maxRecords}&sort=${encodeURIComponent(sort)}`;
-    if (offset) {
-      url += `&offset=${offset}`;
-    }
-
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        `Error de Airtable al obtener ${name}: ${
-          data.error?.message || "Error desconocido"
-        }`
-      );
-    }
-
-    // Mapear los registros para extraer el id de Airtable (record.id) y los fields
-    const mappedRecords = data.records.map((record) => ({
-      airtableId: record.id, // ¡CRÍTICO! Este es el ID que usarás para editar/eliminar.
-      ...record.fields,
-    }));
-
-    allRecords.push(...mappedRecords);
-
-    // Revisar si hay más páginas (offset)
-    offset = data.offset;
-    if (!offset || allRecords.length >= maxRecords) {
-      break;
-    }
-  }
-
-  return allRecords;
-}
+const { createClient } = require("@supabase/supabase-js");
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -97,24 +20,51 @@ exports.handler = async function (event, context) {
     };
   }
 
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
+  // 💡 Inicializar Cliente Supabase
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+  if (!supabaseUrl || !supabaseKey) {
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         error:
-          "Error de configuración: Variables de entorno de Airtable faltantes.",
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
       }),
     };
   }
+  // Usamos la Service Key para que pueda leer, filtrar y ordenar sin problemas
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
-    // Ejecutar las tres peticiones de AirTable de forma concurrente
-    const [ventasData, gastosData, inventarioData] = await Promise.all([
-      fetchAllRecords(TABLES_CONFIG.ventas),
-      fetchAllRecords(TABLES_CONFIG.gastos),
-      fetchAllRecords(TABLES_CONFIG.inventario),
+    // 1. Ejecutar las tres consultas en paralelo con Promise.all
+    const [
+      { data: ventas, error: errorVentas },
+      { data: gastos, error: errorGastos },
+      { data: inventario, error: errorInventario },
+    ] = await Promise.all([
+      // 1. Obtener ventas del último año (o las 500 más recientes)
+      supabase
+        .from("ventas")
+        .select("*")
+        .order("fecha_registro", { ascending: false })
+        .limit(500),
+      // 2. Obtener gastos del último año (o los 500 más recientes)
+      supabase
+        .from("gastos")
+        .select("*")
+        .order("fecha_registro", { ascending: false })
+        .limit(500),
+      // 3. Obtener todo el inventario
+      supabase
+        .from("inventario")
+        .select("*")
+        .order("material", { ascending: true }),
     ]);
+
+    if (errorVentas) throw new Error(errorVentas.message);
+    if (errorGastos) throw new Error(errorGastos.message);
+    if (errorInventario) throw new Error(errorInventario.message);
 
     // Devolver los datos consolidados
     return {
@@ -123,20 +73,20 @@ exports.handler = async function (event, context) {
       body: JSON.stringify({
         success: true,
         data: {
-          ventas: ventasData,
-          gastos: gastosData,
-          inventario: inventarioData,
+          ventas: ventas,
+          gastos: gastos,
+          inventario: inventario,
         },
       }),
     };
   } catch (error) {
-    console.error("❌ Error en obtener-data-admin (AirTable):", error.message);
+    console.error("❌ Error en la función obtener-data-admin:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: `Error interno del servidor al consultar Airtable: ${error.message}`,
+        error: `Error interno del servidor: ${error.message}`,
       }),
     };
   }

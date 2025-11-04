@@ -1,75 +1,13 @@
 // netlify/functions/registrar-venta.js
-const fetch = require("node-fetch");
+const { createClient } = require("@supabase/supabase-js");
 
-// ==========================================================================
-// 🔑 CONFIGURACIÓN DE AIRTABLE
-// ==========================================================================
-const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-// Usamos el nombre de tabla que nos indicaste: "Ventas"
-const AIRTABLE_TABLE_NAME = "Ventas";
-
-// ==========================================================================
-// 💾 FUNCIÓN AUXILIAR: Guardar en Airtable
-// ==========================================================================
-async function guardarEnAirtable(venta) {
-  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
-    throw new Error(
-      "Error de configuración del servidor: Las claves de Airtable no están configuradas."
-    );
-  }
-
-  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
-    AIRTABLE_TABLE_NAME
-  )}`;
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      records: [
-        {
-          fields: {
-            // Mapeo de campos de 'venta' a los campos de la tabla 'Ventas' en Airtable
-            "ID Venta": venta.id,
-            "Fecha Registro": venta.fechaRegistro,
-            "Cédula Cliente": venta.cliente.cedula,
-            "Nombre Cliente": venta.cliente.nombre,
-            "Teléfono Cliente": venta.cliente.telefono,
-            Descripción: venta.descripcion,
-            "Monto Total": parseFloat(venta.montoTotal), // Aseguramos que es un número
-            "Monto Pagado": parseFloat(venta.montoPagado), // Aseguramos que es un número
-            "Monto Pendiente": parseFloat(venta.montoPendiente), // Aseguramos que es un número
-            "Estado Crédito": venta.estadoCredito,
-            "Método Pago": venta.metodoPago,
-            Usuario: venta.usuario,
-          },
-        },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const errorDetails = await response.json().catch(() => response.statusText);
-    throw new Error(
-      `Error al guardar en Airtable. Código: ${
-        response.status
-      }. Detalles: ${JSON.stringify(errorDetails)}`
-    );
-  }
-
-  return await response.json();
-}
-
-// ==========================================================================
-// 🚀 EXPORTACIÓN DEL HANDLER PRINCIPAL
-// ==========================================================================
+// 💡 Inicializar Cliente Supabase (Service Role Key para inserción/modificación)
+// Asegúrate de que estas variables de entorno están configuradas en Netlify
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async function (event, context) {
-  // Configurar CORS
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -77,16 +15,9 @@ exports.handler = async function (event, context) {
     "Content-Type": "application/json",
   };
 
-  // Manejar preflight request
   if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 200,
-      headers,
-      body: "",
-    };
+    return { statusCode: 200, headers, body: "" };
   }
-
-  // Solo aceptar POST
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -95,11 +26,23 @@ exports.handler = async function (event, context) {
     };
   }
 
+  // 0. Verificar configuración de Supabase
+  if (!supabaseUrl || !supabaseKey) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error:
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
+      }),
+    };
+  }
+
   try {
-    // 1. Parsear el body
     const data = JSON.parse(event.body);
 
-    // 2. Validar datos requeridos
+    // 1. Validar campos requeridos
     const requiredFields = [
       "cedula",
       "nombre",
@@ -108,8 +51,12 @@ exports.handler = async function (event, context) {
       "montoTotal",
       "montoPagado",
       "metodoPago",
+      "usuario",
     ];
-    const missingFields = requiredFields.filter((field) => !data[field]);
+
+    const missingFields = requiredFields.filter(
+      (field) => !data[field] && data[field] !== 0
+    );
 
     if (missingFields.length > 0) {
       return {
@@ -117,96 +64,97 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: `Faltan campos requeridos: ${missingFields.join(", ")}`,
+          error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
         }),
       };
     }
 
-    // 3. Procesar datos numéricos
     const montoTotal = parseFloat(data.montoTotal);
     const montoPagado = parseFloat(data.montoPagado);
 
-    if (isNaN(montoTotal) || montoTotal <= 0) {
+    if (
+      isNaN(montoTotal) ||
+      montoTotal <= 0 ||
+      isNaN(montoPagado) ||
+      montoPagado < 0
+    ) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: "El Monto Total debe ser un número positivo",
+          error:
+            "Los montos deben ser números válidos. Monto Total debe ser positivo.",
         }),
       };
     }
-    if (isNaN(montoPagado) || montoPagado < 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "El Monto Pagado debe ser un número no negativo",
-        }),
-      };
-    }
+
     if (montoPagado > montoTotal) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
-          error: "El Monto Pagado no puede ser mayor que el Monto Total",
+          error: "El monto pagado no puede ser mayor al monto total.",
         }),
       };
     }
 
-    // 4. Calcular el saldo pendiente y estado de crédito
+    // Determinar estado de crédito (para la DB)
     const montoPendiente = montoTotal - montoPagado;
-    let estadoCredito = "Completada";
+    let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
 
-    if (montoPendiente > 0) {
-      estadoCredito = "Crédito";
-    }
-
-    // 5. Preparar el objeto de la venta para la base de datos
-    const venta = {
+    // 2. Preparar el objeto de la venta para Supabase (Mapeo a la tabla 'ventas')
+    const ventaSupabase = {
+      // Usar un ID único generado en el código para mantener el formato VENTA-...
       id: `VENTA-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      fechaRegistro: new Date().toISOString(),
-      cliente: {
-        cedula: data.cedula,
-        nombre: data.nombre,
-        telefono: data.telefono,
-      },
+      // fecha_registro se establece automáticamente por el DEFAULT now() de la DB
+      cedula_cliente: data.cedula,
+      nombre_cliente: data.nombre,
+      telefono_cliente: data.telefono,
       descripcion: data.descripcion,
-      montoTotal: montoTotal.toFixed(2),
-      montoPagado: montoPagado.toFixed(2),
-      montoPendiente: montoPendiente.toFixed(2),
-      estadoCredito: estadoCredito,
-      metodoPago: data.metodoPago,
+      monto_total: montoTotal.toFixed(2),
+      monto_pagado: montoPagado.toFixed(2),
+      // monto_pendiente es GENERATED ALWAYS, NO se envía.
+      estado_credito: estadoCredito,
+      metodo_pago: data.metodoPago,
       usuario: data.usuario || "admin",
     };
 
-    console.log("💰 Venta registrada:", venta);
+    console.log("💰 Venta a Supabase:", ventaSupabase);
 
-    // 6. Guardar en Airtable
-    await guardarEnAirtable(venta);
+    // 3. Insertar en Supabase
+    const { data: insertedData, error } = await supabase
+      .from("ventas") // Nombre de la tabla
+      .insert([ventaSupabase])
+      .select() // Para obtener el registro completo (incluyendo monto_pendiente generado)
+      .single();
 
-    // 7. Respuesta de éxito
+    if (error) {
+      console.error("❌ Error de Supabase al registrar la venta:", error);
+      throw new Error(`DB Error: ${error.message}`);
+    }
+
+    // 4. Respuesta de éxito
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Venta registrada exitosamente",
-        venta: venta,
+        message: "Venta registrada exitosamente en Supabase",
+        venta: insertedData,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en la función registrar-venta:", error);
+    console.error("❌ Error en registrar-venta.js:", error);
+
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: "Error interno del servidor",
-        details: error.message,
+        error:
+          "Error interno del servidor al registrar la venta: " + error.message,
       }),
     };
   }

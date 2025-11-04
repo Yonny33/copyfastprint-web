@@ -1,11 +1,10 @@
 // netlify/functions/registrar-inventario.js
-const fetch = require("node-fetch");
+const { createClient } = require("@supabase/supabase-js");
 
-// Variables de entorno
-const API_KEY = process.env.AIRTABLE_API_KEY;
-const BASE_ID = process.env.AIRTABLE_BASE_ID;
-const TABLE_NAME = process.env.AIRTABLE_TABLE_INVENTARIOS; // << USAMOS LA TABLA INVENTARIOS
-const AIRTABLE_API_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+// 💡 Inicializar Cliente Supabase (Service Role Key)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -27,15 +26,15 @@ exports.handler = async function (event, context) {
     };
   }
 
-  // 0. Verificar la configuración de Airtable
-  if (!API_KEY || !BASE_ID || !TABLE_NAME) {
+  // 0. Verificar la configuración de Supabase
+  if (!supabaseUrl || !supabaseKey) {
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
         error:
-          "Error de configuración: Faltan variables de entorno de Airtable.",
+          "Error de configuración: Variables de entorno de Supabase faltantes.",
       }),
     };
   }
@@ -43,16 +42,19 @@ exports.handler = async function (event, context) {
   try {
     const data = JSON.parse(event.body);
 
-    // 1. Validaciones
+    // 1. Validar campos requeridos para el nuevo material
     const requiredFields = [
-      "tipoMovimiento",
-      "codigoProducto",
-      "nombreProducto",
-      "cantidad",
-      "costoUnitario",
-      "unidadMedida",
+      "codigo",
+      "material",
+      "tipo",
+      "stock",
+      "unidad_medida",
+      "stock_minimo",
     ];
-    const missingFields = requiredFields.filter((field) => !data[field]);
+
+    const missingFields = requiredFields.filter(
+      (field) => !data[field] && data[field] !== 0
+    );
 
     if (missingFields.length > 0) {
       return {
@@ -60,105 +62,85 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: `Faltan campos: ${missingFields.join(", ")}`,
+          error: `Faltan campos obligatorios para registrar el material: ${missingFields.join(
+            ", "
+          )}`,
         }),
       };
     }
 
-    const cantidad = parseInt(data.cantidad);
-    const costoUnitario = parseFloat(data.costoUnitario);
+    const stock = parseFloat(data.stock);
+    const stockMinimo = parseFloat(data.stock_minimo);
 
-    if (
-      isNaN(cantidad) ||
-      cantidad === 0 ||
-      isNaN(costoUnitario) ||
-      costoUnitario < 0
-    ) {
+    if (isNaN(stock) || isNaN(stockMinimo) || stock < 0 || stockMinimo < 0) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
           error:
-            "La cantidad debe ser un número entero y el costo unitario debe ser positivo o cero.",
+            "Stock y Stock Mínimo deben ser números válidos y no negativos.",
         }),
       };
     }
 
-    // 2. Preparar datos para Airtable
-    const costoTotal = cantidad * costoUnitario;
-
-    const movimiento = {
-      id: `INV-TRANS-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      fechaRegistro: new Date().toISOString(),
-      tipoMovimiento: data.tipoMovimiento,
-      codigoProducto: data.codigoProducto,
-      nombreProducto: data.nombreProducto,
-      cantidad: cantidad,
-      unidadMedida: data.unidadMedida,
-      costoUnitario: costoUnitario,
-      costoTotal: costoTotal,
-      notas: data.notas || "",
-      usuario: data.usuario || "admin",
+    // 2. Preparar el objeto para Supabase (Mapeo a la tabla 'inventario')
+    const materialSupabase = {
+      codigo: data.codigo,
+      material: data.material,
+      tipo: data.tipo,
+      stock: stock.toFixed(2),
+      unidad_medida: data.unidad_medida,
+      stock_minimo: stockMinimo.toFixed(2),
     };
 
-    // 3. 🎯 Guardar en Airtable
-    const airtableResponse = await fetch(AIRTABLE_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        records: [
-          {
-            fields: {
-              id: movimiento.id,
-              fechaRegistro: movimiento.fechaRegistro,
-              tipoMovimiento: movimiento.tipoMovimiento,
-              codigoProducto: movimiento.codigoProducto,
-              nombreProducto: movimiento.nombreProducto,
-              cantidad: movimiento.cantidad,
-              unidadMedida: movimiento.unidadMedida,
-              costoUnitario: movimiento.costoUnitario,
-              costoTotal: movimiento.costoTotal,
-              notas: movimiento.notas,
-              usuario: movimiento.usuario,
-            },
-          },
-        ],
-      }),
-    });
+    console.log("📦 Material a Supabase:", materialSupabase);
 
-    const airtableResult = await airtableResponse.json();
+    // 3. Insertar en Supabase (manejar el error de código único)
+    const { data: insertedData, error } = await supabase
+      .from("inventario") // Nombre de la tabla
+      .insert([materialSupabase])
+      .select()
+      .single();
 
-    if (!airtableResponse.ok) {
-      console.error("❌ Error de Airtable:", airtableResult);
-      throw new Error(
-        airtableResult.error?.message || "Error al guardar en Airtable"
-      );
+    if (error) {
+      console.error("❌ Error de Supabase al registrar el material:", error);
+
+      // Manejar error de UNIQUE constraint (código duplicado: código de error '23505')
+      if (error.code === "23505" && error.message.includes("codigo")) {
+        return {
+          statusCode: 409, // Conflict
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: `El código de material '${data.codigo}' ya existe. Los códigos deben ser únicos.`,
+          }),
+        };
+      }
+
+      throw new Error(`DB Error: ${error.message}`);
     }
 
+    // 4. Respuesta de éxito
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Movimiento de inventario registrado exitosamente en Airtable",
-        movimientoId: movimiento.id,
-        airtableRecordId: airtableResult.records[0]?.id,
+        message: "Material de inventario registrado exitosamente en Supabase",
+        material: insertedData,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en registrar-inventario:", error);
+    console.error("❌ Error en registrar-inventario.js:", error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
         error:
-          "Error interno del servidor al intentar guardar el movimiento de inventario.",
-        details: error.message,
+          "Error interno del servidor al registrar el material: " +
+          error.message,
       }),
     };
   }
