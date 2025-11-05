@@ -1,128 +1,205 @@
-// js/registro-ventas.js
+// netlify/functions/registrar-venta.js
+const fetch = require("node-fetch");
 
 // ==========================================================================
-// ===  LÓGICA DEL FORMULARIO DE REGISTRO DE VENTAS (VES)  ===
+// 🔑 CONFIGURACIÓN DE AIRTABLE
 // ==========================================================================
+// Estas variables deben estar configuradas en la sección Environment de Netlify.
+const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+// Usamos el nombre de tabla que nos indicaste: "Ventas"
+const AIRTABLE_TABLE_NAME = "Ventas";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const formulario = document.getElementById("registro-ventas-form");
-  const loadingOverlay = document.getElementById("loading-overlay");
-  const montoTotalInput = document.getElementById("montoTotal");
-  const montoPagadoInput = document.getElementById("montoPagado");
-
-  // Función para formatear números en VES
-  function formatVES(numero) {
-    return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+// ==========================================================================
+// 💾 FUNCIÓN AUXILIAR: Guardar en Airtable
+// ==========================================================================
+async function guardarEnAirtable(venta) {
+  if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID) {
+    throw new Error(
+      "Error de configuración del servidor: Las claves de Airtable no están configuradas."
+    );
   }
 
-  // Función para mostrar loading
-  function showLoading() {
-    if (loadingOverlay) {
-      loadingOverlay.style.display = "flex";
-    }
-  }
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(
+    AIRTABLE_TABLE_NAME
+  )}`;
 
-  // Función para ocultar loading
-  function hideLoading() {
-    if (loadingOverlay) {
-      loadingOverlay.style.display = "none";
-    }
-  }
-
-  // Validación en tiempo real del monto pagado
-  if (montoPagadoInput && montoTotalInput) {
-    montoPagadoInput.addEventListener("input", function () {
-      const montoTotal = parseFloat(montoTotalInput.value) || 0;
-      const montoPagado = parseFloat(montoPagadoInput.value) || 0;
-
-      if (montoPagado > montoTotal) {
-        montoPagadoInput.setCustomValidity(
-          "El monto pagado no puede ser mayor que el monto total."
-        );
-      } else {
-        montoPagadoInput.setCustomValidity("");
-      }
-    });
-  }
-
-  if (formulario) {
-    formulario.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      // Forzar la validación de HTML5 (incluyendo la personalizada)
-      if (!formulario.checkValidity()) {
-        formulario.reportValidity();
-        return;
-      }
-
-      showLoading();
-
-      // 1. Obtener datos del formulario
-      const formData = new FormData(formulario);
-      const data = {};
-      formData.forEach((value, key) => (data[key] = value));
-
-      // 2. Incluir usuario
-      data.usuario = sessionStorage.getItem("usuario") || "admin";
-
-      // 3. Preparar los montos
-      const montoTotal = parseFloat(data.montoTotal);
-      const montoPagado = parseFloat(data.montoPagado);
-      const montoPendiente = montoTotal - montoPagado;
-      let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
-
-      try {
-        // 4. Llamar a la función de Netlify
-        const response = await fetch("/.netlify/functions/registrar-venta", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      records: [
+        {
+          fields: {
+            // Mapeo de campos de 'venta' a los campos de la tabla 'Ventas' en Airtable
+            ID_VENTA: venta.id,
+            Fecha_Registro: venta.fechaRegistro,
+            Cédula_Cliente: venta.cliente.cedula || "N/A",
+            Nombre_Cliente: venta.cliente.nombre,
+            Teléfono_Cliente: venta.cliente.telefono || "N/A",
+            Descripción_Venta: venta.descripcion,
+            Monto_Total: parseFloat(venta.montoTotal),
+            Monto_Pagado: parseFloat(venta.montoPagado),
+            Monto_Pendiente: parseFloat(venta.montoPendiente),
+            Estado_Crédito: venta.estadoCredito,
+            Método_Pago: venta.metodoPago,
+            Usuario_Registro: venta.usuario,
           },
-          body: JSON.stringify(data),
-        });
+        },
+      ],
+    }),
+  });
 
-        const result = await response.json();
+  const airtableResult = await response.json();
 
-        // 5. Manejar la respuesta
-        if (result.success) {
-          // Mensaje de éxito con formato VES
-          alert(
-            `✅ Venta registrada con éxito!\n\n` +
-              `Estado: ${estadoCredito}\n` +
-              `Divisa: Bolívares (VES) 🇻🇪\n` +
-              `Monto Total: ${formatVES(montoTotal)}\n` +
-              `Monto Pagado: ${formatVES(montoPagado)}\n` +
-              `Saldo Pendiente: ${formatVES(montoPendiente)}`
-          );
-
-          // Limpiar el formulario
-          formulario.reset();
-        } else {
-          throw new Error(result.error || "Error desconocido en el servidor");
-        }
-      } catch (error) {
-        console.error("❌ Error de conexión:", error);
-
-        // Mensaje de error amigable
-        alert(
-          `⚠️ Error al registrar la venta:\n\n${error.message}\n\n` +
-            `Si el problema persiste, contacta al administrador del sistema.`
-        );
-      } finally {
-        // 7. Ocultar animación de carga
-        hideLoading();
-      }
-    });
-
-    // Evento para el botón reset
-    formulario.addEventListener("reset", function () {
-      // Limpiar cualquier validación personalizada
-      if (montoPagadoInput) {
-        montoPagadoInput.setCustomValidity("");
-      }
-    });
+  if (!response.ok) {
+    console.error("❌ Error de Airtable:", airtableResult);
+    throw new Error(
+      airtableResult.error?.message || "Error al guardar en Airtable"
+    );
   }
-});
+
+  return airtableResult;
+}
+
+// ==========================================================================
+// 🚀 MANEJADOR PRINCIPAL DE NETLIFY FUNCTION
+// ==========================================================================
+exports.handler = async (event, context) => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json",
+  };
+
+  // Manejar preflight request (necesario para CORS)
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
+  }
+
+  // Solo acepta peticiones POST
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: "Método no permitido" }),
+    };
+  }
+
+  try {
+    const data = JSON.parse(event.body);
+
+    // 1. Validar campos requeridos
+    const requiredFields = [
+      "nombre",
+      "descripcion",
+      "montoTotal",
+      "montoPagado",
+      "metodoPago",
+    ];
+    const missingFields = requiredFields.filter((field) => !data[field]);
+
+    if (missingFields.length > 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: `Faltan campos requeridos: ${missingFields.join(", ")}`,
+        }),
+      };
+    }
+
+    // 2. Convertir y validar montos
+    const montoTotal = parseFloat(data.montoTotal);
+    const montoPagado = parseFloat(data.montoPagado);
+
+    if (isNaN(montoTotal) || montoTotal <= 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: "El Monto Total debe ser un número positivo",
+        }),
+      };
+    }
+    if (isNaN(montoPagado) || montoPagado < 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: "El Monto Pagado debe ser un número no negativo",
+        }),
+      };
+    }
+    if (montoPagado > montoTotal) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: "El Monto Pagado no puede ser mayor que el Monto Total",
+        }),
+      };
+    }
+
+    // 3. Determinar el saldo pendiente y estado de crédito
+    const montoPendiente = montoTotal - montoPagado;
+    let estadoCredito = "Completada";
+
+    if (montoPendiente > 0) {
+      estadoCredito = "Crédito";
+    }
+
+    // 4. Preparar el objeto de la venta para la base de datos
+    const venta = {
+      id: `VENTA-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      fechaRegistro: new Date().toISOString(),
+      cliente: {
+        cedula: data.cedula || null, // Permitir null
+        nombre: data.nombre,
+        telefono: data.telefono || null, // Permitir null
+      },
+      descripcion: data.descripcion,
+      montoTotal: montoTotal.toFixed(2),
+      montoPagado: montoPagado.toFixed(2),
+      montoPendiente: montoPendiente.toFixed(2),
+      estadoCredito: estadoCredito,
+      metodoPago: data.metodoPago,
+      usuario: data.usuario || "admin",
+    };
+
+    console.log("💰 Venta a registrar:", venta);
+
+    // 5. Guardar en Airtable
+    await guardarEnAirtable(venta);
+
+    // 6. Respuesta de éxito
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        success: true,
+        message: "Venta registrada exitosamente",
+        venta: venta,
+      }),
+    };
+  } catch (error) {
+    console.error("❌ Error en registrar-venta:", error.message);
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        success: false,
+        error: "Error interno del servidor. Verifique logs.",
+        details: error.message,
+      }),
+    };
+  }
+};
