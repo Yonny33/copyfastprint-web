@@ -1,3 +1,5 @@
+// js/registro-ventas.js
+
 // ==========================================================================
 // ===  LÓGICA DEL FORMULARIO DE REGISTRO DE VENTAS (VES)  ===
 // ==========================================================================
@@ -38,9 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (montoPagado > montoTotal) {
         montoPagadoInput.setCustomValidity(
-          "El monto pagado no puede ser mayor al monto total"
+          "El monto pagado no puede ser mayor que el monto total."
         );
-        montoPagadoInput.reportValidity();
       } else {
         montoPagadoInput.setCustomValidity("");
       }
@@ -51,57 +52,43 @@ document.addEventListener("DOMContentLoaded", () => {
     formulario.addEventListener("submit", async function (e) {
       e.preventDefault();
 
-      // 1. Validación adicional
-      const montoTotal = parseFloat(
-        document.getElementById("montoTotal").value
-      );
-      const montoPagado =
-        parseFloat(document.getElementById("montoPagado").value) || 0;
-
-      if (montoPagado > montoTotal) {
-        alert("❌ Error: El monto pagado no puede ser mayor al monto total.");
+      // Forzar la validación de HTML5 (incluyendo la personalizada)
+      if (!formulario.checkValidity()) {
+        formulario.reportValidity();
         return;
       }
 
-      // 2. Mostrar animación de carga
       showLoading();
 
-      // 3. Calcular crédito
-      const montoPendiente = montoTotal - montoPagado;
-      const estadoCredito = montoPendiente > 0 ? "PENDIENTE" : "PAGADO";
-
-      // 4. Recolectar datos del formulario
+      // 1. Obtener datos del formulario
       const formData = new FormData(formulario);
-      const data = Object.fromEntries(formData);
+      const data = {};
+      formData.forEach((value, key) => (data[key] = value));
 
-      const payload = {
-        ...data,
-        divisa: "VES",
-        montoTotal: montoTotal.toFixed(2),
-        montoPagado: montoPagado.toFixed(2),
-        montoPendiente: montoPendiente.toFixed(2),
-        estadoCredito: estadoCredito,
-        fechaRegistro: new Date().toISOString(),
-      };
+      // 2. Incluir usuario
+      data.usuario = sessionStorage.getItem("usuario") || "admin";
 
-      console.log("📊 Datos a enviar:", payload);
+      // 3. Preparar los montos
+      const montoTotal = parseFloat(data.montoTotal);
+      const montoPagado = parseFloat(data.montoPagado);
+      const montoPendiente = montoTotal - montoPagado;
+      let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
 
-      // 5. Enviar datos a la Netlify Function / Backend
       try {
+        // 4. Llamar a la función de Netlify
         const response = await fetch("/.netlify/functions/registrar-venta", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(data),
         });
 
         const result = await response.json();
 
-        // 6. Manejar la respuesta
-        if (response.ok && result.success) {
-          // Mostrar mensaje de éxito con formato VES
+        // 5. Manejar la respuesta
+        if (result.success) {
+          // Mensaje de éxito con formato VES
           alert(
             `✅ Venta registrada con éxito!\n\n` +
               `Estado: ${estadoCredito}\n` +
@@ -113,11 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // Limpiar el formulario
           formulario.reset();
-
-          // Opcional: Redirigir a una página de éxito
-          // setTimeout(() => {
-          //   window.location.href = "/gracias-registro.html";
-          // }, 2000);
         } else {
           throw new Error(result.error || "Error desconocido en el servidor");
         }
@@ -142,9 +124,5 @@ document.addEventListener("DOMContentLoaded", () => {
         montoPagadoInput.setCustomValidity("");
       }
     });
-  } else {
-    console.error(
-      "❌ No se encontró el formulario con id 'registro-ventas-form'"
-    );
   }
 });
