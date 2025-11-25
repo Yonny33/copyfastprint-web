@@ -1,81 +1,222 @@
 // netlify/functions/editar-registro.js
-
-const { GoogleAuth } = require("google-auth-library");
 const { google } = require("googleapis");
 
-// ==========================================================================
-// 🔑 CONFIGURACIÓN DE GOOGLE SHEETS
-// ==========================================================================
-const SHEETS_ID = process.env.GOOGLE_SHEETS_ID;
-const CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
-const PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY
-  ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n")
-  : null;
+// ⚠️ IMPORTANTE: Estas variables deben estar configuradas en Netlify
+const SHEET_ID = process.env.GOOGLE_SHEET_ID;
+
+// Mapas de configuración para la lógica de búsqueda y mapeo de datos
+const SHEET_CONFIG = {
+  ventas: {
+    name: "Ventas",
+    keyColumn: "A",
+    keyIndex: 0,
+    // Orden de columnas esperado (0-based):
+    // 0: ID, 1: Fecha, 2: Cedula, 3: Nombre, 4: Telefono, 5: Descripcion,
+    // 6: Monto Total, 7: Monto Pagado, 8: Monto Pendiente, 9: Estado Crédito,
+    // 10: Metodo Pago, 11: Usuario
+  },
+  gastos: {
+    name: "Gastos",
+    keyColumn: "A",
+    keyIndex: 0,
+    // Orden de columnas esperado (0-based):
+    // 0: ID, 1: Fecha, 2: Categoria, 3: Descripcion, 4: Monto,
+    // 5: Metodo Pago, 6: Proveedor, 7: Recurrente, 8: Divisa, 9: Usuario
+  },
+  inventario: {
+    name: "Inventario",
+    keyColumn: "A",
+    keyIndex: 0,
+    // Orden de columnas esperado (0-based):
+    // 0: Codigo, 1: Nombre, 2: Tipo, 3: Stock Actual, 4: U. Medida,
+    // 5: Stock Mínimo, 6: Usuario
+  },
+};
 
 /**
- * Mapea los campos de datos (del frontend) a la posición de la columna en Google Sheets.
- * @param {string} tabla - Nombre de la hoja (ventas, gastos, inventario).
- * @param {object} data - Datos a actualizar.
- * @returns {Array<string>} Los valores ordenados como aparecerán en la fila.
+ * 🔑 Autoriza el acceso a Google Sheets API
  */
-function mapDataToRow(tabla, data) {
-  // Las columnas se definen por el orden en tu CSV/Hoja de Cálculo.
-  // Asumimos un máximo de 10 columnas (A:J)
+async function authorizeAndGetSheets() {
+  if (
+    !process.env.GOOGLE_CLIENT_EMAIL ||
+    !process.env.GOOGLE_PRIVATE_KEY ||
+    !SHEET_ID
+  ) {
+    throw new Error(
+      "Variables de entorno de Google Sheets (EMAIL, KEY, ID) no configuradas."
+    );
+  }
 
-  // NOTA IMPORTANTE: Si un campo no se pasa en 'data', se usa el valor actual (data.currentValue).
-  // Si no tenemos el valor actual, se usará 'N/A' o '0', lo cual puede ser un problema si no se pasan todos los campos.
+  // Se requiere el scope de escritura para actualizar datos
+  const scope = "https://www.googleapis.com/auth/spreadsheets";
 
-  // **ESTE MAPEADO DEBE COINCIDIR EXACTAMENTE CON EL ORDEN DE TU HOJA**
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      // Reemplaza los caracteres de salto de línea codificados en la variable de entorno
+      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    },
+    scopes: [scope],
+  });
 
+  const authClient = await auth.getClient();
+  return google.sheets({ version: "v4", auth: authClient });
+}
+
+/**
+ * 🔄 Busca el registro por ID/Código y actualiza la fila correspondiente.
+ * @param {object} sheets Cliente de Google Sheets API
+ * @param {string} tabla Nombre de la tabla ('ventas', 'gastos', 'inventario')
+ * @param {string} id Valor único de la clave (ID o Código)
+ * @param {object} data Datos a actualizar
+ */
+async function findAndUpdateSheet(sheets, tabla, id, data) {
+  const config = SHEET_CONFIG[tabla];
+  if (!config) throw new Error(`Tabla no reconocida: ${tabla}`);
+
+  const sheetName = config.name;
+  const keyColumnLetter = config.keyColumn;
+  const keyColumnIndex = config.keyIndex;
+
+  // 1. Obtener todos los IDs/Códigos de la columna clave
+  const allIdsResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!${keyColumnLetter}:${keyColumnLetter}`,
+  });
+
+  const idList = allIdsResponse.data.values || [];
+
+  // Buscar el índice de la fila que coincide con el ID.
+  // Empezamos a buscar desde el índice 1 del array (Row 2 de la hoja) para saltar el encabezado.
+  let rowIndex = -1;
+  for (let i = 1; i < idList.length; i++) {
+    // La columna clave está en el índice 0 del array interno
+    if (idList[i] && idList[i][keyColumnIndex] === id) {
+      rowIndex = i;
+      break;
+    }
+  }
+
+  if (rowIndex === -1) {
+    throw new Error(
+      `Registro con ID/Código '${id}' no encontrado en la hoja '${sheetName}'.`
+    );
+  }
+
+  // El número de fila en Google Sheets (1-based) es el índice del array (0-based desde Row 1) + 1
+  const sheetRowNumber = rowIndex + 1;
+
+  // 2. Obtener la fila actual para preservar los campos no modificados
+  const currentRowResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    // Leer toda la fila a actualizar
+    range: `${sheetName}!${sheetRowNumber}:${sheetRowNumber}`,
+  });
+  const currentRow = currentRowResponse.data.values
+    ? currentRowResponse.data.values[0]
+    : [];
+
+  // 3. Mapear los datos de entrada a la estructura de la fila completa
+  let updatedRow = [];
+
+  // Lógica para 'ventas': Recalcular montos pendientes y estado de crédito
   if (tabla === "ventas") {
-    // Columnas: Fecha (A), ID (B), Cliente (C), Cantidad (D), Precio Unitario (E), Descripción (F), Venta Bruta (G), Abono (H), Saldo (I), IVA (J)
-    return [
-      data.fechaRegistro || data.currentFecha || "",
-      data.recordId || data.currentID || "", // ID único (Columna B)
-      data.nombreCliente || data.currentCliente || "",
-      data.cantidad || data.currentCantidad || 1, // ASUMIDO
-      data.precioUnitario || data.currentPrecio || data.montoTotal, // ASUMIDO
-      data.descripcion || data.currentDescripcion || "",
-      data.montoTotal || data.currentVentaBruta || 0,
-      data.montoPagado || data.currentAbono || 0,
-      data.montoPendiente || data.currentSaldo || 0,
-      data.iva || data.currentIVA || 0, // ASUMIDO
+    const currentMontoTotal = parseFloat(currentRow[6] || 0);
+    const currentMontoPagado = parseFloat(currentRow[7] || 0);
+
+    const montoTotal = data.montoTotal
+      ? parseFloat(data.montoTotal)
+      : currentMontoTotal;
+    const montoPagado = data.montoPagado
+      ? parseFloat(data.montoPagado)
+      : currentMontoPagado;
+
+    // Recalcular
+    const montoPendiente = montoTotal - montoPagado;
+    let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
+
+    updatedRow = [
+      currentRow[0], // 0: ID (No se toca)
+      data.fechaRegistro || currentRow[1], // 1: Fecha
+      data.cedula || currentRow[2], // 2: Cedula
+      data.nombre || currentRow[3], // 3: Nombre
+      data.telefono || currentRow[4], // 4: Telefono
+      data.descripcion || currentRow[5], // 5: Descripcion
+      montoTotal.toFixed(2), // 6: Monto Total (Recalculado)
+      montoPagado.toFixed(2), // 7: Monto Pagado (Recalculado)
+      montoPendiente.toFixed(2), // 8: Monto Pendiente (Recalculado)
+      estadoCredito, // 9: Estado Credito (Recalculado)
+      data.metodoPago || currentRow[10], // 10: Metodo Pago
+      data.usuario || currentRow[11] || "admin", // 11: Usuario
     ];
-  } else if (tabla === "gastos") {
-    // Columnas: Fecha (A), N° Factura (B), RIF Proveedor (C), Razon Social (D), Concepto (E), Cant (F), Descripción (G), Precio Unitario (H), Monto Total (I), Crédito Fiscal (J)
-    return [
-      data.fecha || data.currentFecha || "",
-      data.nFactura || data.currentNFactura || "", // ID único (Columna B)
-      data.rifProveedor || data.currentRIF || "",
-      data.proveedor || data.currentRazonSocial || "",
-      data.categoria || data.currentConcepto || "",
-      data.cantidad || data.currentCant || 1, // ASUMIDO
-      data.descripcion || data.currentDescripcion || "",
-      data.monto || data.currentPrecio || 0,
-      data.monto || data.currentMontoTotal || 0,
-      data.creditoFiscal || data.currentCreditoFiscal || 0, // ASUMIDO
+  }
+  // Lógica para 'gastos'
+  else if (tabla === "gastos") {
+    const monto = data.monto
+      ? parseFloat(data.monto)
+      : parseFloat(currentRow[4] || 0);
+    updatedRow = [
+      currentRow[0], // 0: ID (No se toca)
+      data.fecha || currentRow[1], // 1: Fecha
+      data.categoria || currentRow[2], // 2: Categoria
+      data.descripcion || currentRow[3], // 3: Descripcion
+      monto.toFixed(2), // 4: Monto
+      data.metodoPago || currentRow[5], // 5: Metodo Pago
+      data.proveedor || currentRow[6], // 6: Proveedor
+      data.recurrente || currentRow[7], // 7: Recurrente
+      data.divisa || currentRow[8], // 8: Divisa
+      data.usuario || currentRow[9] || "admin", // 9: Usuario
+    ];
+  }
+  // Lógica para 'inventario'
+  else if (tabla === "inventario") {
+    // En inventario, el campo de actualización puede ser 'cantidad' o 'stockActual'
+    const newStock = data.cantidad || data.stockActual;
+    const cantidad = newStock
+      ? parseFloat(newStock)
+      : parseFloat(currentRow[3] || 0);
+
+    updatedRow = [
+      currentRow[0], // 0: Codigo (No se toca)
+      data.nombreProducto || currentRow[1], // 1: Nombre
+      data.tipoMovimiento || currentRow[2], // 2: Tipo
+      cantidad, // 3: Stock Actual
+      data.unidadMedida || currentRow[4], // 4: U. Medida
+      data.stockMinimo || currentRow[5], // 5: Stock Minimo
+      data.usuario || currentRow[6] || "admin", // 6: Usuario
     ];
   }
 
-  // Implementar Inventario si es necesario
-  throw new Error(`Mapeo de datos no implementado para la tabla: ${tabla}`);
+  // 4. Asegurar que la fila de actualización tenga al menos la longitud de la fila actual
+  while (updatedRow.length < currentRow.length) {
+    updatedRow.push("");
+  }
+
+  // 5. Actualizar la fila específica en Google Sheets
+  const result = await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `${sheetName}!A${sheetRowNumber}`, // Apunta a la fila exacta desde la columna A
+    valueInputOption: "USER_ENTERED",
+    resource: {
+      values: [updatedRow],
+    },
+  });
+
+  return result;
 }
 
-// ==========================================================================
-// 💾 FUNCIÓN PRINCIPAL: Editar en Google Sheets
-// ==========================================================================
 exports.handler = async function (event, context) {
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "PUT, OPTIONS",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Content-Type": "application/json",
   };
 
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
-  if (event.httpMethod !== "PUT") {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       headers,
@@ -83,130 +224,56 @@ exports.handler = async function (event, context) {
     };
   }
 
-  if (!SHEETS_ID || !CLIENT_EMAIL || !PRIVATE_KEY) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: "Error de configuración de Google Sheets.",
-      }),
-    };
-  }
-
   try {
-    const { tabla, recordId, data } = JSON.parse(event.body);
+    const { tabla, id, data } = JSON.parse(event.body);
 
-    if (!tabla || !recordId || !data) {
+    // 1. Validar campos
+    if (!tabla || !id || !data || Object.keys(data).length === 0) {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
-          error: "Faltan parámetros: tabla, recordId o data.",
+          success: false,
+          error:
+            "Faltan parámetros: 'tabla', 'id' y 'data' (con campos a actualizar) son requeridos.",
         }),
       };
     }
 
-    const auth = new GoogleAuth({
-      credentials: { client_email: CLIENT_EMAIL, private_key: PRIVATE_KEY },
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-    const sheets = google.sheets({ version: "v4", auth });
-
-    // 1. BUSCAR EL ÍNDICE DE LA FILA POR EL ID (Columna B)
-    const rangeToSearch = `${tabla}!B2:B`; // Empezamos en la segunda fila (después del encabezado)
-
-    const searchResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: SHEETS_ID,
-      range: rangeToSearch,
-    });
-
-    const idValues = searchResponse.data.values || [];
-    // El row index es el índice del array + 2 (porque empezamos en la fila 2 de Sheets)
-    const rowIndex = idValues.findIndex((row) => row[0] === recordId);
-
-    if (rowIndex === -1) {
+    // 2. Seguridad: asegurar que la tabla sea una de las permitidas
+    const tablasPermitidas = Object.keys(SHEET_CONFIG);
+    if (!tablasPermitidas.includes(tabla)) {
       return {
-        statusCode: 404,
+        statusCode: 403,
         headers,
         body: JSON.stringify({
-          error: `Registro no encontrado con ID: ${recordId} en la hoja ${tabla}.`,
+          success: false,
+          error: "Operación de actualización no permitida para esta tabla.",
         }),
       };
     }
 
-    // Fila real de Google Sheets (1-basada)
-    const sheetRowNumber = rowIndex + 2;
-
-    // 2. OBTENER LOS DATOS ACTUALES DE LA FILA COMPLETA
-    // Esto es crucial porque el frontend solo envía los campos editados, no toda la fila.
-    const currentRowRange = `${tabla}!A${sheetRowNumber}:J${sheetRowNumber}`;
-    const currentRowResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: SHEETS_ID,
-      range: currentRowRange,
-    });
-
-    const currentData = currentRowResponse.data.values
-      ? currentRowResponse.data.values[0]
-      : [];
-
-    // Mapear los datos actuales a claves para facilitar la fusión (Asumimos el mismo orden de columnas que en mapDataToRow)
-    // Columna 1: Fecha (A), Columna 2: ID (B), etc.
-    const headers = [
-      "currentFecha",
-      "currentID",
-      "currentCliente",
-      "currentCantidad",
-      "currentPrecio",
-      "currentDescripcion",
-      "currentVentaBruta",
-      "currentAbono",
-      "currentSaldo",
-      "currentIVA",
-    ];
-    const currentObject = {};
-    headers.forEach((key, i) => {
-      currentObject[key] = currentData[i];
-    });
-
-    // 3. COMBINAR DATOS (Nuevos datos sobrescriben los actuales)
-    const mergedData = { ...currentObject, ...data, recordId: recordId };
-
-    // 4. Mapear el objeto fusionado a la matriz de filas para la actualización
-    const rowToUpdate = mapDataToRow(tabla, mergedData);
-
-    // 5. ACTUALIZAR LA FILA
-    const rangeToUpdate = `${tabla}!A${sheetRowNumber}:J${sheetRowNumber}`;
-    const updateResponse = await sheets.spreadsheets.values.update({
-      spreadsheetId: SHEETS_ID,
-      range: rangeToUpdate,
-      valueInputOption: "USER_ENTERED",
-      resource: {
-        values: [rowToUpdate],
-      },
-    });
-
-    if (updateResponse.status !== 200) {
-      throw new Error(
-        `Error al actualizar en Google Sheets: ${updateResponse.statusText}`
-      );
-    }
+    // 3. Ejecutar la autorización y la actualización
+    const sheets = await authorizeAndGetSheets();
+    const updateResult = await findAndUpdateSheet(sheets, tabla, id, data);
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: `Registro ${recordId} en ${tabla} actualizado exitosamente.`,
+        message: `Registro (${id}) actualizado exitosamente en Google Sheets.`,
+        updatedCells: updateResult.data.updatedCells,
       }),
     };
   } catch (error) {
-    console.error("❌ Error en la función editar-registro:", error);
+    console.error("❌ Error en editar-registro.js:", error.message);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: `Error interno del servidor: ${error.message}`,
+        error: `Error al actualizar el registro: ${error.message}`,
       }),
     };
   }
