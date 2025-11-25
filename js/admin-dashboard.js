@@ -3,227 +3,134 @@
 // ==========================================================================
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Elemento para la animación de carga
   const loadingOverlay = document.getElementById("loading-overlay");
 
-  // 1. VERIFICACIÓN DE SESIÓN (Redirige si no hay sesión)
+  // 1. VERIFICACIÓN DE SESIÓN (Dejado sin cambios)
   if (sessionStorage.getItem("sesionActiva") !== "true") {
-    // Si no hay sesión, redirigir inmediatamente.
     window.location.href = "login-registro.html";
-    return; // Detener la ejecución del resto del script
+    return;
   }
 
-  // 2. FUNCIÓN PARA FORMATEAR MONEDA (Bolívares)
+  // 2. FUNCIÓN PARA FORMATEAR MONEDA (Dejado sin cambios)
   function formatVES(numero) {
-    return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
+    // Asegurarse de que el número es un float antes de formatear
+    const num = parseFloat(numero);
+    if (isNaN(num)) return "Bs. 0.00";
+    return `Bs. ${num.toLocaleString("es-VE", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
   }
 
-  // 3. MOSTRAR INFORMACIÓN DEL USUARIO
-  const usuario = sessionStorage.getItem("usuario");
-  if (usuario) {
-    const ultimoAcceso = sessionStorage.getItem("ultimoAcceso");
-    const userInfo = document.createElement("div");
+  // 3. LÓGICA DE CÁLCULO DE INDICADORES (NUEVA FUNCIÓN)
+  function calcularIndicadores(ventas, gastos) {
+    const hoy = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    const mesActual = new Date().toISOString().substring(0, 7); // 'YYYY-MM'
 
-    // NOTA: La clase 'user-info-status' está definida en el bloque <style> de admin.html
-    userInfo.className = "user-info-status";
-    userInfo.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 0.5em;">
-        <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
-        <div>
-          <strong style="display: block; color: #222;">Bienvenido, ${usuario}</strong>
-          <small style="color: #666;">Último acceso: ${ultimoAcceso}</small>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(userInfo);
-  }
+    let ventasDia = 0;
+    let ingresosMes = 0;
+    let creditosPendientes = 0;
+    let gastosDia = 0;
+    let clientesPendientes = 0; // Se usará para contar créditos
 
-  // 4. EVENTO DE CERRAR SESIÓN
-  const btnCerrarSesion = document.getElementById("btnCerrarSesion");
-  if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        sessionStorage.clear();
-        window.location.href = "login-registro.html";
+    // --- CÁLCULOS DE VENTAS Y CRÉDITOS ---
+    ventas.forEach((v) => {
+      // Intentar parsear las columnas con los nombres normalizados
+      const montoTotal = parseFloat(v.venta_bruta_ves) || 0;
+      const montoPendiente = parseFloat(v.saldo_pendiente_ves) || 0;
+      const fechaVenta = v.fecha; // El formato es 'YYYY-MM-DD'
+
+      // Ventas del día (venta bruta total)
+      if (fechaVenta === hoy) {
+        ventasDia += montoTotal;
+      }
+
+      // Ingresos del mes (venta bruta total)
+      if (fechaVenta && fechaVenta.startsWith(mesActual)) {
+        ingresosMes += montoTotal;
+      }
+
+      // Créditos Pendientes (acumulado total)
+      if (v.saldo_pendiente_ves && montoPendiente > 0) {
+        creditosPendientes += montoPendiente;
+        clientesPendientes += 1; // Contar cada registro con saldo
       }
     });
+
+    // --- CÁLCULOS DE GASTOS ---
+    gastos.forEach((g) => {
+      const montoGasto = parseFloat(g.monto_total_ves) || 0;
+      const fechaGasto = g.fecha;
+
+      // Gastos del día
+      if (fechaGasto === hoy) {
+        gastosDia += montoGasto;
+      }
+    });
+
+    return {
+      ventasDia,
+      ingresosMes,
+      creditosPendientes,
+      gastosDia,
+      clientesPendientes,
+    };
   }
 
-  // 5. CARGAR DATOS DEL DASHBOARD
+  // 4. FUNCIÓN PRINCIPAL DE CARGA
   async function cargarDashboard() {
-    // Mostrar animación de carga
-    if (loadingOverlay) {
-      loadingOverlay.style.display = "flex";
-    }
+    if (loadingOverlay) loadingOverlay.style.display = "flex";
 
     try {
-      // ⚠️ ATENCIÓN: Esta sección está comentada y usa datos de ejemplo (simulación).
-      // Descomenta y adapta la lógica 'fetch' cuando implementes tu función de Netlify para obtener datos reales.
-
-      /*
-      const response = await fetch('/.netlify/functions/obtener-dashboard');
+      // 🚨 USAR LA FUNCIÓN REAL DE NETLIFY 🚨
+      const response = await fetch(
+        "/.netlify/functions/obtener-data-admin?type=dashboard"
+      );
       if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status}`);
       }
-      const datos = await response.json();
-      */
 
-      // Datos de ejemplo (Simulación - ELIMINAR CUANDO SE USE BACKEND)
-      const datos = {
-        ventasDia: 2450.5,
-        ingresosMes: 45780.0,
-        creditosPendientes: 8930.0,
-        gastosDia: 650.0,
-        clientesPendientes: 12,
-      };
+      const result = await response.json();
 
-      // Simular un tiempo de carga de red
-      await new Promise(resolve => setTimeout(resolve, 500));
+      if (!result.success || !result.data) {
+        throw new Error(
+          result.error || "Datos incompletos o error de servidor."
+        );
+      }
+
+      // 5. PROCESAR LOS DATOS DE GOOGLE SHEETS
+      const { ventas, gastos } = result.data;
+      const indicadores = calcularIndicadores(ventas, gastos);
 
       // Inyectar datos en el DOM
       document.getElementById("ventasDia").textContent = formatVES(
-        datos.ventasDia
+        indicadores.ventasDia
       );
       document.getElementById("ingresosMes").textContent = formatVES(
-        datos.ingresosMes
+        indicadores.ingresosMes
       );
       document.getElementById("creditosPendientes").textContent = formatVES(
-        datos.creditosPendientes
+        indicadores.creditosPendientes
       );
       document.getElementById("gastosDia").textContent = formatVES(
-        datos.gastosDia
+        indicadores.gastosDia
       );
       document.getElementById("clientesPendientes").textContent =
-        datos.clientesPendientes;
+        indicadores.clientesPendientes; // Este es un conteo, no moneda
     } catch (error) {
-      console.error("Error al cargar el dashboard:", error);
-      // Opcional: Mostrar un mensaje de error visible al usuario
+      console.error("❌ Error al cargar el dashboard:", error);
+      // Mantener los valores en 0 o mostrar error
+      document.getElementById("ventasDia").textContent = formatVES(0);
+      document.getElementById("ingresosMes").textContent = formatVES(0);
+      document.getElementById("creditosPendientes").textContent = formatVES(0);
+      document.getElementById("gastosDia").textContent = formatVES(0);
+      document.getElementById("clientesPendientes").textContent = 0;
+      alert(`⚠️ Error al cargar datos: ${error.message}`);
     } finally {
-      // Ocultar animación de carga
-      if (loadingOverlay) {
-        loadingOverlay.style.display = "none";
-      }
+      if (loadingOverlay) loadingOverlay.style.display = "none";
     }
   }
 
-  // Iniciar carga del dashboard al cargar el DOM
-  cargarDashboard();
-});// ==========================================================================
-// ===  LÓGICA DEL PANEL ADMINISTRATIVO (admin.html)  ===
-// ==========================================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Elemento para la animación de carga
-  const loadingOverlay = document.getElementById("loading-overlay");
-
-  // 1. VERIFICACIÓN DE SESIÓN (Redirige si no hay sesión)
-  if (sessionStorage.getItem("sesionActiva") !== "true") {
-    // Si no hay sesión, redirigir inmediatamente.
-    window.location.href = "login-registro.html";
-    return; // Detener la ejecución del resto del script
-  }
-
-  // 2. FUNCIÓN PARA FORMATEAR MONEDA (Bolívares)
-  function formatVES(numero) {
-    return `Bs. ${parseFloat(numero).toLocaleString("es-VE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  }
-
-  // 3. MOSTRAR INFORMACIÓN DEL USUARIO
-  const usuario = sessionStorage.getItem("usuario");
-  if (usuario) {
-    const ultimoAcceso = sessionStorage.getItem("ultimoAcceso");
-    const userInfo = document.createElement("div");
-
-    // NOTA: La clase 'user-info-status' está definida en el bloque <style> de admin.html
-    userInfo.className = "user-info-status";
-    userInfo.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 0.5em;">
-        <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
-        <div>
-          <strong style="display: block; color: #222;">Bienvenido, ${usuario}</strong>
-          <small style="color: #666;">Último acceso: ${ultimoAcceso}</small>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(userInfo);
-  }
-
-  // 4. EVENTO DE CERRAR SESIÓN
-  const btnCerrarSesion = document.getElementById("btnCerrarSesion");
-  if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        sessionStorage.clear();
-        window.location.href = "login-registro.html";
-      }
-    });
-  }
-
-  // 5. CARGAR DATOS DEL DASHBOARD
-  async function cargarDashboard() {
-    // Mostrar animación de carga
-    if (loadingOverlay) {
-      loadingOverlay.style.display = "flex";
-    }
-
-    try {
-      // ⚠️ ATENCIÓN: Esta sección está comentada y usa datos de ejemplo (simulación).
-      // Descomenta y adapta la lógica 'fetch' cuando implementes tu función de Netlify para obtener datos reales.
-
-      /*
-      const response = await fetch('/.netlify/functions/obtener-dashboard');
-      if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-      }
-      const datos = await response.json();
-      */
-
-      // Datos de ejemplo (Simulación - ELIMINAR CUANDO SE USE BACKEND)
-      const datos = {
-        ventasDia: 2450.5,
-        ingresosMes: 45780.0,
-        creditosPendientes: 8930.0,
-        gastosDia: 650.0,
-        clientesPendientes: 12,
-      };
-
-      // Simular un tiempo de carga de red
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Inyectar datos en el DOM
-      document.getElementById("ventasDia").textContent = formatVES(
-        datos.ventasDia
-      );
-      document.getElementById("ingresosMes").textContent = formatVES(
-        datos.ingresosMes
-      );
-      document.getElementById("creditosPendientes").textContent = formatVES(
-        datos.creditosPendientes
-      );
-      document.getElementById("gastosDia").textContent = formatVES(
-        datos.gastosDia
-      );
-      document.getElementById("clientesPendientes").textContent =
-        datos.clientesPendientes;
-    } catch (error) {
-      console.error("Error al cargar el dashboard:", error);
-      // Opcional: Mostrar un mensaje de error visible al usuario
-    } finally {
-      // Ocultar animación de carga
-      if (loadingOverlay) {
-        loadingOverlay.style.display = "none";
-      }
-    }
-  }
-
-  // Iniciar carga del dashboard al cargar el DOM
+  // 6. Ejecutar la carga al inicio
   cargarDashboard();
 });
