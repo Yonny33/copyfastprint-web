@@ -1,132 +1,75 @@
-// netlify/functions/registrar-gasto.js
-const { createClient } = require("@supabase/supabase-js");
+// ...existing code...
+const { verifyAuth } = require("./_utils");
+const { appendRow } = require("./_google-sheets");
 
-// 💡 Inicializar Cliente Supabase (Service Role Key)
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-exports.handler = async function (event, context) {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json",
-  };
-
+exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-  if (event.httpMethod !== "POST") {
     return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: "Método no permitido" }),
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": process.env.ORIGIN || "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST,OPTIONS",
+        "Access-Control-Allow-Credentials": "true",
+      },
+      body: "",
     };
   }
 
-  // 0. Verificar configuración de Supabase
-  if (!supabaseUrl || !supabaseKey) {
+  const auth = verifyAuth(event);
+  if (!auth.ok) {
     return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error:
-          "Error de configuración: Variables de entorno de Supabase faltantes.",
-      }),
+      statusCode: auth.statusCode,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: auth.message }),
     };
   }
 
   try {
-    const data = JSON.parse(event.body);
-
-    // 1. Validar campos requeridos
-    const requiredFields = [
-      "fecha",
-      "categoria",
-      "descripcion",
-      "monto",
-      "metodoPago",
-      "usuario",
-    ];
-
-    const missingFields = requiredFields.filter(
-      (field) => !data[field] && data[field] !== 0
-    );
-
-    if (missingFields.length > 0) {
+    const payload = JSON.parse(event.body || "{}");
+    if (!payload.descripcion || payload.monto == null) {
       return {
         statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Campos requeridos faltantes" }),
       };
     }
 
-    const monto = parseFloat(data.monto);
+    const monto = Number(payload.monto);
     if (isNaN(monto) || monto <= 0) {
       return {
         statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "El monto debe ser un número positivo",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Monto inválido" }),
       };
     }
 
-    // 2. Preparar datos para guardar (Mapeo a la tabla 'gastos')
-    const gastoSupabase = {
-      id: `GASTO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      // fecha_registro se establece automáticamente por el DEFAULT now() de la DB
-      fecha: data.fecha,
-      categoria: data.categoria,
-      descripcion: data.descripcion,
-      monto: monto.toFixed(2),
-      metodo_pago: data.metodoPago,
-      proveedor: data.proveedor || null,
-      recurrente: data.recurrente === "si" || data.recurrente === true,
-      divisa: data.divisa || "VES",
-      usuario: data.usuario || "admin",
-    };
+    const sheet = process.env.EXPENSES_SHEET_NAME || "gastos";
+    const id = `GASTO-${Date.now()}`;
+    const row = [
+      id,
+      payload.descripcion,
+      monto,
+      payload.categoria || "",
+      new Date().toISOString(),
+    ];
 
-    console.log("💸 Gasto a Supabase:", gastoSupabase);
+    await appendRow(sheet, row);
 
-    // 3. Insertar en Supabase
-    const { data: insertedData, error } = await supabase
-      .from("gastos") // Nombre de la tabla
-      .insert([gastoSupabase])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("❌ Error de Supabase al registrar el gasto:", error);
-      throw new Error(`DB Error: ${error.message}`);
-    }
-
-    // 4. Respuesta de éxito
     return {
       statusCode: 200,
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        success: true,
-        message: "Gasto registrado exitosamente en Supabase",
-        gasto: insertedData,
+        message: "Gasto registrado",
+        data: { id, descripcion: payload.descripcion, monto },
       }),
     };
-  } catch (error) {
-    console.error("❌ Error en registrar-gasto.js:", error);
+  } catch (err) {
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error:
-          "Error interno del servidor al registrar el gasto: " + error.message,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Error interno" }),
     };
   }
 };
+// ...existing code...

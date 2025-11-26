@@ -1,62 +1,75 @@
-// netlify/functions/registrar-venta.js
-const { google } = require("googleapis");
-// ... (lógica de authorizeAndGetSheets idéntica, pero con scope de ESCRITURA) ...
+// ...existing code...
+const { verifyAuth } = require("./_utils");
+const { appendRow } = require("./_google-sheets");
 
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const VENTAS_SHEET_NAME = "Ventas";
+exports.handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": process.env.ORIGIN || "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST,OPTIONS",
+        "Access-Control-Allow-Credentials": "true",
+      },
+      body: "",
+    };
+  }
 
-// Se omite la función authorizeAndGetSheets por brevedad, es la misma que obtener-data-admin.js
-// pero con scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+  const auth = verifyAuth(event);
+  if (!auth.ok) {
+    return {
+      statusCode: auth.statusCode,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: auth.message }),
+    };
+  }
 
-exports.handler = async function (event, context) {
-  // ... (código de validación HTTP/CORS)
   try {
-    const sheets = await authorizeAndGetSheets(); // Asegúrate de re-incluir la función authorizeAndGetSheets
+    const payload = JSON.parse(event.body || "{}");
+    if (!payload.clienteId || payload.monto == null) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Campos requeridos faltantes" }),
+      };
+    }
 
-    // 1. Validaciones y cálculo de montoPendiente (manteniendo la lógica original)
-    const data = JSON.parse(event.body);
-    const montoTotal = parseFloat(data.montoTotal);
-    const montoPagado = parseFloat(data.montoPagado);
-    // ... (validaciones)
-    const montoPendiente = montoTotal - montoPagado;
-    let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
+    const monto = Number(payload.monto);
+    if (isNaN(monto) || monto <= 0) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Monto inválido" }),
+      };
+    }
 
-    // 2. Preparar los datos en el orden de las columnas de la hoja 'Ventas'
-    const newRow = [
-      `VENTA-${Date.now()}`,
-      new Date().toISOString().split("T")[0],
-      data.cedula || "",
-      data.nombre,
-      data.telefono || "",
-      data.descripcion,
-      montoTotal.toFixed(2),
-      montoPagado.toFixed(2),
-      montoPendiente.toFixed(2),
-      estadoCredito,
-      data.metodoPago,
-      data.usuario || "admin",
+    const sheet = process.env.SALES_SHEET_NAME || "ventas";
+    const id = `VENTA-${Date.now()}`;
+    const row = [
+      id,
+      payload.clienteId,
+      monto,
+      payload.notas || "",
+      new Date().toISOString(),
     ];
 
-    // 3. Insertar en Google Sheets
-    const insertResult = await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: `${VENTAS_SHEET_NAME}!A:Z`,
-      valueInputOption: "USER_ENTERED",
-      resource: {
-        values: [newRow],
-      },
-    });
+    await appendRow(sheet, row);
 
     return {
       statusCode: 200,
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        success: true,
-        message: "Venta registrada exitosamente en Google Sheets",
-        insertCount: insertResult.data.updates.updatedCells,
+        message: "Venta registrada",
+        data: { id, clienteId: payload.clienteId, monto },
       }),
     };
-  } catch (error) {
-    // ... (manejo de errores)
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Error interno" }),
+    };
   }
 };
+// ...existing code...

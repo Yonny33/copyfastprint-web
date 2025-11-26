@@ -1,94 +1,68 @@
-// netlify/functions/obtener-data-admin.js
-const { google } = require("googleapis");
+// ...existing code...
+const { verifyAuth } = require("./_utils");
+const { readRange } = require("./_google-sheets");
 
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-
-async function authorizeAndGetSheets() {
-  if (
-    !process.env.GOOGLE_CLIENT_EMAIL ||
-    !process.env.GOOGLE_PRIVATE_KEY ||
-    !SHEET_ID
-  ) {
-    throw new Error(
-      "Variables de entorno de Google Sheets (EMAIL, KEY, ID) no configuradas."
-    );
+exports.handler = async (event) => {
+  const auth = verifyAuth(event);
+  if (!auth.ok) {
+    return {
+      statusCode: auth.statusCode,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: auth.message }),
+    };
   }
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    },
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-  });
-
-  const authClient = await auth.getClient();
-  return google.sheets({ version: "v4", auth: authClient });
-}
-
-exports.handler = async function (event, context) {
-  // ... (código de validación HTTP/CORS)
-
   try {
-    const sheets = await authorizeAndGetSheets();
+    const salesSheet = process.env.SALES_SHEET_NAME || "ventas";
+    const expensesSheet = process.env.EXPENSES_SHEET_NAME || "gastos";
+    const clientsSheet = process.env.CLIENTS_SHEET_NAME || "clientes";
 
-    // Rangos de las hojas de cálculo (adaptar a la estructura real de su Sheet)
-    const ranges = {
-      ventas: "Ventas!A2:Z",
-      gastos: "Gastos!A2:Z",
-      inventario: "Inventario!A2:Z",
-    };
+    const ventasRows = await readRange(`${salesSheet}!A:E`);
+    const gastosRows = await readRange(`${expensesSheet}!A:E`);
+    const clientesRows = await readRange(`${clientsSheet}!A:E`);
 
-    // 1. Obtener datos de Google Sheets
-    const [ventasResponse, gastosResponse, inventarioResponse] =
-      await Promise.all([
-        sheets.spreadsheets.values.get({
-          spreadsheetId: SHEET_ID,
-          range: ranges.ventas,
-        }),
-        sheets.spreadsheets.values.get({
-          spreadsheetId: SHEET_ID,
-          range: ranges.gastos,
-        }),
-        sheets.spreadsheets.values.get({
-          spreadsheetId: SHEET_ID,
-          range: ranges.inventario,
-        }),
-      ]);
-
-    const responseData = {
-      ventas: ventasResponse.data.values || [],
-      gastos: gastosResponse.data.values || [],
-      inventario: inventarioResponse.data.values || [],
-    };
-
-    // Si se pide 'reporte', se añade un placeholder.
-    // ** La lógica de procesamiento de reportes debe ser implementada por el usuario **
-    const query = event.queryStringParameters || {};
-    if (query.type === "reporte") {
-      responseData.reporteMensual = [];
-      responseData.gastosPorCategoria = [];
-      responseData.creditos = [];
-      responseData.servicios = [];
-    }
+    const mapRows = (rows, fields) =>
+      (rows || []).map((r) => {
+        const obj = {};
+        fields.forEach((f, i) => {
+          obj[f] = r[i] || null;
+        });
+        return obj;
+      });
 
     return {
       statusCode: 200,
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        success: true,
-        data: responseData,
+        ventas: mapRows(ventasRows, [
+          "id",
+          "clienteId",
+          "monto",
+          "notas",
+          "createdAt",
+        ]),
+        gastos: mapRows(gastosRows, [
+          "id",
+          "descripcion",
+          "monto",
+          "categoria",
+          "createdAt",
+        ]),
+        clientes: mapRows(clientesRows, [
+          "id",
+          "nombre",
+          "telefono",
+          "email",
+          "createdAt",
+        ]),
       }),
     };
-  } catch (error) {
-    console.error("❌ Error al obtener datos de Google Sheets:", error);
+  } catch (err) {
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: `Error al obtener datos: ${error.message}`,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Error interno" }),
     };
   }
 };
+// ...existing code...
