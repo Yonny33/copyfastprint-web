@@ -4,11 +4,11 @@
   "description": "Copy Fast & Print Website",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "check-codes": "node scripts/check-codes.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "node-fetch": "^2.7.0",
+    "googleapis": "^121.0.0",
     "jsonwebtoken": "^9.0.0"
   },
   "engines": {

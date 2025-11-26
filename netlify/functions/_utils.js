@@ -14,7 +14,7 @@ function verifyAuth(event) {
   const headerCookie = event.headers?.cookie || event.headers?.Cookie || "";
   const cookies = parseCookies(headerCookie);
   const token = cookies["cfp_token"];
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET || process.env.JWTSECRET;
   if (!token || !secret)
     return { ok: false, statusCode: 401, message: "No token" };
   try {

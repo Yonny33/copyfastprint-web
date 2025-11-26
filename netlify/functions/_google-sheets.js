@@ -12,7 +12,7 @@ function getSheetsClient() {
     );
   }
 
-  // Convert literal '\n' to real newlines if needed
+  // Convert literal '\n' to newlines if key was pasted escaped
   privateKey = privateKey.replace(/\\n/g, "\n");
 
   const auth = new google.auth.JWT({
