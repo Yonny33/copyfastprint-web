@@ -140,22 +140,28 @@
             </p>
           </div>
 
+          // ...existing code...
           <form id="registro-ventas-form" class="form-grid">
             <div class="form-separator full-width">
               <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
             </div>
+
             <div class="form-group">
               <label for="cedula">Cédula / RIF *</label>
               <input type="text" id="cedula" name="cedula" required />
             </div>
+
             <div class="form-group">
               <label for="nombre">Nombre / Razón Social *</label>
-              <input type="text" id="nombre" name="nombre" required />
+              <!-- name cambiado a "cliente" para coincidir con la función -->
+              <input type="text" id="nombre" name="cliente" required />
             </div>
+
             <div class="form-group">
               <label for="telefono">Teléfono *</label>
               <input type="tel" id="telefono" name="telefono" required />
             </div>
+
             <div class="form-group">
               <label for="email">Email (Opcional)</label>
               <input type="email" id="email" name="email" />
@@ -164,6 +170,7 @@
             <div class="form-separator full-width">
               <h3><i class="fas fa-receipt"></i> Detalle de la Venta</h3>
             </div>
+
             <div class="form-group full-width">
               <label for="descripcion"
                 >Descripción del Servicio/Producto *</label
@@ -175,6 +182,7 @@
                 required
               ></textarea>
             </div>
+
             <div class="form-group">
               <label for="tipoServicio">Tipo de Servicio</label>
               <select id="tipoServicio" name="tipoServicio">
@@ -185,29 +193,48 @@
                 <option value="Otro">Otro</option>
               </select>
             </div>
+
+            <!-- Nuevo campo cantidad (necesario para la hoja) -->
             <div class="form-group">
-              <label for="montoTotal">Monto Total (Bs.) *</label>
+              <label for="cantidad">Cantidad</label>
               <input
                 type="number"
-                id="montoTotal"
-                name="montoTotal"
+                id="cantidad"
+                name="cantidad"
+                min="1"
+                step="1"
+                value="1"
+                required
+              />
+            </div>
+
+            <!-- montoTotal renombrado a precio_unitario (coincide con registrar-venta) -->
+            <div class="form-group">
+              <label for="precioUnitario">Precio Unitario (Bs.) *</label>
+              <input
+                type="number"
+                id="precioUnitario"
+                name="precio_unitario"
                 step="0.01"
                 min="0.01"
                 required
               />
             </div>
+
+            <!-- montoPagado renombrado a abono -->
             <div class="form-group">
               <label for="montoPagado">Monto Pagado (Bs.) *</label>
               <input
                 type="number"
                 id="montoPagado"
-                name="montoPagado"
+                name="abono"
                 step="0.01"
                 min="0"
                 required
               />
               <span id="pago-error" class="error-message"></span>
             </div>
+
             <div class="form-group">
               <label for="metodoPago">Método de Pago *</label>
               <select id="metodoPago" name="metodoPago" required>
@@ -220,9 +247,10 @@
                 <option value="Otro">Otro</option>
               </select>
             </div>
+
             <div class="form-group">
               <label for="fechaVenta">Fecha de Venta *</label>
-              <input type="date" id="fechaVenta" name="fechaVenta" required />
+              <input type="date" id="fechaVenta" name="fecha" required />
             </div>
 
             <div class="form-group full-width">
