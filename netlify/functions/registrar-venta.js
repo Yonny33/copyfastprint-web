@@ -3,6 +3,7 @@ const { verifyAuth } = require("./_utils");
 const { appendRow } = require("./_google-sheets");
 
 exports.handler = async (event) => {
+  // CORS preflight
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 204,
@@ -16,6 +17,7 @@ exports.handler = async (event) => {
     };
   }
 
+  // Autenticación
   const auth = verifyAuth(event);
   if (!auth.ok) {
     return {
@@ -27,33 +29,69 @@ exports.handler = async (event) => {
 
   try {
     const payload = JSON.parse(event.body || "{}");
-    if (!payload.clienteId || payload.monto == null) {
+
+    // Campos esperados mínimos
+    if (
+      !payload.cliente ||
+      payload.cantidad == null ||
+      payload.precio_unitario == null
+    ) {
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "Campos requeridos faltantes" }),
+        body: JSON.stringify({
+          message:
+            "Faltan campos requeridos: cliente, cantidad, precio_unitario",
+        }),
       };
     }
 
-    const monto = Number(payload.monto);
-    if (isNaN(monto) || monto <= 0) {
+    // Parseo y validaciones numéricas
+    const cantidad = Number(payload.cantidad);
+    const precio = Number(payload.precio_unitario);
+    if (isNaN(cantidad) || isNaN(precio) || cantidad < 0 || precio < 0) {
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: "Monto inválido" }),
+        body: JSON.stringify({ message: "Cantidad o precio inválido" }),
       };
     }
 
-    const sheet = process.env.SALES_SHEET_NAME || "ventas";
+    const ventaBruta = Number((cantidad * precio).toFixed(2));
+    const abono = Number(payload.abono ?? 0);
+    if (isNaN(abono) || abono < 0) {
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "Abono inválido" }),
+      };
+    }
+    const saldo = Number((ventaBruta - abono).toFixed(2));
+    const iva = Number((ventaBruta * 0.16).toFixed(2));
+
+    // Fecha: usar la proporcionada o la fecha ISO actual (solo fecha)
+    const fecha = payload.fecha || new Date().toISOString().split("T")[0];
+
+    // ID único
     const id = `VENTA-${Date.now()}`;
+
+    // Orden de columnas debe coincidir EXACTAMENTE con la hoja "ventas":
+    // Fecha | ID | Cliente | Cantidad (Suéteres) | Precio (Unitario) |
+    // Descripción | Venta Bruta (VES) | Abono Recibido (VES) | Saldo Pendiente (VES) | IVA Débito Fiscal 16% (VES)
     const row = [
-      id,
-      payload.clienteId,
-      monto,
-      payload.notas || "",
-      new Date().toISOString(),
+      fecha, // Fecha
+      id, // ID
+      payload.cliente, // Cliente
+      cantidad, // Cantidad (Suéteres)
+      precio, // Precio (Unitario)
+      payload.descripcion || "", // Descripción
+      ventaBruta, // Venta Bruta (VES)
+      abono, // Abono Recibido (VES)
+      saldo, // Saldo Pendiente (VES)
+      iva, // IVA Débito Fiscal 16% (VES)
     ];
 
+    const sheet = process.env.SALES_SHEET_NAME || "ventas";
     await appendRow(sheet, row);
 
     return {
@@ -61,14 +99,22 @@ exports.handler = async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: "Venta registrada",
-        data: { id, clienteId: payload.clienteId, monto },
+        data: {
+          id,
+          fecha,
+          cliente: payload.cliente,
+          ventaBruta,
+          abono,
+          saldo,
+          iva,
+        },
       }),
     };
   } catch (err) {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Error interno" }),
+      body: JSON.stringify({ message: "Error interno", error: err.message }),
     };
   }
 };
