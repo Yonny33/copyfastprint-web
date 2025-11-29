@@ -51,35 +51,7 @@
     <main class="admin-container">
       <div class="section-heading">
         <h2>📊 Control de Gastos Diarios</h2>
-        <p>
-          Panel de administración y seguimiento de egresos. Los datos que ves a
-          continuación corresponden al
-          <strong>día actual</strong>.
-        </p>
-      </div>
-
-      <div class="dashboard-grid">
-        <div class="stat-card red">
-          <i class="fas fa-money-bill-wave"></i>
-          <div>
-            <h4>Total Gastos (Hoy)</h4>
-            <p class="stat-value" id="totalGastosDia">Bs. 0,00</p>
-          </div>
-        </div>
-        <div class="stat-card dark-red">
-          <i class="fas fa-list-alt"></i>
-          <div>
-            <h4>Cantidad de Gastos (Hoy)</h4>
-            <p class="stat-value" id="cantidadGastos">0</p>
-          </div>
-        </div>
-        <div class="stat-card gray">
-          <i class="fas fa-calendar-alt"></i>
-          <div>
-            <h4>Total Gastos (Mes)</h4>
-            <p class="stat-value" id="totalGastosMes">Bs. 0,00</p>
-          </div>
-        </div>
+        <p>Panel de administración y seguimiento de egresos.</p>
       </div>
 
       <section class="form-section">
@@ -125,18 +97,9 @@
               <option value="Otro">Otro</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="proveedor">Proveedor (Opcional)</label>
-            <input type="text" id="proveedor" name="proveedor" />
-          </div>
           <div class="form-group full-width">
-            <label for="descripcion">Descripción *</label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              rows="2"
-              required
-            ></textarea>
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion" rows="2"></textarea>
           </div>
 
           <button type="submit" class="calculate-btn full-width">
@@ -146,7 +109,8 @@
       </section>
 
       <section class="table-section">
-        <h3>📜 Detalle de Gastos del Día</h3>
+        <h3>📜 Detalle de Gastos</h3>
+        <div id="error-container" style="color: red; margin-bottom: 15px"></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead>
@@ -155,9 +119,7 @@
                 <th>Monto (Bs.)</th>
                 <th>Categoría</th>
                 <th>Descripción</th>
-                <th>Método</th>
-                <th>Proveedor</th>
-                <th>Acciones</th>
+                <th>Método de Pago</th>
               </tr>
             </thead>
             <tbody id="gastos-list"></tbody>
@@ -166,152 +128,18 @@
       </section>
     </main>
 
-    <div id="edit-modal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('edit-modal')"
-          >&times;</span
-        >
-        <h3>✏️ Editar Gasto</h3>
-        <form id="edit-gasto-form" class="form-grid">
-          <input type="hidden" id="edit-gasto-id" name="id" />
-
-          <div class="form-group">
-            <label for="edit-fecha">Fecha del Gasto *</label>
-            <input type="date" id="edit-fecha" name="fecha" required />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-monto">Monto (Bs.) *</label>
-            <input
-              type="number"
-              id="edit-monto"
-              name="monto"
-              step="0.01"
-              min="0.01"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="edit-categoria">Categoría *</label>
-            <select id="edit-categoria" name="categoria" required>
-              <option value="Materiales">Materiales</option>
-              <option value="Servicios">Servicios (Luz, Agua, Internet)</option>
-              <option value="Mantenimiento">Mantenimiento</option>
-              <option value="Transporte">Transporte / Flete</option>
-              <option value="Nomina">Nómina / Sueldos</option>
-              <option value="Alquiler">Alquiler / Renta</option>
-              <option value="Marketing">Marketing / Publicidad</option>
-              <option value="Otros">Otros</option>
-            </select>
-          </div>
-
-          <div class="form-group full-width">
-            <label for="edit-descripcion">Descripción *</label>
-            <textarea
-              id="edit-descripcion"
-              name="descripcion"
-              rows="2"
-              required
-            ></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-metodoPago">Método de Pago *</label>
-            <select id="edit-metodoPago" name="metodo_pago" required>
-              <option value="Efectivo">Efectivo</option>
-              <option value="Transferencia">Transferencia</option>
-              <option value="Pago-Movil">Pago Móvil</option>
-              <option value="Tarjeta">Tarjeta</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-proveedor">Proveedor (Opcional)</label>
-            <input type="text" id="edit-proveedor" name="proveedor" />
-          </div>
-
-          <button type="submit" class="calculate-btn">
-            <i class="fas fa-save"></i> Guardar Cambios
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <style>
-      .modal {
-        display: none; /* Oculto por defecto */
-        position: fixed;
-        z-index: 2000; /* Asegura que esté por encima de todo */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-        padding-top: 60px;
-      }
-      .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto; /* 5% desde arriba y centrado */
-        padding: 30px;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 500px;
-        border-radius: 12px;
-        position: relative;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-      .modal-close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        line-height: 1;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-      }
-      .modal-close:hover,
-      .modal-close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    </style>
-
     <footer class="footer">
-      <div class="footer-content">
-        <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Tu Solución Integral en Impresión y Personalización</h5>
-      </div>
-      <div class="social-networks">
-        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/profile.php?id=61578120201237"
-          target="_blank"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-pinterest"></i
-        ></a>
-        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
-          ><i class="fab fa-tiktok"></i
-        ></a>
-      </div>
+      <!-- ... tu footer ... -->
     </footer>
 
     <a href="#" id="scroll-to-top" class="scroll-to-top">
       <i class="fas fa-chevron-up"></i>
     </a>
 
-    <script src="js/scripts.js"></script>
-    <script src="js/registro-gastos.js"></script>
-    <script src="js/gasto-form-handler.js"></script>
+    <!-- SCRIPTS CORREGIDOS -->
+    <script src="public/js/scripts.js"></script>
+    <script src="public/js/gasto-form-handler.js"></script>
+    <script src="public/js/registro-gastos.js"></script>
     <script>
       // Botón de cerrar sesión
       document
