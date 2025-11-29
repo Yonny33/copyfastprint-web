@@ -13,7 +13,7 @@ async function cargarGastosData() {
   gastosListBody.innerHTML = ""; // Limpiar la tabla antes de cargar nuevos datos
 
   try {
-    // Añadimos un parámetro a la URL para indicar que queremos obtener los gastos
+    // Añadimos un parámetro a a la URL para indicar que queremos obtener los gastos
     const url = `${SCRIPT_URL_GASTOS}?action=getGastos`;
     const response = await fetch(url);
 
