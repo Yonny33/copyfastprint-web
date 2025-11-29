@@ -1,6 +1,4 @@
-
-// URL de nuestra nueva función de Firebase que actúa como proxy
-const PROXY_URL_GASTOS = 'https://us-central1-copyfast-control.cloudfunctions.net/proxyGoogleScript';
+// La URL del proxy ya está definida en gasto-form-handler.js, que se carga primero.
 
 document.addEventListener('DOMContentLoaded', cargarGastosData);
 
@@ -9,20 +7,25 @@ async function cargarGastosData() {
     const errorContainer = document.getElementById('error-container');
     const gastosListBody = document.getElementById('gastos-list');
 
+    // Asegurarnos de que la URL del proxy esté disponible
+    if (typeof PROXY_URL_GASTOS === 'undefined') {
+        console.error('La variable PROXY_URL_GASTOS no está definida. Asegúrate de que gasto-form-handler.js se cargue primero.');
+        errorContainer.textContent = 'Error de configuración: La URL del servidor no está definida.';
+        return;
+    }
+
     loadingOverlay.style.display = 'flex';
     errorContainer.textContent = '';
     gastosListBody.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
 
     try {
-        // Preparamos los datos que enviaremos en el cuerpo de la petición POST
         const postData = {
             action: 'getGastos'
         };
 
-        // Realizamos la petición POST a nuestra función de Firebase
         const response = await fetch(PROXY_URL_GASTOS, {
             method: 'POST',
-            mode: 'cors', // Habilitar CORS para la petición
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -30,10 +33,12 @@ async function cargarGastosData() {
         });
 
         if (!response.ok) {
-            throw new Error(`Error de red o servidor: ${response.status} ${response.statusText}`);
+            // Intentamos leer el texto del error para dar más contexto
+            const errorText = await response.text();
+            throw new Error(`Error de red o servidor: ${response.status}. ${errorText}`);
         }
 
-        const result = await response.json(); // La respuesta ya debería ser JSON
+        const result = await response.json();
 
         if (result.status === "success") {
             mostrarGastosEnTabla(result.data);
@@ -53,7 +58,7 @@ function mostrarGastosEnTabla(gastos) {
     const tbody = document.getElementById('gastos-list');
     tbody.innerHTML = ''; // Limpiar antes de llenar
 
-    if (gastos.length === 0) {
+    if (!gastos || gastos.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5">No hay gastos registrados.</td></tr>';
         return;
     }
@@ -61,16 +66,15 @@ function mostrarGastosEnTabla(gastos) {
     gastos.forEach(gasto => {
         const tr = document.createElement('tr');
 
-        // Asegurarnos de que la fecha es válida antes de formatearla
         const fecha = gasto.fecha ? new Date(gasto.fecha).toLocaleDateString('es-VE') : 'Fecha inválida';
-        const monto = parseFloat(gasto.monto).toFixed(2);
+        const monto = !isNaN(parseFloat(gasto.monto)) ? parseFloat(gasto.monto).toFixed(2) : '0.00';
 
         tr.innerHTML = `
             <td>${fecha}</td>
             <td>Bs. ${monto}</td>
-            <td>${gasto.categoria}</td>
-            <td>${gasto.descripcion}</td>
-            <td>${gasto.metodoPago}</td>
+            <td>${gasto.categoria || 'N/A'}</td>
+            <td>${gasto.descripcion || ''}</td>
+            <td>${gasto.metodoPago || 'N/A'}</td>
         `;
         tbody.appendChild(tr);
     });

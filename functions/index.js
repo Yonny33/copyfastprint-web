@@ -1,4 +1,4 @@
-
+// Forzando el redespliegue para aplicar la configuración
 const functions = require("firebase-functions");
 const axios = require("axios");
 const cors = require("cors")({origin: true});
@@ -7,7 +7,6 @@ exports.proxyGoogleScript = functions.https.onRequest((req, res) => {
   // Habilitar CORS para permitir solicitudes desde cualquier origen
   cors(req, res, async () => {
     // Obtener la URL de Google Apps Script desde la configuración de Firebase
-    // ¡LO MOVIMOS AQUÍ ADENTRO!
     const GOOGLE_SCRIPT_URL = functions.config().google.script_url;
 
     // Si la URL no está configurada, devuelve un error claro
