@@ -1,4 +1,5 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhh5ZWD2dsFPvfWe6V_sp7RG2zFLE2y7DbO_HGqyJGYfVUJjzyozZlTXFq2ntlf1hjsw/exec';
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwvlvXmJd6xprAs3jSn8YuURliNLoH4TThLh5UuKNzcEZZXrcNO_UA9MG5oyA8iuZ-kyA/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   cargarYMostrarData();
@@ -8,31 +9,34 @@ async function cargarYMostrarData() {
   try {
     const response = await fetch(SCRIPT_URL);
     if (!response.ok) {
-      throw new Error(`Error en la respuesta de la red: ${response.statusText}`);
+      throw new Error(
+        `Error en la respuesta de la red: ${response.statusText}`
+      );
     }
-    
+
     // Google Apps Script a veces envuelve la respuesta, intentamos parsearla
     const text = await response.text();
     let data;
     try {
-        data = JSON.parse(text);
+      data = JSON.parse(text);
     } catch (e) {
-        // Si falla el parseo, puede ser que la respuesta no sea JSON válido.
-        // Esto puede pasar si el script de Google devuelve un error HTML.
-        console.error("La respuesta no es un JSON válido:", text);
-        throw new Error("La respuesta del servidor no tiene el formato esperado.");
+      // Si falla el parseo, puede ser que la respuesta no sea JSON válido.
+      // Esto puede pasar si el script de Google devuelve un error HTML.
+      console.error("La respuesta no es un JSON válido:", text);
+      throw new Error(
+        "La respuesta del servidor no tiene el formato esperado."
+      );
     }
 
     actualizarTarjetas(data);
     // Si tienes gráficos, aquí iría la lógica para actualizarlos con `data`
-
   } catch (error) {
     console.error("Error al cargar los datos del dashboard:", error);
     // Opcional: Mostrar un mensaje de error en la interfaz
-    const errorDisplay = document.getElementById('error-container');
+    const errorDisplay = document.getElementById("error-container");
     if (errorDisplay) {
-        errorDisplay.textContent = `No se pudieron cargar los datos: ${error.message}`;
-        errorDisplay.style.display = 'block';
+      errorDisplay.textContent = `No se pudieron cargar los datos: ${error.message}`;
+      errorDisplay.style.display = "block";
     }
   }
 }
