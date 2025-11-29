@@ -1,78 +1,73 @@
-const { verifyAuth } = require("./_utils");
+const { verifyAuth, handleOptions } = require("./_utils");
 const { appendRow } = require("./_google-sheets");
 
 exports.handler = async (event) => {
+  // Manejar OPTIONS request para CORS
   if (event.httpMethod === "OPTIONS") {
+    return handleOptions();
+  }
+
+  // Solo permitir POST requests
+  if (event.httpMethod !== "POST") {
     return {
-      statusCode: 204,
-      headers: {
-        "Access-Control-Allow-Origin": process.env.ORIGIN || "*",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Methods": "POST,OPTIONS",
-      },
-      body: "",
+      statusCode: 405,
+      body: JSON.stringify({ success: false, message: "Método no permitido" }),
     };
   }
 
+  // Verificar la autenticación del usuario
   const auth = verifyAuth(event);
   if (!auth.ok) {
     return {
       statusCode: auth.statusCode,
-      body: JSON.stringify({ message: auth.message }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ success: false, message: auth.message }),
     };
   }
 
   try {
-    const payload = JSON.parse(event.body || "{}");
+    const data = JSON.parse(event.body || "{}");
 
-    // Validación de campos clave
-    if (!payload.concepto || !payload.monto_total) {
+    // 1. Validar los campos que vienen del formulario de gastos.html
+    if (!data.fecha || !data.monto || !data.categoria || !data.descripcion) {
       return {
         statusCode: 400,
         body: JSON.stringify({
+          success: false,
           message:
-            "Faltan campos requeridos: concepto y monto_total son obligatorios.",
+            "Faltan campos requeridos. Asegúrate de enviar fecha, monto, categoría y descripción.",
         }),
       };
     }
 
-    const montoTotal = Number(payload.monto_total);
-    if (isNaN(montoTotal) || montoTotal <= 0) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "El campo monto_total debe ser un número positivo.",
-        }),
-      };
-    }
+    // 2. Generar un ID único y la fecha de creación
+    const id = `GTO-${Date.now()}`;
+    const createdAt = new Date().toISOString();
 
-    const id = `GASTO-${Date.now()}`;
-    const now = new Date();
-
-    // Se arma la fila en el orden correcto de la hoja 'gastos'
-    const row = [
-      payload.fecha || now.toISOString().split("T")[0], // 1. fecha
-      id, // 2. id
-      payload.rif || "", // 3. rif
-      payload.razon_social || "", // 4. razon_social
-      payload.concepto, // 5. concepto
-      payload.cantidad || "", // 6. cantidad
-      payload.descripcion || "", // 7. descripcion
-      payload.precio_unitario || "", // 8. precio_unitario
-      montoTotal, // 9. monto_total
-      payload.iva_fiscal || "", // 10. iva_fiscal
-      now.toISOString(), // 11. createdAt
+    // 3. Crear la fila de datos en el orden esperado por la hoja de Google Sheets.
+    // Asumimos un orden lógico. Si los datos aparecen en las columnas incorrectas, solo hay que reordenar esta lista.
+    const newRow = [
+      data.fecha,
+      data.categoria,
+      data.descripcion,
+      data.proveedor || "", // Opcional, puede estar vacío
+      data.monto,
+      data.metodoPago || "", // Requerido en el form, pero añadimos fallback
+      id, // ID único para referencia futura
+      createdAt, // Fecha de registro
     ];
 
-    const sheet = process.env.EXPENSES_SHEET_NAME || "gastos";
-    await appendRow(sheet, row);
+    // 4. Usar el helper para añadir la fila a la hoja de cálculo correcta
+    const sheetName = process.env.EXPENSES_SHEET_NAME || "gastos";
+    await appendRow(sheetName, newRow);
 
+    // 5. Devolver una respuesta de éxito
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: "Gasto registrado exitosamente",
-        data: { id },
+        success: true,
+        message: "Gasto registrado exitosamente!",
       }),
     };
   } catch (err) {
@@ -81,7 +76,8 @@ exports.handler = async (event) => {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        message: "Error interno del servidor",
+        success: false,
+        message: "Error interno del servidor.",
         error: err.message,
       }),
     };
