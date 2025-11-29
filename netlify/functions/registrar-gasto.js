@@ -7,64 +7,83 @@ exports.handler = async (event) => {
       statusCode: 204,
       headers: {
         "Access-Control-Allow-Origin": process.env.ORIGIN || "*",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Methods": "POST,OPTIONS",
-        "Access-Control-Allow-Credentials": "true",
       },
       body: "",
     };
   }
 
   const auth = verifyAuth(event);
-  if (!auth.ok)
+  if (!auth.ok) {
     return {
       statusCode: auth.statusCode,
       body: JSON.stringify({ message: auth.message }),
     };
+  }
 
   try {
     const payload = JSON.parse(event.body || "{}");
-    if (!payload.descripcion || payload.monto == null) {
+
+    // Validación de campos clave
+    if (!payload.concepto || !payload.monto_total) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "Campos requeridos faltantes" }),
+        body: JSON.stringify({
+          message:
+            "Faltan campos requeridos: concepto y monto_total son obligatorios.",
+        }),
       };
     }
 
-    const monto = Number(payload.monto);
-    if (isNaN(monto) || monto <= 0) {
+    const montoTotal = Number(payload.monto_total);
+    if (isNaN(montoTotal) || montoTotal <= 0) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: "Monto inválido" }),
+        body: JSON.stringify({
+          message: "El campo monto_total debe ser un número positivo.",
+        }),
       };
     }
 
     const id = `GASTO-${Date.now()}`;
+    const now = new Date();
+
+    // Se arma la fila en el orden correcto de la hoja 'gastos'
     const row = [
-      payload.fecha || new Date().toISOString().split("T")[0],
-      id,
-      payload.rif || "",
-      payload.razon || "",
-      payload.descripcion,
-      payload.cant || "",
-      payload.precio_unitario || "",
-      monto,
-      payload.credito_fiscal || "",
-      new Date().toISOString(),
+      payload.fecha || now.toISOString().split("T")[0], // 1. fecha
+      id, // 2. id
+      payload.rif || "", // 3. rif
+      payload.razon_social || "", // 4. razon_social
+      payload.concepto, // 5. concepto
+      payload.cantidad || "", // 6. cantidad
+      payload.descripcion || "", // 7. descripcion
+      payload.precio_unitario || "", // 8. precio_unitario
+      montoTotal, // 9. monto_total
+      payload.iva_fiscal || "", // 10. iva_fiscal
+      now.toISOString(), // 11. createdAt
     ];
+
     const sheet = process.env.EXPENSES_SHEET_NAME || "gastos";
     await appendRow(sheet, row);
 
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Gasto registrado", data: { id } }),
+      body: JSON.stringify({
+        message: "Gasto registrado exitosamente",
+        data: { id },
+      }),
     };
   } catch (err) {
+    console.error("Error en registrar-gasto.js:", err);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Error interno" }),
+      body: JSON.stringify({
+        message: "Error interno del servidor",
+        error: err.message,
+      }),
     };
   }
 };

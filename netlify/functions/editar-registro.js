@@ -1,280 +1,125 @@
-// netlify/functions/editar-registro.js
-const { google } = require("googleapis");
+const { verifyAuth } = require("./_utils");
+const { findRowNumberById, updateRow, readRange } = require("./_google-sheets");
 
-// ⚠️ IMPORTANTE: Estas variables deben estar configuradas en Netlify
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-
-// Mapas de configuración para la lógica de búsqueda y mapeo de datos
 const SHEET_CONFIG = {
-  ventas: {
-    name: "Ventas",
-    keyColumn: "A",
-    keyIndex: 0,
-    // Orden de columnas esperado (0-based):
-    // 0: ID, 1: Fecha, 2: Cedula, 3: Nombre, 4: Telefono, 5: Descripcion,
-    // 6: Monto Total, 7: Monto Pagado, 8: Monto Pendiente, 9: Estado Crédito,
-    // 10: Metodo Pago, 11: Usuario
-  },
-  gastos: {
-    name: "Gastos",
-    keyColumn: "A",
-    keyIndex: 0,
-    // Orden de columnas esperado (0-based):
-    // 0: ID, 1: Fecha, 2: Categoria, 3: Descripcion, 4: Monto,
-    // 5: Metodo Pago, 6: Proveedor, 7: Recurrente, 8: Divisa, 9: Usuario
-  },
-  inventario: {
-    name: "Inventario",
-    keyColumn: "A",
-    keyIndex: 0,
-    // Orden de columnas esperado (0-based):
-    // 0: Codigo, 1: Nombre, 2: Tipo, 3: Stock Actual, 4: U. Medida,
-    // 5: Stock Mínimo, 6: Usuario
-  },
+    ventas: { name: "ventas", keyColumn: "B" },
+    gastos: { name: "gastos", keyColumn: "B" },
+    clientes: { name: "clientes", keyColumn: "A" },
+    inventario: { name: "inventario", keyColumn: "A" },
 };
 
-/**
- * 🔑 Autoriza el acceso a Google Sheets API
- */
-async function authorizeAndGetSheets() {
-  if (
-    !process.env.GOOGLE_CLIENT_EMAIL ||
-    !process.env.GOOGLE_PRIVATE_KEY ||
-    !SHEET_ID
-  ) {
-    throw new Error(
-      "Variables de entorno de Google Sheets (EMAIL, KEY, ID) no configuradas."
-    );
-  }
+// --- Lógica de negocio para actualizar cada tipo de tabla ---
 
-  // Se requiere el scope de escritura para actualizar datos
-  const scope = "https://www.googleapis.com/auth/spreadsheets";
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      // Reemplaza los caracteres de salto de línea codificados en la variable de entorno
-      private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    },
-    scopes: [scope],
-  });
-
-  const authClient = await auth.getClient();
-  return google.sheets({ version: "v4", auth: authClient });
+async function handleVentasUpdate(rowNumber, data) {
+    const currentRow = (await readRange(`ventas!${rowNumber}:${rowNumber}`))[0] || [];
+    const ventaBruta = data.venta_bruta !== undefined ? parseFloat(data.venta_bruta) : parseFloat(currentRow[6] || 0);
+    const abono = data.abono !== undefined ? parseFloat(data.abono) : parseFloat(currentRow[7] || 0);
+    
+    const updatedRow = [
+        data.fecha || currentRow[0],
+        currentRow[1], // ID no cambia
+        data.cliente || currentRow[2],
+        data.cantidad || currentRow[3],
+        data.precio_unitario || currentRow[4],
+        data.descripcion || currentRow[5],
+        ventaBruta.toFixed(2),
+        abono.toFixed(2),
+        (ventaBruta - abono).toFixed(2), // Saldo recalculado
+        data.iva_fiscal || currentRow[9],
+    ];
+    return updateRow("ventas", rowNumber, updatedRow);
 }
 
-/**
- * 🔄 Busca el registro por ID/Código y actualiza la fila correspondiente.
- * @param {object} sheets Cliente de Google Sheets API
- * @param {string} tabla Nombre de la tabla ('ventas', 'gastos', 'inventario')
- * @param {string} id Valor único de la clave (ID o Código)
- * @param {object} data Datos a actualizar
- */
-async function findAndUpdateSheet(sheets, tabla, id, data) {
-  const config = SHEET_CONFIG[tabla];
-  if (!config) throw new Error(`Tabla no reconocida: ${tabla}`);
-
-  const sheetName = config.name;
-  const keyColumnLetter = config.keyColumn;
-  const keyColumnIndex = config.keyIndex;
-
-  // 1. Obtener todos los IDs/Códigos de la columna clave
-  const allIdsResponse = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${sheetName}!${keyColumnLetter}:${keyColumnLetter}`,
-  });
-
-  const idList = allIdsResponse.data.values || [];
-
-  // Buscar el índice de la fila que coincide con el ID.
-  // Empezamos a buscar desde el índice 1 del array (Row 2 de la hoja) para saltar el encabezado.
-  let rowIndex = -1;
-  for (let i = 1; i < idList.length; i++) {
-    // La columna clave está en el índice 0 del array interno
-    if (idList[i] && idList[i][keyColumnIndex] === id) {
-      rowIndex = i;
-      break;
-    }
-  }
-
-  if (rowIndex === -1) {
-    throw new Error(
-      `Registro con ID/Código '${id}' no encontrado en la hoja '${sheetName}'.`
-    );
-  }
-
-  // El número de fila en Google Sheets (1-based) es el índice del array (0-based desde Row 1) + 1
-  const sheetRowNumber = rowIndex + 1;
-
-  // 2. Obtener la fila actual para preservar los campos no modificados
-  const currentRowResponse = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    // Leer toda la fila a actualizar
-    range: `${sheetName}!${sheetRowNumber}:${sheetRowNumber}`,
-  });
-  const currentRow = currentRowResponse.data.values
-    ? currentRowResponse.data.values[0]
-    : [];
-
-  // 3. Mapear los datos de entrada a la estructura de la fila completa
-  let updatedRow = [];
-
-  // Lógica para 'ventas': Recalcular montos pendientes y estado de crédito
-  if (tabla === "ventas") {
-    const currentMontoTotal = parseFloat(currentRow[6] || 0);
-    const currentMontoPagado = parseFloat(currentRow[7] || 0);
-
-    const montoTotal = data.montoTotal
-      ? parseFloat(data.montoTotal)
-      : currentMontoTotal;
-    const montoPagado = data.montoPagado
-      ? parseFloat(data.montoPagado)
-      : currentMontoPagado;
-
-    // Recalcular
-    const montoPendiente = montoTotal - montoPagado;
-    let estadoCredito = montoPendiente > 0 ? "Crédito" : "Completada";
-
-    updatedRow = [
-      currentRow[0], // 0: ID (No se toca)
-      data.fechaRegistro || currentRow[1], // 1: Fecha
-      data.cedula || currentRow[2], // 2: Cedula
-      data.nombre || currentRow[3], // 3: Nombre
-      data.telefono || currentRow[4], // 4: Telefono
-      data.descripcion || currentRow[5], // 5: Descripcion
-      montoTotal.toFixed(2), // 6: Monto Total (Recalculado)
-      montoPagado.toFixed(2), // 7: Monto Pagado (Recalculado)
-      montoPendiente.toFixed(2), // 8: Monto Pendiente (Recalculado)
-      estadoCredito, // 9: Estado Credito (Recalculado)
-      data.metodoPago || currentRow[10], // 10: Metodo Pago
-      data.usuario || currentRow[11] || "admin", // 11: Usuario
+async function handleGastosUpdate(rowNumber, data) {
+    const currentRow = (await readRange(`gastos!${rowNumber}:${rowNumber}`))[0] || [];
+    const updatedRow = [
+        data.fecha || currentRow[0],
+        currentRow[1], // ID no cambia
+        data.rif || currentRow[2],
+        data.razon_social || currentRow[3],
+        data.concepto || currentRow[4],
+        data.cantidad || currentRow[5],
+        data.descripcion || currentRow[6],
+        data.precio_unitario || currentRow[7],
+        data.monto_total || currentRow[8],
+        data.iva_fiscal || currentRow[9],
+        currentRow[10], // createdAt no cambia
     ];
-  }
-  // Lógica para 'gastos'
-  else if (tabla === "gastos") {
-    const monto = data.monto
-      ? parseFloat(data.monto)
-      : parseFloat(currentRow[4] || 0);
-    updatedRow = [
-      currentRow[0], // 0: ID (No se toca)
-      data.fecha || currentRow[1], // 1: Fecha
-      data.categoria || currentRow[2], // 2: Categoria
-      data.descripcion || currentRow[3], // 3: Descripcion
-      monto.toFixed(2), // 4: Monto
-      data.metodoPago || currentRow[5], // 5: Metodo Pago
-      data.proveedor || currentRow[6], // 6: Proveedor
-      data.recurrente || currentRow[7], // 7: Recurrente
-      data.divisa || currentRow[8], // 8: Divisa
-      data.usuario || currentRow[9] || "admin", // 9: Usuario
-    ];
-  }
-  // Lógica para 'inventario'
-  else if (tabla === "inventario") {
-    // En inventario, el campo de actualización puede ser 'cantidad' o 'stockActual'
-    const newStock = data.cantidad || data.stockActual;
-    const cantidad = newStock
-      ? parseFloat(newStock)
-      : parseFloat(currentRow[3] || 0);
-
-    updatedRow = [
-      currentRow[0], // 0: Codigo (No se toca)
-      data.nombreProducto || currentRow[1], // 1: Nombre
-      data.tipoMovimiento || currentRow[2], // 2: Tipo
-      cantidad, // 3: Stock Actual
-      data.unidadMedida || currentRow[4], // 4: U. Medida
-      data.stockMinimo || currentRow[5], // 5: Stock Minimo
-      data.usuario || currentRow[6] || "admin", // 6: Usuario
-    ];
-  }
-
-  // 4. Asegurar que la fila de actualización tenga al menos la longitud de la fila actual
-  while (updatedRow.length < currentRow.length) {
-    updatedRow.push("");
-  }
-
-  // 5. Actualizar la fila específica en Google Sheets
-  const result = await sheets.spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range: `${sheetName}!A${sheetRowNumber}`, // Apunta a la fila exacta desde la columna A
-    valueInputOption: "USER_ENTERED",
-    resource: {
-      values: [updatedRow],
-    },
-  });
-
-  return result;
+    return updateRow("gastos", rowNumber, updatedRow);
 }
 
-exports.handler = async function (event, context) {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json",
-  };
+async function handleClientesUpdate(rowNumber, data) {
+    const currentRow = (await readRange(`clientes!${rowNumber}:${rowNumber}`))[0] || [];
+    const updatedRow = [
+        currentRow[0], // ID no cambia
+        data.nombre || currentRow[1],
+        data.telefono || currentRow[2],
+        data.email || currentRow[3],
+        currentRow[4], // createdAt no cambia
+    ];
+    return updateRow("clientes", rowNumber, updatedRow);
+}
 
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
-  }
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: "Método no permitido" }),
+async function handleInventarioUpdate(rowNumber, data) {
+    const currentRow = (await readRange(`inventario!${rowNumber}:${rowNumber}`))[0] || [];
+    const updatedRow = [
+        currentRow[0], // Código no cambia
+        data.nombre || currentRow[1],
+        data.tipo || currentRow[2],
+        data.stock_actual || currentRow[3],
+        data.u_medida || currentRow[4],
+        data.stock_minimo || currentRow[5],
+        data.usuario || currentRow[6],
+    ];
+    return updateRow("inventario", rowNumber, updatedRow);
+}
+
+// --- Función principal del endpoint ---
+
+exports.handler = async function (event) {
+    const headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-control-allow-methods": "POST, OPTIONS",
     };
-  }
+    if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers };
 
-  try {
-    const { tabla, id, data } = JSON.parse(event.body);
+    const auth = verifyAuth(event);
+    if (!auth.ok) return { statusCode: 401, body: JSON.stringify({ message: auth.message }) };
 
-    // 1. Validar campos
-    if (!tabla || !id || !data || Object.keys(data).length === 0) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error:
-            "Faltan parámetros: 'tabla', 'id' y 'data' (con campos a actualizar) son requeridos.",
-        }),
-      };
+    try {
+        const { tabla, id, data } = JSON.parse(event.body);
+        if (!tabla || !id || !data || !SHEET_CONFIG[tabla]) {
+            return { statusCode: 400, body: JSON.stringify({ message: "Parámetros inválidos o tabla no reconocida." }) };
+        }
+
+        const { name: sheetName, keyColumn } = SHEET_CONFIG[tabla];
+        const rowNumber = await findRowNumberById(sheetName, id, keyColumn);
+
+        if (rowNumber === -1) {
+            return { statusCode: 404, body: JSON.stringify({ message: `Registro con ID '${id}' no encontrado.` }) };
+        }
+
+        let result;
+        switch (tabla) {
+            case "ventas": result = await handleVentasUpdate(rowNumber, data); break;
+            case "gastos": result = await handleGastosUpdate(rowNumber, data); break;
+            case "clientes": result = await handleClientesUpdate(rowNumber, data); break;
+            case "inventario": result = await handleInventarioUpdate(rowNumber, data); break;
+        }
+
+        return { 
+            statusCode: 200, 
+            headers, 
+            body: JSON.stringify({ 
+                success: true, 
+                message: `Registro '${id}' actualizado exitosamente en '${tabla}'.`,
+                updatedRange: result.updatedRange 
+            }) 
+        };
+
+    } catch (error) {
+        console.error("Error en editar-registro.js:", error);
+        return { statusCode: 500, headers, body: JSON.stringify({ message: "Error interno del servidor", error: error.message }) };
     }
-
-    // 2. Seguridad: asegurar que la tabla sea una de las permitidas
-    const tablasPermitidas = Object.keys(SHEET_CONFIG);
-    if (!tablasPermitidas.includes(tabla)) {
-      return {
-        statusCode: 403,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "Operación de actualización no permitida para esta tabla.",
-        }),
-      };
-    }
-
-    // 3. Ejecutar la autorización y la actualización
-    const sheets = await authorizeAndGetSheets();
-    const updateResult = await findAndUpdateSheet(sheets, tabla, id, data);
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        message: `Registro (${id}) actualizado exitosamente en Google Sheets.`,
-        updatedCells: updateResult.data.updatedCells,
-      }),
-    };
-  } catch (error) {
-    console.error("❌ Error en editar-registro.js:", error.message);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error: `Error al actualizar el registro: ${error.message}`,
-      }),
-    };
-  }
 };

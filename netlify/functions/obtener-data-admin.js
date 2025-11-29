@@ -13,10 +13,16 @@ exports.handler = async (event) => {
     const salesSheet = process.env.SALES_SHEET_NAME || "ventas";
     const expensesSheet = process.env.EXPENSES_SHEET_NAME || "gastos";
     const clientsSheet = process.env.CLIENTS_SHEET_NAME || "clientes";
+    const inventorySheet = process.env.INVENTORY_SHEET_NAME || "inventario";
 
-    const ventasRows = await readRange(`${salesSheet}!A:J`);
-    const gastosRows = await readRange(`${expensesSheet}!A:K`);
-    const clientesRows = await readRange(`${clientsSheet}!A:E`);
+    // Ajustamos los rangos y obtenemos todos los datos en paralelo
+    const [ventasRows, gastosRows, clientesRows, inventarioRows] =
+      await Promise.all([
+        readRange(`${salesSheet}!A:J`), // 10 columnas
+        readRange(`${expensesSheet}!A:K`), // 11 columnas
+        readRange(`${clientsSheet}!A:E`), // 5 columnas (actualizado)
+        readRange(`${inventorySheet}!A:G`), // 7 columnas
+      ]);
 
     const mapRows = (rows, fields) =>
       (rows || []).map((r) => {
@@ -38,30 +44,39 @@ exports.handler = async (event) => {
           "cantidad",
           "precio_unitario",
           "descripcion",
-          "ventaBruta",
+          "venta_bruta",
           "abono",
-          "saldo",
-          "iva",
+          "saldo_pendiente",
+          "iva_fiscal",
         ]),
         gastos: mapRows(gastosRows, [
           "fecha",
           "id",
           "rif",
-          "razon",
+          "razon_social",
           "concepto",
-          "cant",
+          "cantidad",
           "descripcion",
           "precio_unitario",
           "monto_total",
-          "credito_fiscal",
+          "iva_fiscal",
           "createdAt",
         ]),
         clientes: mapRows(clientesRows, [
           "id",
           "nombre",
           "telefono",
-          "email",
+          "email", // Corregido (añadido de nuevo)
           "createdAt",
+        ]),
+        inventario: mapRows(inventarioRows, [
+          "codigo",
+          "nombre",
+          "tipo",
+          "stock_actual",
+          "u_medida",
+          "stock_minimo",
+          "usuario",
         ]),
       }),
     };
@@ -69,7 +84,11 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Error interno" }),
+      body: JSON.stringify({
+        message:
+          "Error interno del servidor al leer los datos de Google Sheets: " +
+          err.message,
+      }),
     };
   }
 };

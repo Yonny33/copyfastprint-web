@@ -1,10 +1,5 @@
 // netlify/functions/registrar-inventario.js
-const { createClient } = require("@supabase/supabase-js");
-
-// 💡 Inicializar Cliente Supabase (Service Role Key)
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const { appendRow } = require("./_google-sheets");
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -26,23 +21,10 @@ exports.handler = async function (event, context) {
     };
   }
 
-  // 0. Verificar la configuración de Supabase
-  if (!supabaseUrl || !supabaseKey) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        success: false,
-        error:
-          "Error de configuración: Variables de entorno de Supabase faltantes.",
-      }),
-    };
-  }
-
   try {
     const data = JSON.parse(event.body);
 
-    // 1. Validar campos requeridos para el nuevo material
+    // 1. Validar campos requeridos
     const requiredFields = [
       "codigo",
       "material",
@@ -62,9 +44,7 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           success: false,
-          error: `Faltan campos obligatorios para registrar el material: ${missingFields.join(
-            ", "
-          )}`,
+          error: `Faltan campos obligatorios: ${missingFields.join(", ")}`,
         }),
       };
     }
@@ -78,48 +58,27 @@ exports.handler = async function (event, context) {
         headers,
         body: JSON.stringify({
           success: false,
-          error:
-            "Stock y Stock Mínimo deben ser números válidos y no negativos.",
+          error: "Stock y Stock Mínimo deben ser números válidos.",
         }),
       };
     }
 
-    // 2. Preparar el objeto para Supabase (Mapeo a la tabla 'inventario')
-    const materialSupabase = {
-      codigo: data.codigo,
-      material: data.material,
-      tipo: data.tipo,
-      stock: stock.toFixed(2),
-      unidad_medida: data.unidad_medida,
-      stock_minimo: stockMinimo.toFixed(2),
-    };
+    // 2. Preparar la fila para Google Sheets en el orden correcto
+    // Columnas esperadas: Codigo, Nombre, Tipo, Stock Actual, U. Medida, Stock Mínimo, Usuario
+    const newRow = [
+      data.codigo,
+      data.material, // Corresponde a 'Nombre'
+      data.tipo,
+      stock.toFixed(2), // Corresponde a 'Stock Actual'
+      data.unidad_medida, // Corresponde a 'U. Medida'
+      stockMinimo.toFixed(2), // Corresponde a 'Stock Mínimo'
+      data.usuario || "", // Corresponde a 'Usuario', se deja vacío si no se proporciona
+    ];
 
-    console.log("📦 Material a Supabase:", materialSupabase);
+    const inventorySheetName = process.env.INVENTORY_SHEET_NAME || "inventario";
 
-    // 3. Insertar en Supabase (manejar el error de código único)
-    const { data: insertedData, error } = await supabase
-      .from("inventario") // Nombre de la tabla
-      .insert([materialSupabase])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("❌ Error de Supabase al registrar el material:", error);
-
-      // Manejar error de UNIQUE constraint (código duplicado: código de error '23505')
-      if (error.code === "23505" && error.message.includes("codigo")) {
-        return {
-          statusCode: 409, // Conflict
-          headers,
-          body: JSON.stringify({
-            success: false,
-            error: `El código de material '${data.codigo}' ya existe. Los códigos deben ser únicos.`,
-          }),
-        };
-      }
-
-      throw new Error(`DB Error: ${error.message}`);
-    }
+    // 3. Añadir la fila a Google Sheets
+    await appendRow(inventorySheetName, newRow);
 
     // 4. Respuesta de éxito
     return {
@@ -127,8 +86,9 @@ exports.handler = async function (event, context) {
       headers,
       body: JSON.stringify({
         success: true,
-        message: "Material de inventario registrado exitosamente en Supabase",
-        material: insertedData,
+        message:
+          "Material de inventario registrado exitosamente en Google Sheets",
+        material: data,
       }),
     };
   } catch (error) {
