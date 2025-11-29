@@ -1,4 +1,6 @@
-const SCRIPT_URL_GASTOS = 'https://script.google.com/macros/s/AKfycbwvlvXmJd6xprAs3jSn8YuURliNLoH4TThLh5UuKNzcEZZXrcNO_UA9MG5oyA8iuZ-kyA/exec';
+
+// URL de nuestra nueva función de Firebase que actúa como proxy
+const PROXY_URL_GASTOS = 'https://us-central1-copyfast-control.cloudfunctions.net/proxyGoogleScript';
 
 document.addEventListener('DOMContentLoaded', cargarGastosData);
 
@@ -12,22 +14,26 @@ async function cargarGastosData() {
     gastosListBody.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
 
     try {
-        // Añadimos un parámetro a la URL para indicar que queremos obtener los gastos
-        const url = `${SCRIPT_URL_GASTOS}?action=getGastos`;
-        const response = await fetch(url);
+        // Preparamos los datos que enviaremos en el cuerpo de la petición POST
+        const postData = {
+            action: 'getGastos'
+        };
+
+        // Realizamos la petición POST a nuestra función de Firebase
+        const response = await fetch(PROXY_URL_GASTOS, {
+            method: 'POST',
+            mode: 'cors', // Habilitar CORS para la petición
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        });
 
         if (!response.ok) {
             throw new Error(`Error de red o servidor: ${response.status} ${response.statusText}`);
         }
 
-        const resultText = await response.text();
-        let result;
-        try {
-            result = JSON.parse(resultText);
-        } catch (e) {
-            console.error("La respuesta del servidor no es un JSON válido:", resultText);
-            throw new Error("El formato de la respuesta del servidor es incorrecto.");
-        }
+        const result = await response.json(); // La respuesta ya debería ser JSON
 
         if (result.status === "success") {
             mostrarGastosEnTabla(result.data);
@@ -55,7 +61,8 @@ function mostrarGastosEnTabla(gastos) {
     gastos.forEach(gasto => {
         const tr = document.createElement('tr');
 
-        const fecha = new Date(gasto.fecha).toLocaleDateString('es-VE');
+        // Asegurarnos de que la fecha es válida antes de formatearla
+        const fecha = gasto.fecha ? new Date(gasto.fecha).toLocaleDateString('es-VE') : 'Fecha inválida';
         const monto = parseFloat(gasto.monto).toFixed(2);
 
         tr.innerHTML = `
