@@ -117,125 +117,121 @@ if (scrollToTopBtn) {
   console.warn("El elemento 'scroll-to-top' no se encontró en el DOM.");
 }
 
-// ...existing code...
+// =================== LIGHTBOX CON NAVEGACIÓN (CONDICIONAL) ===================
 
-// =================== LIGHTBOX CON NAVEGACIÓN ===================
-
-// Obtener todas las imágenes de la galería
+// Solo ejecutar si estamos en una página con la galería.
+// Comprobamos si existen los elementos principales del lightbox.
+const lightboxModal = document.getElementById("lightbox-modal");
 const galleryImages = Array.from(document.querySelectorAll(".design-card img"));
-let currentImgIndex = 0;
 
-// Crear botones de navegación si no existen
-function ensureLightboxNavButtons() {
-  const modal = document.getElementById("lightbox-modal");
-  if (!document.getElementById("lightbox-prev")) {
-    const prevBtn = document.createElement("button");
-    prevBtn.id = "lightbox-prev";
-    prevBtn.innerHTML = "&#10094;";
-    prevBtn.className = "lightbox-nav";
-    modal.appendChild(prevBtn);
-  }
-  if (!document.getElementById("lightbox-next")) {
-    const nextBtn = document.createElement("button");
-    nextBtn.id = "lightbox-next";
-    nextBtn.innerHTML = "&#10095;";
-    nextBtn.className = "lightbox-nav";
-    modal.appendChild(nextBtn);
-  }
-}
+if (lightboxModal && galleryImages.length > 0) {
+  let currentImgIndex = 0;
 
-// Mostrar imagen en el lightbox según el índice
-function showLightboxImage(index) {
-  const modal = document.getElementById("lightbox-modal");
-  const modalImg = document.getElementById("lightbox-img");
-  const caption = document.getElementById("lightbox-caption");
-  const whatsappBtn = document.getElementById("whatsapp-btn");
-  currentImgIndex = index;
-  modalImg.src = galleryImages[index].src;
-  caption.textContent = galleryImages[index].alt;
-
-  // Obtener el título del suéter
-  const designCard = galleryImages[index].closest(".design-card");
-  const titleElement = designCard.querySelector(".card-info h3");
-  const titulo = titleElement
-    ? titleElement.textContent
-    : galleryImages[index].alt;
-
-  // Extraer el color después de "Suéter" (puede tener acentos)
-  let color = "";
-  const altText = galleryImages[index].alt;
-  const match = altText.match(/Suéter\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
-  if (match) {
-    color = match[1];
+  // Crear botones de navegación si no existen
+  function ensureLightboxNavButtons() {
+    if (!document.getElementById("lightbox-prev")) {
+      const prevBtn = document.createElement("button");
+      prevBtn.id = "lightbox-prev";
+      prevBtn.innerHTML = "&#10094;";
+      prevBtn.className = "lightbox-nav";
+      lightboxModal.appendChild(prevBtn);
+    }
+    if (!document.getElementById("lightbox-next")) {
+      const nextBtn = document.createElement("button");
+      nextBtn.id = "lightbox-next";
+      nextBtn.innerHTML = "&#10095;";
+      nextBtn.className = "lightbox-nav";
+      lightboxModal.appendChild(nextBtn);
+    }
   }
 
-  // Obtener el enlace absoluto de la imagen
-  const imagenUrl = galleryImages[index].src;
+  // Mostrar imagen en el lightbox según el índice
+  function showLightboxImage(index) {
+    const modalImg = document.getElementById("lightbox-img");
+    const caption = document.getElementById("lightbox-caption");
+    const whatsappBtn = document.getElementById("whatsapp-btn");
+    currentImgIndex = index;
+    modalImg.src = galleryImages[index].src;
+    caption.textContent = galleryImages[index].alt;
 
-  // Mensaje con título, color y enlace de la imagen
-  const mensaje = encodeURIComponent(
-    `Hola, me interesa el diseño: ${titulo} en color: ${color}. Enlace de la imagen: ${imagenUrl}`
-  );
-  whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`; // Cambia 1234567890 por tu número real
+    const designCard = galleryImages[index].closest(".design-card");
+    const titleElement = designCard.querySelector(".card-info h3");
+    const titulo = titleElement
+      ? titleElement.textContent
+      : galleryImages[index].alt;
 
-  modal.style.display = "flex";
-  document.body.style.overflow = "hidden";
-}
+    let color = "";
+    const altText = galleryImages[index].alt;
+    const match = altText.match(/Suéter\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
+    if (match) {
+      color = match[1];
+    }
 
-// Evento click en cada imagen para abrir el lightbox
-galleryImages.forEach((img, idx) => {
-  img.style.cursor = "pointer";
-  img.addEventListener("click", function () {
-    ensureLightboxNavButtons();
-    showLightboxImage(idx);
+    const imagenUrl = galleryImages[index].src;
+
+    const mensaje = encodeURIComponent(
+      `Hola, me interesa el diseño: ${titulo} en color: ${color}. Enlace de la imagen: ${imagenUrl}`
+    );
+    whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`;
+
+    lightboxModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+
+  // Evento click en cada imagen para abrir el lightbox
+  galleryImages.forEach((img, idx) => {
+    img.style.cursor = "pointer";
+    img.addEventListener("click", function () {
+      ensureLightboxNavButtons();
+      showLightboxImage(idx);
+    });
   });
-});
 
-// Botón cerrar
-document.getElementById("lightbox-close").onclick = function () {
-  document.getElementById("lightbox-modal").style.display = "none";
-  document.body.style.overflow = "";
-};
-
-// Cerrar al hacer click fuera de la imagen
-document.getElementById("lightbox-modal").onclick = function (e) {
-  if (e.target === this) {
-    this.style.display = "none";
+  // Botón cerrar
+  document.getElementById("lightbox-close").onclick = function () {
+    lightboxModal.style.display = "none";
     document.body.style.overflow = "";
-  }
-};
+  };
 
-// Navegación siguiente/anterior
-document.addEventListener("click", function (e) {
-  if (e.target.id === "lightbox-next") {
-    e.stopPropagation();
-    let next = (currentImgIndex + 1) % galleryImages.length;
-    showLightboxImage(next);
-  }
-  if (e.target.id === "lightbox-prev") {
-    e.stopPropagation();
-    let prev =
-      (currentImgIndex - 1 + galleryImages.length) % galleryImages.length;
-    showLightboxImage(prev);
-  }
-});
+  // Cerrar al hacer click fuera de la imagen
+  lightboxModal.onclick = function (e) {
+    if (e.target === this) {
+      this.style.display = "none";
+      document.body.style.overflow = "";
+    }
+  };
 
-// Opcional: navegación con flechas del teclado
-document.addEventListener("keydown", function (e) {
-  const modal = document.getElementById("lightbox-modal");
-  if (modal.style.display === "flex") {
-    if (e.key === "ArrowRight") {
+  // Navegación siguiente/anterior
+  document.addEventListener("click", function (e) {
+    if (e.target.id === "lightbox-next") {
+      e.stopPropagation();
       let next = (currentImgIndex + 1) % galleryImages.length;
       showLightboxImage(next);
     }
-    if (e.key === "ArrowLeft") {
+    if (e.target.id === "lightbox-prev") {
+      e.stopPropagation();
       let prev =
         (currentImgIndex - 1 + galleryImages.length) % galleryImages.length;
       showLightboxImage(prev);
     }
-    if (e.key === "Escape") {
-      modal.style.display = "none";
-      document.body.style.overflow = "";
+  });
+
+  // Navegación con flechas del teclado
+  document.addEventListener("keydown", function (e) {
+    if (lightboxModal.style.display === "flex") {
+      if (e.key === "ArrowRight") {
+        let next = (currentImgIndex + 1) % galleryImages.length;
+        showLightboxImage(next);
+      }
+      if (e.key === "ArrowLeft") {
+        let prev =
+          (currentImgIndex - 1 + galleryImages.length) % galleryImages.length;
+        showLightboxImage(prev);
+      }
+      if (e.key === "Escape") {
+        lightboxModal.style.display = "none";
+        document.body.style.overflow = "";
+      }
     }
-  }
-});
+  });
+}
