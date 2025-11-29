@@ -14,31 +14,18 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers };
   }
   if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: "Método no permitido" }),
-    };
+    return { statusCode: 405, body: JSON.stringify({ message: "Método no permitido" }) };
   }
 
   if (!PASSWORD_SEGURO || !JWT_SECRET) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: "Variables de entorno del servidor no configuradas.",
-      }),
-    };
+    return { statusCode: 500, body: JSON.stringify({ message: "Variables de entorno del servidor no configuradas." }) };
   }
 
   try {
     const { usuario, password } = JSON.parse(event.body);
 
     if (!usuario || !password) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "Usuario y contraseña son requeridos.",
-        }),
-      };
+      return { statusCode: 400, body: JSON.stringify({ message: "Usuario y contraseña son requeridos." }) };
     }
 
     if (usuario === USUARIO_SEGURO && password === PASSWORD_SEGURO) {
@@ -60,25 +47,20 @@ exports.handler = async (event) => {
         },
         body: JSON.stringify({ success: true, message: "Acceso concedido" }),
       };
+
     } else {
       // Credenciales incorrectas
       return {
         statusCode: 401,
         headers,
-        body: JSON.stringify({
-          success: false,
-          message: "Usuario o contraseña incorrectos",
-        }),
+        body: JSON.stringify({ success: false, message: "Usuario o contraseña incorrectos" }),
       };
     }
   } catch (error) {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({
-        message: "Error interno del servidor",
-        error: error.message,
-      }),
+      body: JSON.stringify({ message: "Error interno del servidor", error: error.message }),
     };
   }
 };

@@ -4,11 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
+      
       const submitButton = form.querySelector('button[type="submit"]');
       submitButton.disabled = true;
-      submitButton.innerHTML =
-        '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
 
       // 1. Recolectar datos del formulario
       const data = {
@@ -36,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("¡Gasto registrado con éxito!");
           form.reset(); // Limpiar el formulario
           // Recargar la página para ver el nuevo gasto en la tabla
-          window.location.reload();
+          window.location.reload(); 
         } else {
           throw new Error(result.message || "No se pudo registrar el gasto.");
         }
@@ -46,8 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } finally {
         // Reactivar el botón
         submitButton.disabled = false;
-        submitButton.innerHTML =
-          '<i class="fas fa-plus-circle"></i> Registrar Gasto';
+        submitButton.innerHTML = '<i class="fas fa-plus-circle"></i> Registrar Gasto';
       }
     });
   }
