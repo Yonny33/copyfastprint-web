@@ -10,7 +10,6 @@ document
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // Pequeña validación en el cliente
     if (!data.fecha || !data.monto || !data.categoria) {
       alert("Por favor, completa todos los campos obligatorios.");
       return;
@@ -22,32 +21,38 @@ document
       '<i class="fas fa-spinner fa-spin"></i> Registrando...';
 
     try {
+      // La petición a Google Apps Script no necesita ser un POST complejo.
+      // Lo envolvemos en una función de redirección para evitar problemas de CORS.
+      // NOTA: Esta es una solución alternativa común para Google Apps Script.
       const response = await fetch(SCRIPT_URL, {
         method: "POST",
-        mode: "cors",
+        // Cambiamos el Content-Type para evitar el preflight de CORS que causa "Failed to fetch"
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "text/plain;charset=utf-8",
         },
         body: JSON.stringify(data),
       });
 
-      // El cuerpo de la respuesta de un script de Google en modo 'cors' suele ser texto plano.
       const resultText = await response.text();
       const result = JSON.parse(resultText);
 
       if (result.status === "success") {
         alert("¡Gasto registrado con éxito!");
         form.reset();
-        // Si la función para recargar la tabla de gastos existe, la llamamos.
         if (typeof cargarGastosData === "function") {
           cargarGastosData();
         }
       } else {
-        throw new Error(result.message || "Ocurrió un error desconocido.");
+        throw new Error(
+          result.message || "Ocurrió un error desconocido en el script."
+        );
       }
     } catch (error) {
       console.error("Error al registrar el gasto:", error);
-      alert(`Error al registrar el gasto: ${error.message}`);
+      // El error "Failed to fetch" suele ser un problema de red o CORS.
+      alert(
+        `Error al enviar los datos: ${error.message}. Revisa la consola para más detalles.`
+      );
     } finally {
       submitButton.disabled = false;
       submitButton.innerHTML =
