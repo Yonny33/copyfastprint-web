@@ -121,7 +121,7 @@
       <div class="form-container">
         <div class="form-wrapper">
           <!-- FORMULARIO CON NETLIFY FORMS -->
-          <form id="cotizacion-form" class="cotizacion-form">
+          <form id="cotizacion-form" class="cotizacion-form" novalidate>
             <!-- Campo oculto para Netlify -->
             <input type="hidden" name="form-name" value="cotizacion" />
 
@@ -698,7 +698,80 @@
     <a href="#" id="scroll-to-top" class="scroll-to-top">
       <i class="fas fa-chevron-up"></i>
     </a>
+    <script>
+      // ==========================================================================
+      // ===  MANEJO DEL FORMULARIO DE COTIZACIÓN CON GOOGLE APPS SCRIPT  ===
+      // ==========================================================================
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("cotizacion-form");
+        if (!form) return;
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault(); // Prevenir el envío tradicional
+
+          const submitButton = form.querySelector('button[type="submit"]');
+          const originalButtonText = submitButton.innerHTML;
+          submitButton.disabled = true;
+          submitButton.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+          // URL de tu nueva API de Google Apps Script
+          const googleScriptURL =
+            "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec";
+
+          // Construir el objeto de datos del formulario
+          const formData = new FormData(form);
+          const data = {
+            type: "gasto", // O 'cotizacion' si lo ajustas en el script
+            monto: formData.get("presupuesto"),
+            categoria: formData.get("servicio"),
+            descripcion: `
+              Nombre: ${formData.get("nombre")}
+              Email: ${formData.get("email")}
+              Teléfono: ${formData.get("telefono")}
+              Servicio: ${formData.get("servicio")}
+              Producto: ${
+                formData.get("prendaDTF") ||
+                formData.get("prendaSublimacion") ||
+                "N/A"
+              }
+              Cantidad: ${formData.get("cantidad")}
+              Descripción: ${formData.get("descripcion")}
+              Fecha Requerida: ${formData.get("fechaRequerida")}
+              Mensaje Adicional: ${formData.get("mensaje")}
+            `.trim(),
+          };
+
+          fetch(googleScriptURL, {
+            method: "POST",
+            mode: "no-cors", // Importante para evitar errores de CORS con Apps Script
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then(() => {
+              // Como usamos 'no-cors', no podemos leer la respuesta.
+              // Asumimos éxito si no hay un error de red.
+              alert(
+                "¡Cotización enviada con éxito! Nos pondremos en contacto contigo pronto."
+              );
+              form.reset(); // Limpiar el formulario
+            })
+            .catch((error) => {
+              console.error("Error al enviar el formulario:", error);
+              alert(
+                "Hubo un error al enviar tu cotización. Por favor, inténtalo de nuevo o contáctanos por WhatsApp."
+              );
+            })
+            .finally(() => {
+              // Restaurar el botón
+              submitButton.disabled = false;
+              submitButton.innerHTML = originalButtonText;
+            });
+        });
+      });
+    </script>
     <script src="js/scripts.js"></script>
-    <script src="js/formulario-netlify.js"></script>
   </body>
 </html>

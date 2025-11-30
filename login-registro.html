@@ -340,6 +340,85 @@
           loginForm.style.opacity = "0.5";
           loginForm.style.pointerEvents = "none";
 
+          // 2. Enviar los datos a la API de Google Apps Script
+          try {
+            // URL de tu nueva API
+            const googleScriptURL =
+              "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec";
+
+            // En este caso, usaremos GET para una validación simple
+            // (En un futuro, esto debería ser un POST con autenticación más segura)
+            const response = await fetch(
+              `${googleScriptURL}?action=login&user=${encodeURIComponent(
+                usuario
+              )}&pass=${encodeURIComponent(password)}`
+            );
+
+            const result = await response.json();
+
+            // 3. Manejar la respuesta del servidor
+            if (result.status === "success" && result.auth === true) {
+              // Login exitoso
+              sessionStorage.setItem("sesionActiva", "true");
+              sessionStorage.setItem("usuario", usuario);
+              sessionStorage.setItem("loginTime", new Date().toISOString());
+
+              // Redirigir a la página de administración (debes crearla)
+              window.location.href = "admin.html";
+            } else {
+              // Login fallido
+              mostrarError(result.message || "Credenciales incorrectas.");
+              document.getElementById("password").value = "";
+              document.getElementById("password").focus();
+            }
+          } catch (error) {
+            console.error("Error de conexión:", error);
+            mostrarError(
+              "Error: No se pudo conectar con el servicio de login."
+            );
+          } finally {
+            // Restaurar estado del formulario
+            loginForm.style.opacity = "1";
+            loginForm.style.pointerEvents = "auto";
+          }
+        });
+
+        function mostrarError(mensaje) {
+          errorText.textContent = mensaje;
+          errorMessage.classList.add("show");
+
+          setTimeout(() => {
+            errorMessage.classList.remove("show");
+          }, 3000);
+        }
+      }
+
+      // Limpiar campos al cargar
+      document.getElementById("usuario").value = "";
+      document.getElementById("password").value = "";
+
+      // Focus automático en el campo de usuario
+      document.getElementById("usuario").focus();
+    </script>
+    <!-- El script de abajo ya no es necesario si se maneja aquí -->
+    <!--
+    <script>
+      // Obtener elementos del DOM
+      const loginForm = document.getElementById("loginForm");
+      const errorMessage = document.getElementById("errorMessage");
+      const errorText = document.getElementById("errorText");
+
+      if (loginForm) {
+        loginForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const usuario = document.getElementById("usuario").value;
+          const password = document.getElementById("password").value;
+
+          // 1. Mostrar animación/bloqueo de formulario (opcional)
+          loginForm.style.opacity = "0.5";
+          loginForm.style.pointerEvents = "none";
+
           // 2. Enviar los datos al servidor (Netlify Function)
           try {
             const response = await fetch("/.netlify/functions/validar-login", {
@@ -399,6 +478,6 @@
 
       // Focus automático en el campo de usuario
       document.getElementById("usuario").focus();
-    </script>
+    </script> -->
   </body>
 </html>
