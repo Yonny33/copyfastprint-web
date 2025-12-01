@@ -16,10 +16,10 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Ventas y Clientes - COPYFAST&PRINT</title>
+    <title>Registro de Gastos - COPYFAST&PRINT</title>
     <meta
       name="description"
-      content="Panel de registro interno para clientes, ventas y control de crédito de COPYFAST&PRINT."
+      content="Panel de registro interno para gastos de COPYFAST&PRINT."
     />
     <link
       rel="icon"
@@ -101,7 +101,7 @@
   <body>
     <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="loader"></div>
-      <p>Registrando venta...</p>
+      <p>Registrando gasto...</p>
     </div>
 
     <script>
@@ -118,8 +118,8 @@
         </div>
         <ul class="menu" id="menu">
           <li><a href="admin.html">Admin</a></li>
-          <li><a href="ventas.html" class="active">Registro Ventas</a></li>
-          <li><a href="gastos.html">Registro Gastos</a></li>
+          <li><a href="ventas.html">Registro Ventas</a></li>
+          <li><a href="gastos.html" class="active">Registro Gastos</a></li>
           <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
         </ul>
         <div class="menu-toggle" id="menu_toggle">
@@ -133,47 +133,19 @@
       <div class="form-wrapper">
         <section class="form-section">
           <div class="section-heading">
-            <h2>📝 Registro de Venta y Clientes</h2>
+            <h2>💸 Registro de Gastos</h2>
             <p>
-              Completa los datos de la venta y del cliente para realizar el
-              registro.
+              Completa los datos del gasto para mantener un control financiero.
             </p>
           </div>
 
-          <form id="registro-ventas-form" class="form-grid">
+          <form id="registro-gastos-form" class="form-grid">
             <div class="form-separator full-width">
-              <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
-            </div>
-
-            <div class="form-group">
-              <label for="cedula">Cédula / RIF *</label>
-              <input type="text" id="cedula" name="cedula" required />
-            </div>
-
-            <div class="form-group">
-              <label for="nombre">Nombre / Razón Social *</label>
-              <!-- name cambiado a "cliente" para coincidir con la función -->
-              <input type="text" id="nombre" name="cliente" required />
-            </div>
-
-            <div class="form-group">
-              <label for="telefono">Teléfono *</label>
-              <input type="tel" id="telefono" name="telefono" required />
-            </div>
-
-            <div class="form-group">
-              <label for="email">Email (Opcional)</label>
-              <input type="email" id="email" name="email" />
-            </div>
-
-            <div class="form-separator full-width">
-              <h3><i class="fas fa-receipt"></i> Detalle de la Venta</h3>
+              <h3><i class="fas fa-money-bill-wave"></i> Detalle del Gasto</h3>
             </div>
 
             <div class="form-group full-width">
-              <label for="descripcion"
-                >Descripción del Servicio/Producto *</label
-              >
+              <label for="descripcion">Descripción del Gasto *</label>
               <textarea
                 id="descripcion"
                 name="descripcion"
@@ -183,78 +155,37 @@
             </div>
 
             <div class="form-group">
-              <label for="tipoServicio">Tipo de Servicio</label>
-              <select id="tipoServicio" name="tipoServicio">
-                <option value="Sublimacion">Sublimación</option>
-                <option value="DTF">DTF</option>
-                <option value="Impresion">Impresión/Fotocopia</option>
-                <option value="Diseno">Diseño Gráfico</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-
-            <!-- Nuevo campo cantidad (necesario para la hoja) -->
-            <div class="form-group">
-              <label for="cantidad">Cantidad</label>
+              <label for="monto">Monto del Gasto (Bs.) *</label>
               <input
                 type="number"
-                id="cantidad"
-                name="cantidad"
-                min="1"
-                step="1"
-                value="1"
-                required
-              />
-            </div>
-
-            <!-- montoTotal renombrado a precio_unitario (coincide con registrar-venta) -->
-            <div class="form-group">
-              <label for="precioUnitario">Precio Unitario (Bs.) *</label>
-              <input
-                type="number"
-                id="precioUnitario"
-                name="precio_unitario"
+                id="monto"
+                name="monto"
                 step="0.01"
                 min="0.01"
                 required
               />
             </div>
 
-            <!-- montoPagado renombrado a abono -->
             <div class="form-group">
-              <label for="montoPagado">Monto Pagado (Bs.) *</label>
-              <input
-                type="number"
-                id="montoPagado"
-                name="abono"
-                step="0.01"
-                min="0"
-                required
-              />
-              <span id="pago-error" class="error-message"></span>
-            </div>
-
-            <div class="form-group">
-              <label for="metodoPago">Método de Pago *</label>
-              <select id="metodoPago" name="metodoPago" required>
-                <option value="">Selecciona una</option>
-                <option value="Efectivo">Efectivo</option>
-                <option value="Transferencia">Transferencia</option>
-                <option value="Pago-Movil">Pago Móvil</option>
-                <option value="Tarjeta">Tarjeta</option>
-                <option value="Credito">Crédito</option>
+              <label for="categoria">Categoría de Gasto</label>
+              <select id="categoria" name="categoria">
+                <option value="Materiales">Materiales e Insumos</option>
+                <option value="Servicios">Servicios Públicos</option>
+                <option value="Alquiler">Alquiler</option>
+                <option value="Marketing">Marketing y Publicidad</option>
+                <option value="Salarios">Salarios</option>
                 <option value="Otro">Otro</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="fechaVenta">Fecha de Venta *</label>
-              <input type="date" id="fechaVenta" name="fecha" required />
+              <label for="fechaGasto">Fecha del Gasto *</label>
+              <input type="date" id="fechaGasto" name="fecha" required />
             </div>
 
             <div class="form-group full-width">
               <button type="submit" class="calculate-btn">
-                <i class="fas fa-save"></i> Registrar Venta
+                <i class="fas fa-save"></i> Registrar Gasto
               </button>
               <button type="reset" class="btn-secondary">
                 <i class="fas fa-trash-alt"></i> Limpiar Formulario
@@ -265,15 +196,6 @@
       </div>
 
       <div class="info-column">
-        <div class="info-box highlight">
-          <h3><i class="fas fa-info-circle"></i> Venta a Crédito</h3>
-          <p>
-            Si el **Monto Pagado** es menor al **Monto Total**, la venta se
-            registrará automáticamente como **Venta a Crédito** con el saldo
-            pendiente.
-          </p>
-        </div>
-
         <div class="info-box info">
           <h3><i class="fas fa-check"></i> Campos Requeridos</h3>
           <p>
@@ -312,7 +234,7 @@
     </a>
 
     <script src="/js/scripts.js"></script>
-    <script src="/js/ventas.js"></script>
+    <script src="/js/registro-gastos.js"></script>
     <script>
       // Botón de cerrar sesión
       document
