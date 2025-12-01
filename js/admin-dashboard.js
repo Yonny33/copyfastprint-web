@@ -1,136 +1,58 @@
-// ==========================================================================
-// ===  LÓGICA DEL PANEL ADMINISTRATIVO (admin.html)  ===
-// ==========================================================================
+// js/admin-dashboard.js
 
-document.addEventListener("DOMContentLoaded", () => {
-  const loadingOverlay = document.getElementById("loading-overlay");
-
-  // 1. VERIFICACIÓN DE SESIÓN (Dejado sin cambios)
-  if (sessionStorage.getItem("sesionActiva") !== "true") {
+document.addEventListener("DOMContentLoaded", function () {
+  // --- VERIFICACIÓN DE SESIÓN ---
+  const sesionActiva = sessionStorage.getItem("sesionActiva");
+  if (!sesionActiva) {
+    // Si no hay sesión, redirigir al login
     window.location.href = "login-registro.html";
-    return;
+    return; // Detener la ejecución del script
   }
 
-  // 2. FUNCIÓN PARA FORMATEAR MONEDA (Dejado sin cambios)
-  function formatVES(numero) {
-    // Asegurarse de que el número es un float antes de formatear
-    const num = parseFloat(numero);
-    if (isNaN(num)) return "Bs. 0.00";
-    return `Bs. ${num.toLocaleString("es-VE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  }
-
-  // 3. LÓGICA DE CÁLCULO DE INDICADORES (NUEVA FUNCIÓN)
-  function calcularIndicadores(ventas, gastos) {
-    const hoy = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
-    const mesActual = new Date().toISOString().substring(0, 7); // 'YYYY-MM'
-
-    let ventasDia = 0;
-    let ingresosMes = 0;
-    let creditosPendientes = 0;
-    let gastosDia = 0;
-    let clientesPendientes = 0; // Se usará para contar créditos
-
-    // --- CÁLCULOS DE VENTAS Y CRÉDITOS ---
-    ventas.forEach((v) => {
-      // Intentar parsear las columnas con los nombres normalizados
-      const montoTotal = parseFloat(v.venta_bruta_ves) || 0;
-      const montoPendiente = parseFloat(v.saldo_pendiente_ves) || 0;
-      const fechaVenta = v.fecha; // El formato es 'YYYY-MM-DD'
-
-      // Ventas del día (venta bruta total)
-      if (fechaVenta === hoy) {
-        ventasDia += montoTotal;
-      }
-
-      // Ingresos del mes (venta bruta total)
-      if (fechaVenta && fechaVenta.startsWith(mesActual)) {
-        ingresosMes += montoTotal;
-      }
-
-      // Créditos Pendientes (acumulado total)
-      if (v.saldo_pendiente_ves && montoPendiente > 0) {
-        creditosPendientes += montoPendiente;
-        clientesPendientes += 1; // Contar cada registro con saldo
-      }
+  // --- CERRAR SESIÓN ---
+  const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+  if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener("click", function (e) {
+      e.preventDefault();
+      sessionStorage.clear(); // Limpiar todos los datos de la sesión
+      window.location.href = "login-registro.html";
     });
-
-    // --- CÁLCULOS DE GASTOS ---
-    gastos.forEach((g) => {
-      const montoGasto = parseFloat(g.monto_total_ves) || 0;
-      const fechaGasto = g.fecha;
-
-      // Gastos del día
-      if (fechaGasto === hoy) {
-        gastosDia += montoGasto;
-      }
-    });
-
-    return {
-      ventasDia,
-      ingresosMes,
-      creditosPendientes,
-      gastosDia,
-      clientesPendientes,
-    };
   }
 
-  // 4. FUNCIÓN PRINCIPAL DE CARGA
-  async function cargarDashboard() {
-    if (loadingOverlay) loadingOverlay.style.display = "flex";
+  // --- CARGAR DATOS DEL DASHBOARD ---
+  const googleScriptURL =
+    "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec";
 
-    try {
-      // 🚨 USAR LA FUNCIÓN REAL DE NETLIFY 🚨
-      const response = await fetch(
-        "/.netlify/functions/obtener-data-admin?type=dashboard"
-      );
+  // Hacemos la petición a la API para obtener los datos del dashboard
+  fetch(`${googleScriptURL}?action=getDashboardData`)
+    .then((response) => {
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+        throw new Error(`Error de red: ${response.statusText}`);
       }
-
-      const result = await response.json();
-
-      if (!result.success || !result.data) {
-        throw new Error(
-          result.error || "Datos incompletos o error de servidor."
-        );
+      return response.json();
+    })
+    .then((data) => {
+      if (data.status === "success") {
+        // Si la API responde con éxito, actualizamos los valores en el HTML
+        document.getElementById("ventasDia").textContent = data.ventasDia;
+        document.getElementById("ingresosMes").textContent = data.ingresosMes;
+        document.getElementById("creditosPendientes").textContent =
+          data.creditosPendientes;
+        document.getElementById("gastosDia").textContent = data.gastosDia;
+        document.getElementById("clientesPendientes").textContent =
+          data.clientesPendientes;
+      } else {
+        // Si la API devuelve un error controlado
+        throw new Error(`Error en la API: ${data.message}`);
       }
-
-      // 5. PROCESAR LOS DATOS DE GOOGLE SHEETS
-      const { ventas, gastos } = result.data;
-      const indicadores = calcularIndicadores(ventas, gastos);
-
-      // Inyectar datos en el DOM
-      document.getElementById("ventasDia").textContent = formatVES(
-        indicadores.ventasDia
-      );
-      document.getElementById("ingresosMes").textContent = formatVES(
-        indicadores.ingresosMes
-      );
-      document.getElementById("creditosPendientes").textContent = formatVES(
-        indicadores.creditosPendientes
-      );
-      document.getElementById("gastosDia").textContent = formatVES(
-        indicadores.gastosDia
-      );
-      document.getElementById("clientesPendientes").textContent =
-        indicadores.clientesPendientes; // Este es un conteo, no moneda
-    } catch (error) {
-      console.error("❌ Error al cargar el dashboard:", error);
-      // Mantener los valores en 0 o mostrar error
-      document.getElementById("ventasDia").textContent = formatVES(0);
-      document.getElementById("ingresosMes").textContent = formatVES(0);
-      document.getElementById("creditosPendientes").textContent = formatVES(0);
-      document.getElementById("gastosDia").textContent = formatVES(0);
-      document.getElementById("clientesPendientes").textContent = 0;
-      alert(`⚠️ Error al cargar datos: ${error.message}`);
-    } finally {
-      if (loadingOverlay) loadingOverlay.style.display = "none";
-    }
-  }
-
-  // 6. Ejecutar la carga al inicio
-  cargarDashboard();
+    })
+    .catch((error) => {
+      console.error("Error al cargar datos del dashboard:", error);
+      // Mostramos un mensaje de error en todas las tarjetas
+      const cards = document.querySelectorAll(".card-value");
+      cards.forEach((card) => {
+        card.textContent = "Error";
+        card.style.color = "#c60e0f";
+      });
+    });
 });
