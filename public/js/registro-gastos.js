@@ -1,81 +1,123 @@
-// La URL del proxy ya está definida en gasto-form-handler.js, que se carga primero.
+// js/gastos.js
 
-document.addEventListener('DOMContentLoaded', cargarGastosData);
+document.addEventListener("DOMContentLoaded", () => {
+  // 1. Mover la obtención de elementos dentro de DOMContentLoaded
+  const loadingOverlay = document.getElementById("loading-overlay");
+  const tablaGastosBody = document.getElementById("tabla-gastos-body");
+  const totalGastosSpan = document.getElementById("total-gastos-ves");
 
-async function cargarGastosData() {
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const errorContainer = document.getElementById('error-container');
-    const gastosListBody = document.getElementById('gastos-list');
+  // Funciones de utilidad
+  function showLoading() {
+    if (loadingOverlay) loadingOverlay.style.display = "flex";
+  }
 
-    // Asegurarnos de que la URL del proxy esté disponible
-    if (typeof PROXY_URL_GASTOS === 'undefined') {
-        console.error('La variable PROXY_URL_GASTOS no está definida. Asegúrate de que gasto-form-handler.js se cargue primero.');
-        errorContainer.textContent = 'Error de configuración: La URL del servidor no está definida.';
-        return;
-    }
+  function hideLoading() {
+    if (loadingOverlay) loadingOverlay.style.display = "none";
+  }
 
-    loadingOverlay.style.display = 'flex';
-    errorContainer.textContent = '';
-    gastosListBody.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
+  function formatVES(numeroStr) {
+    const numero = parseFloat(numeroStr);
+    if (isNaN(numero)) return "Bs. 0.00";
+    return `Bs. ${numero.toLocaleString("es-VE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
 
+  // 2. Función para cargar datos de Gastos
+  async function cargarGastosData() {
+    showLoading();
     try {
-        const postData = {
-            action: 'getGastos'
-        };
+      // Llama a la Netlify Function que ahora usa Google Sheets
+      const response = await fetch("/.netlify/functions/obtener-data-admin");
 
-        const response = await fetch(PROXY_URL_GASTOS, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(postData),
-        });
+      if (!response.ok) {
+        throw new Error(`Error al obtener los datos: ${response.status}`);
+      }
 
-        if (!response.ok) {
-            // Intentamos leer el texto del error para dar más contexto
-            const errorText = await response.text();
-            throw new Error(`Error de red o servidor: ${response.status}. ${errorText}`);
-        }
+      const result = await response.json();
 
-        const result = await response.json();
-
-        if (result.status === "success") {
-            mostrarGastosEnTabla(result.data);
-        } else {
-            throw new Error(result.message || 'No se pudieron cargar los gastos.');
-        }
-
+      if (result.success && result.data && result.data.gastos) {
+        // Filtramos los gastos. El backend retorna 'ventas', 'gastos', 'inventario'.
+        const gastos = result.data.gastos;
+        actualizarTablaGastos(gastos);
+      } else {
+        alert("No se pudieron cargar los datos de gastos.");
+        console.error("Respuesta del servidor no exitosa:", result.error);
+      }
     } catch (error) {
-        console.error('Error al cargar la data de gastos:', error);
-        errorContainer.textContent = `Error: ${error.message}`;
+      console.error("Error de red o servidor:", error);
+      alert(`Error al cargar datos de gastos: ${error.message}`);
     } finally {
-        loadingOverlay.style.display = 'none';
+      hideLoading();
     }
-}
+  }
 
-function mostrarGastosEnTabla(gastos) {
-    const tbody = document.getElementById('gastos-list');
-    tbody.innerHTML = ''; // Limpiar antes de llenar
+  // 3. Función para actualizar la tabla con los nuevos nombres de columnas de Sheets
+  function actualizarTablaGastos(gastos) {
+    tablaGastosBody.innerHTML = "";
+    let totalGastos = 0;
 
-    if (!gastos || gastos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">No hay gastos registrados.</td></tr>';
-        return;
-    }
+    // Aseguramos que los gastos sean los más recientes primero
+    const gastosOrdenados = [...gastos].reverse();
 
-    gastos.forEach(gasto => {
-        const tr = document.createElement('tr');
+    gastosOrdenados.forEach((gasto, index) => {
+      // **Mapeo de Campos de Google Sheets (se usan las claves normalizadas)**
+      // NOTA: 'descripción' viene sin acento y sin espacio.
+      const fecha = gasto.fecha || "N/A";
+      const concepto = gasto.concepto || "N/A";
+      const descripcion = gasto.descripción || "Sin detalles";
+      const proveedor = gasto.razon_social || "N/A";
+      const montoStr = gasto.monto_total_ves || "0";
 
-        const fecha = gasto.fecha ? new Date(gasto.fecha).toLocaleDateString('es-VE') : 'Fecha inválida';
-        const monto = !isNaN(parseFloat(gasto.monto)) ? parseFloat(gasto.monto).toFixed(2) : '0.00';
+      const monto = parseFloat(montoStr) || 0;
+      totalGastos += monto;
 
-        tr.innerHTML = `
-            <td>${fecha}</td>
-            <td>Bs. ${monto}</td>
-            <td>${gasto.categoria || 'N/A'}</td>
-            <td>${gasto.descripcion || ''}</td>
-            <td>${gasto.metodoPago || 'N/A'}</td>
-        `;
-        tbody.appendChild(tr);
+      const row = tablaGastosBody.insertRow();
+
+      // Columna 1: Fecha
+      row.insertCell().textContent = fecha;
+      // Columna 2: Concepto
+      row.insertCell().textContent = concepto;
+      // Columna 3: Descripción
+      row.insertCell().textContent = descripcion;
+      // Columna 4: Proveedor
+      row.insertCell().textContent = proveedor;
+      // Columna 5: Monto
+      row.insertCell().textContent = formatVES(monto);
+
+      // Columna 6: Acciones (Botones de Editar/Eliminar)
+      const accionesCell = row.insertCell();
+      accionesCell.innerHTML = `
+                <button onclick="editarGasto(${index})" class="btn-sm btn-editar" title="Editar Gasto">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="eliminarGasto(${index})" class="btn-sm btn-eliminar" title="Eliminar Gasto">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
     });
-}
+
+    // Actualizar el total
+    if (totalGastosSpan) {
+      totalGastosSpan.textContent = formatVES(totalGastos);
+    }
+  }
+
+  // Ejecutar la carga de datos al iniciar la página
+  cargarGastosData();
+
+  // Las funciones globales para los botones (Editar/Eliminar)
+  // Deberán ser implementadas en el futuro con la lógica de Google Sheets
+  window.editarGasto = (index) => {
+    alert(
+      "Función de Editar (Google Sheets) no implementada aún. Necesitamos actualizar editar-registro.js."
+    );
+  };
+
+  window.eliminarGasto = (index) => {
+    alert(
+      "Función de Eliminar (Google Sheets) no implementada aún. Necesitamos actualizar eliminar-registro.js."
+    );
+  };
+});
