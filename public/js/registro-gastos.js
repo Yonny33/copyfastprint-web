@@ -1,99 +1,53 @@
-
 document.addEventListener("DOMContentLoaded", () => {
-  const loadingOverlay = document.getElementById("loading-overlay");
-  const tablaGastosBody = document.getElementById("tabla-gastos-body");
-  const totalGastosSpan = document.getElementById("total-gastos-ves");
+  const form = document.getElementById("registro-gastos-form");
+  if (!form) return;
 
-  function showLoading() {
-    if (loadingOverlay) loadingOverlay.style.display = "flex";
-  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  function hideLoading() {
-    if (loadingOverlay) loadingOverlay.style.display = "none";
-  }
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+    }
 
-  function formatVES(numeroStr) {
-    const numero = parseFloat(numeroStr);
-    if (isNaN(numero)) return "Bs. 0.00";
-    return `Bs. ${numero.toLocaleString("es-VE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  }
-
-  async function cargarGastosData() {
-    showLoading();
-    try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec?action=obtenerDatos&sheetName=Gastos");
-
-      if (!response.ok) {
-        throw new Error(`Error al obtener los datos: ${response.status}`);
+    const fd = new FormData(form);
+    
+    const payload = {
+      action: "registrarGasto",
+      sheetName: "Gastos",
+      data: {
+        fecha: fd.get("fecha") || new Date().toLocaleDateString('en-CA'),
+        monto: fd.get("monto"),
+        categoria: fd.get("categoria"),
+        descripcion: fd.get("descripcion"),
       }
+    };
+
+    try {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" }, 
+        body: JSON.stringify(payload),
+        redirect: "follow"
+      });
 
       const result = await response.json();
 
-      if (result.status === 'success' && result.data) {
-        actualizarTablaGastos(result.data);
+      if (result.status === 'success') {
+        alert("¡Gasto registrado con éxito!");
+        form.reset();
       } else {
-        alert("No se pudieron cargar los datos de gastos.");
-        console.error("Respuesta del servidor no exitosa:", result.message);
+        throw new Error(result.message || "No se pudo registrar el gasto.");
       }
     } catch (error) {
-      console.error("Error de red o servidor:", error);
-      alert(`Error al cargar datos de gastos: ${error.message}`);
+      console.error("Error al registrar el gasto:", error);
+      alert(`Error al registrar el gasto: ${error.message}`);
     } finally {
-      hideLoading();
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-save"></i> Registrar Gasto';
+      }
     }
-  }
-
-  function actualizarTablaGastos(gastos) {
-    if(!tablaGastosBody) return;
-    tablaGastosBody.innerHTML = "";
-    let totalGastos = 0;
-
-    const gastosOrdenados = [...gastos].reverse();
-
-    gastosOrdenados.forEach((gasto, index) => {
-      const fecha = gasto.fecha || "N/A";
-      const concepto = gasto.concepto || "N/A";
-      const descripcion = gasto.descripción || "Sin detalles";
-      const proveedor = gasto.razon_social || "N/A";
-      const montoStr = gasto.monto_total_ves || "0";
-
-      const monto = parseFloat(montoStr) || 0;
-      totalGastos += monto;
-
-      const row = tablaGastosBody.insertRow();
-
-      row.insertCell().textContent = fecha;
-      row.insertCell().textContent = concepto;
-      row.insertCell().textContent = descripcion;
-      row.insertCell().textContent = proveedor;
-      row.insertCell().textContent = formatVES(monto);
-
-      const accionesCell = row.insertCell();
-      accionesCell.innerHTML = `
-                <button onclick="editarGasto(${index})" class="btn-sm btn-editar" title="Editar Gasto">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="eliminarGasto(${index})" class="btn-sm btn-eliminar" title="Eliminar Gasto">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            `;
-    });
-
-    if (totalGastosSpan) {
-      totalGastosSpan.textContent = formatVES(totalGastos);
-    }
-  }
-
-  cargarGastosData();
-
-  window.editarGasto = (index) => {
-    alert("La función de editar aún no está implementada.");
-  };
-
-  window.eliminarGasto = (index) => {
-    alert("La función de eliminar aún no está implementada.");
-  };
+  });
 });
