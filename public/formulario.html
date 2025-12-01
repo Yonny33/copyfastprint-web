@@ -81,9 +81,9 @@
     />
     <meta name="theme-color" content="#ffffff" />
 
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/especificaciones.css" />
-    <link rel="stylesheet" href="css/formulario.css" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/especificaciones.css" />
+    <link rel="stylesheet" href="/css/formulario.css" />
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
@@ -591,8 +591,18 @@
         const loadingOverlay = document.getElementById("loadingOverlay");
 
         // Solo inicializar la calculadora si todos los elementos existen
-        if (amountInput && fromCurrencySelect && toCurrencySelect && calculateBtn && swapBtn && refreshBtn && resultAmount && exchangeRateDisplay && lastUpdateDisplay && loadingOverlay) {
-
+        if (
+          amountInput &&
+          fromCurrencySelect &&
+          toCurrencySelect &&
+          calculateBtn &&
+          swapBtn &&
+          refreshBtn &&
+          resultAmount &&
+          exchangeRateDisplay &&
+          lastUpdateDisplay &&
+          loadingOverlay
+        ) {
           let exchangeRates = {};
 
           async function fetchExchangeRates() {
@@ -612,7 +622,9 @@
                 }
                 calculateConversion();
               } else {
-                throw new Error(data.message || "No se pudieron obtener las tasas.");
+                throw new Error(
+                  data.message || "No se pudieron obtener las tasas."
+                );
               }
             } catch (error) {
               console.error("Error al obtener tasas:", error);
@@ -639,25 +651,39 @@
             const rate = exchangeRates[to] / exchangeRates[from];
             const result = amount * rate;
 
-            resultAmount.textContent = new Intl.NumberFormat("es-CO", { style: "currency", currency: to }).format(result);
-            exchangeRateDisplay.textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
+            resultAmount.textContent = new Intl.NumberFormat("es-CO", {
+              style: "currency",
+              currency: to,
+            }).format(result);
+            exchangeRateDisplay.textContent = `1 ${from} = ${rate.toFixed(
+              4
+            )} ${to}`;
           }
 
-          if (calculateBtn) calculateBtn.addEventListener("click", calculateConversion);
-          if (swapBtn) swapBtn.addEventListener("click", () => {
-            [fromCurrencySelect.value, toCurrencySelect.value] = [toCurrencySelect.value, fromCurrencySelect.value];
-            calculateConversion();
-          });
-          if (refreshBtn) refreshBtn.addEventListener("click", fetchExchangeRates);
-          if (amountInput) amountInput.addEventListener("input", calculateConversion);
-          if (fromCurrencySelect) fromCurrencySelect.addEventListener("change", calculateConversion);
-          if (toCurrencySelect) toCurrencySelect.addEventListener("change", calculateConversion);
+          if (calculateBtn)
+            calculateBtn.addEventListener("click", calculateConversion);
+          if (swapBtn)
+            swapBtn.addEventListener("click", () => {
+              [fromCurrencySelect.value, toCurrencySelect.value] = [
+                toCurrencySelect.value,
+                fromCurrencySelect.value,
+              ];
+              calculateConversion();
+            });
+          if (refreshBtn)
+            refreshBtn.addEventListener("click", fetchExchangeRates);
+          if (amountInput)
+            amountInput.addEventListener("input", calculateConversion);
+          if (fromCurrencySelect)
+            fromCurrencySelect.addEventListener("change", calculateConversion);
+          if (toCurrencySelect)
+            toCurrencySelect.addEventListener("change", calculateConversion);
 
           // Carga inicial de tasas
           fetchExchangeRates();
         }
       });
     </script>
-    <script src="js/scripts.js"></script>
+    <script src="/js/scripts.js"></script>
   </body>
 </html>
