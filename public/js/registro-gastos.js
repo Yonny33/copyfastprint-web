@@ -12,31 +12,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const fd = new FormData(form);
-    
-    const payload = {
-      action: "registrarGasto",
-      sheetName: "Gastos",
-      data: {
-        fecha: fd.get("fecha") || new Date().toLocaleDateString('en-CA'),
-        monto: fd.get("monto"),
-        categoria: fd.get("categoria"),
-        descripcion: fd.get("descripcion"),
-      }
-    };
+    fd.append("action", "registrarGasto");
+    fd.append("sheetName", "Gastos");
+
+    if (!fd.get("fecha")) {
+      fd.set("fecha", new Date().toLocaleDateString('en-CA'));
+    }
 
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec", {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" }, 
-        body: JSON.stringify(payload),
-        redirect: "follow"
-      });
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec",
+        {
+          method: "POST",
+          body: fd,
+        }
+      );
 
       const result = await response.json();
 
-      if (result.status === 'success') {
+      if (result.status === "success") {
         alert("¡Gasto registrado con éxito!");
         form.reset();
+        window.location.reload();
       } else {
         throw new Error(result.message || "No se pudo registrar el gasto.");
       }

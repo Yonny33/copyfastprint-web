@@ -12,28 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const fd = new FormData(form);
+    fd.append("action", "registrarVenta");
+    fd.append("sheetName", "Ventas");
 
-    const payload = {
-      action: "registrarVenta",
-      sheetName: "Ventas",
-      data: {
-        cliente: fd.get("cliente"),
-        cantidad: fd.get("cantidad"),
-        precio_unitario: fd.get("precio_unitario"),
-        descripcion: fd.get("descripcion"),
-        abono: fd.get("abono"),
-        fecha: fd.get("fecha") || new Date().toLocaleDateString('en-CA'),
-      },
-    };
+    // Asegurarse de que la fecha no esté vacía
+    if (!fd.get("fecha")) {
+      fd.set("fecha", new Date().toLocaleDateString('en-CA'));
+    }
 
     try {
       const response = await fetch(
         "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec",
         {
           method: "POST",
-          headers: { "Content-Type": "text/plain" },
-          body: JSON.stringify(payload),
-          redirect: "follow",
+          body: fd, // Enviar FormData directamente
         }
       );
 
@@ -42,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.status === "success") {
         alert("¡Venta registrada con éxito!");
         form.reset();
+        window.location.reload(); // Recargar para ver la tabla actualizada
       } else {
         throw new Error(result.message || "No se pudo registrar la venta.");
       }
