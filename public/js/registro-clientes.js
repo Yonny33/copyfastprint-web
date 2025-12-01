@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("registro-gastos-form");
+  const form = document.getElementById("registro-clientes-form");
   if (!form) return;
 
   form.addEventListener("submit", async (e) => {
@@ -14,12 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    data.action = "registrarGasto";
-    data.sheetName = "Gastos";
-
-    if (!data.fecha) {
-      data.fecha = new Date().toLocaleDateString('en-CA');
-    }
+    data.action = "registrarCliente";
+    data.sheetName = "Clientes";
 
     try {
       const response = await fetch(
@@ -33,19 +29,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (result.status === "success") {
-        alert("¡Gasto registrado con éxito!");
+        alert("¡Cliente registrado con éxito!");
         form.reset();
-        window.location.reload();
       } else {
-        throw new Error(result.message || "No se pudo registrar el gasto.");
+        throw new Error(result.message || "No se pudo registrar el cliente.");
       }
     } catch (error) {
-      console.error("Error al registrar el gasto:", error);
-      alert(`Error al registrar el gasto: ${error.message}`);
+      console.error("Error al registrar el cliente:", error);
+      alert(`Error al registrar el cliente: ${error.message}`);
     } finally {
       if (submitButton) {
         submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-save"></i> Registrar Gasto';
+        submitButton.innerHTML = '<i class="fas fa-save"></i> Registrar Cliente';
       }
     }
   });

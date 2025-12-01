@@ -1,6 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registro-ventas-form");
+  const clienteSelect = document.getElementById("cliente");
+
   if (!form) return;
+
+  // Función para cargar clientes en el select
+  async function cargarClientes() {
+    try {
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec?action=getClientes"
+      );
+      const result = await response.json();
+
+      if (result.status === "success") {
+        clienteSelect.innerHTML = '<option value="">Selecciona un cliente</option>';
+        result.data.forEach((cliente) => {
+          const option = document.createElement("option");
+          option.value = cliente.cedula;
+          option.textContent = `${cliente.nombre} (${cliente.cedula})`;
+          clienteSelect.appendChild(option);
+        });
+      } else {
+        throw new Error(result.message || "No se pudieron cargar los clientes.");
+      }
+    } catch (error) {
+      console.error("Error al cargar clientes:", error);
+      clienteSelect.innerHTML = '<option value="">Error al cargar clientes</option>';
+    }
+  }
+
+  // Cargar clientes al iniciar la página
+  if (clienteSelect) {
+    cargarClientes();
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -11,13 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
     }
 
-    const fd = new FormData(form);
-    fd.append("action", "registrarVenta");
-    fd.append("sheetName", "Ventas");
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-    // Asegurarse de que la fecha no esté vacía
-    if (!fd.get("fecha")) {
-      fd.set("fecha", new Date().toLocaleDateString('en-CA'));
+    data.action = "registrarVenta";
+    data.sheetName = "Ventas";
+
+    if (!data.fecha) {
+      data.fecha = new Date().toLocaleDateString('en-CA');
     }
 
     try {
@@ -25,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec",
         {
           method: "POST",
-          body: fd, // Enviar FormData directamente
+          body: JSON.stringify(data),
         }
       );
 
