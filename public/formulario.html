@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -120,19 +121,14 @@
 
       <div class="form-container">
         <div class="form-wrapper">
-          <!-- FORMULARIO CON NETLIFY FORMS -->
           <form id="cotizacion-form" class="cotizacion-form" novalidate>
-            <!-- Campo oculto para Netlify -->
             <input type="hidden" name="form-name" value="cotizacion" />
-
-            <!-- Honeypot anti-spam -->
             <p style="display: none">
               <label
                 >No llenes esto si eres humano: <input name="bot-field"
               /></label>
             </p>
 
-            <!-- SECCIÓN 1: INFORMACIÓN PERSONAL -->
             <fieldset class="form-section">
               <legend>Tu Información</legend>
 
@@ -180,7 +176,6 @@
               </div>
             </fieldset>
 
-            <!-- SECCIÓN 2: TIPO DE SERVICIO -->
             <fieldset class="form-section">
               <legend>Tipo de Servicio</legend>
 
@@ -229,7 +224,6 @@
               </div>
             </fieldset>
 
-            <!-- SECCIÓN 3: DETALLES DEL PROYECTO -->
             <fieldset class="form-section">
               <legend>Detalles del Proyecto</legend>
 
@@ -296,7 +290,6 @@
               </div>
             </fieldset>
 
-            <!-- SECCIÓN 4: PRESUPUESTO -->
             <fieldset class="form-section">
               <legend>Presupuesto Estimado</legend>
 
@@ -326,7 +319,6 @@
               </div>
             </fieldset>
 
-            <!-- SECCIÓN 5: MENSAJE ADICIONAL -->
             <fieldset class="form-section">
               <legend>Información Adicional</legend>
 
@@ -363,7 +355,6 @@
               </div>
             </fieldset>
 
-            <!-- BOTONES -->
             <div class="form-actions">
               <button type="submit" class="btn-submit">
                 <i class="fas fa-paper-plane"></i> Enviar Cotización
@@ -375,7 +366,6 @@
           </form>
         </div>
 
-        <!-- SIDEBAR CON INFORMACIÓN -->
         <div class="form-sidebar">
           <div class="info-box">
             <h3><i class="fas fa-clock"></i> Tiempo de Respuesta</h3>
@@ -393,7 +383,6 @@
               Chatear
             </a>
           </div>
-          <!-- SIDEBAR CON INFORMACIÓN -->
           <div class="currency-calculator">
             <div class="calculator-header">
               <i class="fas fa-calculator"></i>
@@ -685,5 +674,6 @@
       });
     </script>
     <script src="/js/scripts.js"></script>
+    <script src="/js/formulario-cotizacion.js"></script>
   </body>
 </html>

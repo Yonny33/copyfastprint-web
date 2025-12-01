@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("registro-gasto-form");
 
@@ -9,32 +10,32 @@ document.addEventListener("DOMContentLoaded", () => {
       submitButton.disabled = true;
       submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
 
-      // 1. Recolectar datos del formulario
-      const data = {
-        fecha: form.fecha.value,
-        monto: form.monto.value,
-        categoria: form.categoria.value,
-        metodoPago: form.metodoPago.value,
-        proveedor: form.proveedor.value,
-        descripcion: form.descripcion.value,
+      const payload = {
+        action: "registrarGasto",
+        sheetName: "Gastos",
+        data: {
+            fecha: form.fecha.value || new Date().toLocaleDateString('en-CA'),
+            monto_total_ves: form.monto.value,
+            concepto: form.categoria.value,
+            metodo_pago: form.metodoPago.value,
+            razon_social: form.proveedor.value,
+            descripción: form.descripcion.value,
+        }
       };
 
       try {
-        // 2. Enviar datos a la Netlify Function
-        const response = await fetch("/.netlify/functions/registrar-gasto", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload),
+          redirect: "follow"
         });
 
         const result = await response.json();
 
-        if (response.ok && result.success) {
+        if (result.status === 'success') {
           alert("¡Gasto registrado con éxito!");
-          form.reset(); // Limpiar el formulario
-          // Recargar la página para ver el nuevo gasto en la tabla
+          form.reset();
           window.location.reload(); 
         } else {
           throw new Error(result.message || "No se pudo registrar el gasto.");
@@ -43,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error al registrar el gasto:", error);
         alert(`Error: ${error.message}`);
       } finally {
-        // Reactivar el botón
         submitButton.disabled = false;
         submitButton.innerHTML = '<i class="fas fa-plus-circle"></i> Registrar Gasto';
       }
