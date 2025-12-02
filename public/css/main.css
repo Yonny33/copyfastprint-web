@@ -1,0 +1,526 @@
+/* =========================================================================
+   RAÍZ Y VARIABLES GLOBALES (CUSTOM PROPERTIES)
+   ========================================================================= */
+
+:root {
+  /* Paleta de Colores Primarios */
+  --color-primario: #c60e0f; /* Rojo principal para acciones y branding */
+  --color-primario-hover: #a10b0c; /* Rojo más oscuro para hover */
+  --color-secundario: #f9bf00; /* Amarillo para acentos y destacados */
+  --color-terciario: #1a1a1a; /* Negro principal para texto */
+
+  /* Colores de Fondo */
+  --color-fondo-principal: #ffffff; /* Blanco */
+  --color-fondo-seccion: #f8f9fa; /* Gris muy claro para secciones */
+  --color-fondo-oscuro: #121212; /* Para pie de página y secciones oscuras */
+
+  /* Colores de Texto */
+  --color-texto-principal: #333333; /* Gris oscuro para párrafos */
+  --color-texto-secundario: #6c757d; /* Gris más claro para hints y texto de apoyo */
+  --color-texto-inverso: #ffffff; /* Para texto sobre fondos oscuros */
+  --color-enlace: var(--color-primario);
+  --color-enlace-hover: var(--color-primario-hover);
+
+  /* Colores de Estado y Notificaciones */
+  --color-exito: #28a745;
+  --color-error: #dc3545;
+  --color-advertencia: #ffc107;
+  --color-info: #17a2b8;
+
+  /* Tipografía */
+  --fuente-principal: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --fuente-titulos: "Georgia", "Times New Roman", serif;
+  --tamano-base: 16px;
+  --line-height-base: 1.6;
+
+  /* Espaciado y Bordes */
+  --espaciado-base: 1rem; /* 16px */
+  --radio-borde: 5px;
+  --grosor-borde: 1px;
+  --color-borde: #dee2e6;
+
+  /* Sombras */
+  --sombra-caja-suave: 0 4px 8px rgba(0, 0, 0, 0.05);
+  --sombra-caja-media: 0 6px 12px rgba(0, 0, 0, 0.1);
+  --sombra-texto: 1px 1px 2px rgba(0, 0, 0, 0.2);
+
+  /* Transiciones */
+  --transicion-rapida: all 0.2s ease-in-out;
+}
+
+/* =========================================================================
+   RESETEO Y ESTILOS GLOBALES
+   ========================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--tamano-base);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--fuente-principal);
+  color: var(--color-texto-principal);
+  background-color: var(--color-fondo-principal);
+  line-height: var(--line-height-base);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--fuente-titulos);
+  color: var(--color-terciario);
+  margin-bottom: var(--espaciado-base);
+  font-weight: 700;
+}
+
+p {
+  margin-bottom: var(--espaciado-base);
+}
+
+a {
+  color: var(--color-enlace);
+  text-decoration: none;
+  transition: var(--transicion-rapida);
+}
+
+a:hover {
+  color: var(--color-enlace-hover);
+  text-decoration: underline;
+}
+
+main {
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: calc(var(--espaciado-base) * 2);
+}
+
+/* =========================================================================
+   ESTILOS DEL PANEL DE ADMINISTRACIÓN (admin.html, registro-gastos.html, etc.)
+   ========================================================================= */
+
+/* Header del Admin */
+body.admin-page header {
+    background-color: var(--color-terciario);
+    color: var(--color-texto-inverso);
+    padding: var(--espaciado-base) calc(var(--espaciado-base) * 2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--sombra-caja-media);
+}
+
+body.admin-page header h1 {
+    color: var(--color-texto-inverso);
+    font-size: 1.5rem;
+}
+
+#userInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-base);
+}
+
+#logoutButton {
+    background-color: var(--color-primario);
+    color: var(--color-texto-inverso);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radio-borde);
+    cursor: pointer;
+    transition: var(--transicion-rapida);
+}
+
+#logoutButton:hover {
+    background-color: var(--color-primario-hover);
+}
+
+/* Navegación del Admin */
+body.admin-page nav {
+    background-color: #333;
+    padding: var(--espaciado-base);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--espaciado-base);
+    box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+}
+
+body.admin-page nav a {
+    color: var(--color-texto-inverso);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radio-borde);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+body.admin-page nav a:hover {
+    background-color: var(--color-primario);
+}
+
+body.admin-page nav a.active {
+    background-color: var(--color-primario-hover);
+    font-weight: 700;
+}
+
+/* Contenedores de formularios del Admin */
+.form-container {
+    background: var(--color-fondo-principal);
+    padding: calc(var(--espaciado-base) * 2);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-caja-media);
+    max-width: 800px;
+    margin: calc(var(--espaciado-base) * 2) auto;
+}
+
+.form-container h2 {
+    text-align: center;
+    color: var(--color-primario);
+    margin-bottom: calc(var(--espaciado-base) * 1.5);
+}
+
+.form-group {
+    margin-bottom: var(--espaciado-base);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-texto-secundario);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    font-size: 1rem;
+    transition: var(--transicion-rapida);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(198, 14, 15, 0.2);
+}
+
+.form-group button[type="submit"] {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--color-exito);
+    color: var(--color-texto-inverso);
+    border: none;
+    border-radius: var(--radio-borde);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transicion-rapida);
+}
+
+.form-group button[type="submit"]:hover {
+    background-color: #218838; /* Más oscuro */
+}
+
+
+/* Tarjetas del Dashboard */
+.dashboard-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: calc(var(--espaciado-base) * 1.5);
+    margin-top: var(--espaciado-base);
+}
+
+.summary-card {
+    background-color: var(--color-fondo-seccion);
+    padding: var(--espaciado-base);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-caja-suave);
+    text-align: center;
+    border-left: 5px solid var(--color-secundario);
+}
+
+.summary-card h3 {
+    font-size: 1.2rem;
+    color: var(--color-primario);
+}
+
+.summary-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-terciario);
+    margin: 0;
+}
+
+
+/* =========================================================================
+   ESTILOS DEL SITIO PÚBLICO (index.html, diseño.html, etc.)
+   ========================================================================= */
+
+/* Navbar Público */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--espaciado-base) calc(var(--espaciado-base) * 2);
+  background-color: var(--color-fondo-principal);
+  box-shadow: var(--sombra-caja-suave);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.brand h2 {
+  font-family: var(--fuente-principal);
+  color: var(--color-terciario);
+  font-weight: 700;
+  margin: 0;
+}
+
+.brand span {
+  color: var(--color-primario);
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  gap: calc(var(--espaciado-base) * 1.5);
+}
+
+.menu a {
+  color: var(--color-texto-principal);
+  font-weight: 500;
+  text-decoration: none;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid transparent;
+}
+
+.menu a:hover,
+.menu a.active {
+  color: var(--color-primario);
+  border-bottom-color: var(--color-primario);
+}
+
+.toggle_menu {
+  display: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+#toggle_close {
+  display: none;
+}
+
+
+/* Footer Global */
+.footer {
+    background: var(--color-fondo-oscuro);
+    color: var(--color-texto-inverso);
+    padding: calc(var(--espaciado-base) * 2) var(--espaciado-base);
+    text-align: center;
+    margin-top: auto; /* Empuja el footer hacia abajo */
+}
+
+.footer-content h2 {
+    color: var(--color-texto-inverso);
+    margin-bottom: 0.5rem;
+}
+
+.footer-content h5 {
+    color: var(--color-texto-secundario);
+    margin-bottom: var(--espaciado-base);
+    font-weight: 400;
+}
+
+.social-networks a {
+    color: var(--color-texto-inverso);
+    font-size: 1.5rem;
+    margin: 0 var(--espaciado-base);
+    text-decoration: none;
+}
+.social-networks a:hover {
+    color: var(--color-secundario);
+}
+
+
+/* =========================================================================
+   COMPONENTES REUTILIZABLES
+   ========================================================================= */
+
+/* Botón Scroll-to-Top */
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--color-primario);
+  color: var(--color-texto-inverso);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+}
+
+.scroll-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Lightbox Modal */
+.lightbox-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.9);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 80vh;
+}
+
+#lightbox-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#lightbox-caption {
+  color: var(--color-texto-inverso);
+  margin-top: var(--espaciado-base);
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+#whatsapp-btn {
+    margin-top: var(--espaciado-base);
+    padding: 0.75rem 1.5rem;
+    background-color: #25D366; /* Color de WhatsApp */
+    color: var(--color-texto-inverso);
+    border-radius: var(--radio-borde);
+    text-decoration: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+#whatsapp-btn:hover {
+    background-color: #1DAE54;
+}
+
+.lightbox-close, .lightbox-nav {
+  position: absolute;
+  cursor: pointer;
+  color: white;
+  font-size: 2rem;
+  background-color: rgba(0,0,0,0.5);
+  border: none;
+  padding: 0.5rem 1rem;
+  z-index: 2001;
+  user-select: none;
+}
+
+.lightbox-close {
+  top: 15px;
+  right: 35px;
+  font-size: 2.5rem;
+}
+
+#lightbox-prev {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#lightbox-next {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+
+/* =========================================================================
+   DISEÑO RESPONSIVE
+   ========================================================================= */
+
+@media (max-width: 992px) {
+  main {
+    padding: var(--espaciado-base);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Menú de navegación público */
+  .menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 70%;
+    height: 100vh;
+    background-color: var(--color-fondo-oscuro);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: calc(var(--espaciado-base) * 2);
+    transition: left 0.4s ease;
+  }
+  
+  .menu.show-menu {
+    left: 0;
+  }
+
+  .menu a {
+    color: var(--color-texto-inverso);
+    font-size: 1.2rem;
+  }
+
+  .toggle_menu {
+    display: block;
+    z-index: 1001;
+  }
+
+  /* Ajustes en panel de admin */
+  body.admin-page nav {
+      flex-direction: column;
+      align-items: stretch;
+  }
+  body.admin-page nav a {
+      text-align: center;
+  }
+  
+  body.admin-page header {
+      flex-direction: column;
+      gap: var(--espaciado-base);
+  }
+}
