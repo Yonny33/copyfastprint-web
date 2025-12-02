@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Gastos - COPYFAST&PRINT</title>
-    <link rel="stylesheet" href="../css/estilos.css">
+    <!-- Rutas de CSS corregidas: sin ../ -->
+    <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
     <script>
+        // Ruta del login corregida: sin ../
         if (!sessionStorage.getItem('usuario')) {
-            window.location.href = "../login-registro.html";
+            window.location.href = "login-registro.html";
         }
     </script>
 </head>
@@ -17,8 +19,8 @@
         <h1><i class="fas fa-dollar-sign"></i> Registro de Gastos</h1>
     </header>
     <nav>
-        <!-- ENLACES DE NAVEGACIÓN CORREGIDOS Y SIMPLIFICADOS -->
-        <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <!-- Rutas de navegación corregidas: sin ../ -->
+        <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a href="registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
         <a href="registro-gastos.html" class="active"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
         <a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
@@ -77,7 +79,8 @@
     <footer>
         <p>&copy; 2024 COPYFAST&PRINT. Todos los derechos reservados.</p>
     </footer>
-    <script src="../js/registro-gastos.js"></script>
+    <!-- Ruta de JS corregida: sin ../ -->
+    <script src="js/registro-gastos.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const usuario = sessionStorage.getItem('usuario');

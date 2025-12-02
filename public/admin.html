@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - COPYFAST&PRINT</title>
+    <!-- Ruta de CSS corregida: sin ../ -->
     <link rel="stylesheet" href="css/estilos.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
     <script>
+        // Ruta del login corregida: sin ../
         if (!sessionStorage.getItem('usuario')) {
             window.location.href = 'login-registro.html';
         }
@@ -21,13 +23,13 @@
         </div>
     </header>
     <nav>
+        <!-- Rutas de navegación corregidas: sin prefijos -->
         <a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <!-- Enlaces corregidos y con cache-busting para gastos -->
-        <a href="public/registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
-        <a href="public/registro-gastos.html?v=2"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
-        <a href="public/reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
-        <a href="public/clientes.html"><i class="fas fa-users"></i> Clientes</a>
-        <a href="public/inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
+        <a href="registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
+        <a href="registro-gastos.html"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
+        <a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
+        <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+        <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
     </nav>
     <main>
         <section class="dashboard-summary">
@@ -56,6 +58,23 @@
     <footer>
         <p>&copy; 2024 COPYFAST&PRINT. Todos los derechos reservados.</p>
     </footer>
-    <script src="js/admin.js"></script>
+    <!-- Ruta de JS corregida: sin ../ -->
+    <script src="js/admin-dashboard.js"></script>
+    <script>
+        // Funcionalidad del dashboard que ya tenías
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = sessionStorage.getItem('usuario');
+            if (username) {
+                document.getElementById('username').textContent = username;
+            }
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                    sessionStorage.clear();
+                    window.location.href = 'login-registro.html';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
