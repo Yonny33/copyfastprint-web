@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       const result = await response.json();
 
-      if (result.status === "success") {
+      if (result.status === "success" && result.customers) {
         clienteSelect.innerHTML = '<option value="">Selecciona un cliente</option>';
-        result.data.forEach((cliente) => {
+        result.customers.forEach((cliente) => {
           const option = document.createElement("option");
           option.value = cliente.cedula;
           option.textContent = `${cliente.nombre} (${cliente.cedula})`;
