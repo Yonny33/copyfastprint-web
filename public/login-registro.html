@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión - COPYFAST&PRINT</title>
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
     <link rel="stylesheet" href="/css/styles.css" />
     <link rel="stylesheet" href="/css/formulario.css" />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
-    />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
     <style>
       body {
         display: flex;
@@ -58,12 +50,6 @@
         font-size: 1em;
         box-sizing: border-box;
       }
-      .login-container input[type="text"]:focus,
-      .login-container input[type="password"]:focus {
-        border-color: #c60e0f;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(198, 14, 15, 0.1);
-      }
       .login-container button {
         width: 100%;
         padding: 1em;
@@ -74,156 +60,48 @@
         font-size: 1.1em;
         font-weight: 700;
         cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
+        transition: background-color 0.3s ease;
       }
       .login-container button:hover {
         background-color: #9c0b0c;
-        transform: translateY(-2px);
       }
-      .login-container .error-message {
+      .error-message {
         color: #e74c3c;
         margin-top: 1em;
         font-size: 0.9em;
-      }
-      .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.95);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 3000;
-      }
-      .loader {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #c60e0f;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 10px;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        font-weight: 600;
       }
     </style>
-  </head>
-  <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
-      <div class="loader"></div>
-      <p>Iniciando sesión...</p>
-    </div>
-
+</head>
+<body>
     <div class="login-container">
-      <h2>Iniciar Sesión</h2>
-      <form id="login-form">
-        <div class="form-group">
-          <label for="username">Usuario:</label>
-          <input type="text" id="username" name="username" required />
-        </div>
-        <div class="form-group">
-          <label for="password">Contraseña:</label>
-          <input type="password" id="password" name="password" required />
-        </div>
-        <button type="submit">Entrar</button>
-        <p id="login-error" class="error-message" style="display: none;"></p>
-      </form>
+        <h2>Iniciar Sesión</h2>
+        <!-- Este formulario ahora envía los datos directamente al script de Google -->
+        <form method="POST" action="https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec">
+            <input type="hidden" name="action" value="login">
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+            <button type="submit">Entrar</button>
+            <p id="login-error" class="error-message" style="display: none;"></p>
+        </form>
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const loginForm = document.getElementById("login-form");
-        const loginError = document.getElementById("login-error");
-        const loadingOverlay = document.getElementById("loading-overlay");
-
-        // URL de tu Google Apps Script
-        const googleScriptURL =
-          "https://script.google.com/macros/s/AKfycbwqkpIrmwD4SDeOda5ttFAqM_MPrlnqX_Ij6l51iGH88313xNoYpI4lQzsNou20-1MY/exec"; // Asegúrate de que esta URL sea la correcta de tu Apps Script
-
-        loginForm.addEventListener("submit", async function (e) {
-          e.preventDefault();
-          loadingOverlay.style.display = "flex"; // Mostrar overlay de carga
-          loginError.style.display = "none"; // Ocultar errores previos
-
-          const username = document.getElementById("username").value;
-          const password = document.getElementById("password").value;
-
-          try {
-            const response = await fetch(googleScriptURL, {
-              method: "POST",
-              mode: "no-cors", // Importante para Apps Script
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                action: "login",
-                username: username,
-                password: password,
-              }),
-            });
-
-            // Debido a 'no-cors', no podemos leer la respuesta directamente.
-            // Asumimos éxito si no hay un error de red.
-            // Para una verificación real, Apps Script debería redirigir o devolver un token.
-            // Por ahora, simularemos el éxito si no hay error de red.
-            // En un entorno real, la respuesta de Apps Script debería ser un JSON con status.
-
-            // Para simular la respuesta de Apps Script (ya que no-cors no permite leerla)
-            // Necesitarás que tu Apps Script redirija o establezca una cookie.
-            // Por simplicidad, aquí asumimos que si la llamada no falla, el login es exitoso.
-            // ESTO DEBE SER MEJORADO EN EL APPS SCRIPT PARA UNA VERIFICACIÓN SEGURA.
-
-            // Una forma más robusta con Apps Script es que el script devuelva un HTML
-            // con un script que establezca la sesión y redirija, o que use ContentService
-            // para devolver JSON si el frontend puede manejar CORS (lo cual no es el caso con 'no-cors').
-
-            // Para este flujo, si la petición no lanza un error, asumimos éxito.
-            // La lógica de verificación real debe estar en el Apps Script.
-            // Si el Apps Script devuelve un error (ej. 401 Unauthorized),
-            // el fetch con 'no-cors' no lo capturará como un error de red.
-            // La forma más segura es que el Apps Script devuelva un HTML con un mensaje
-            // o redirija a una página de error/éxito.
-
-            // Por ahora, simularemos un retraso y luego un éxito.
-            // En tu Apps Script, la función doPost para 'login' debería hacer la verificación
-            // y luego redirigir a 'admin.html' si es exitoso, o a 'login-registro.html?error=true' si falla.
-
-            // Si el Apps Script está configurado para redirigir en caso de éxito,
-            // esta parte del código no se ejecutará si el login es exitoso.
-            // Si el Apps Script devuelve un JSON (con CORS habilitado), entonces leeríamos la respuesta.
-
-            // Dado que estamos usando 'no-cors', la forma más simple de manejar esto
-            // es que el Apps Script, en caso de login exitoso, redirija directamente a admin.html
-            // y en caso de fallo, redirija de nuevo a login-registro.html con un parámetro de error.
-
-            // Si tu Apps Script ya maneja la redirección, el siguiente código no es necesario.
-            // Si no, aquí hay una simulación temporal:
-            const simulatedSuccess = true; // Esto debe venir de la lógica real del Apps Script
-            if (simulatedSuccess) {
-                // Si el Apps Script no redirigió, asumimos éxito y redirigimos manualmente
-                sessionStorage.setItem("sesionActiva", "true");
-                sessionStorage.setItem("usuario", username); // Guardar el usuario para mostrarlo
-                window.location.href = "admin.html";
-            } else {
-                loginError.textContent = "Usuario o contraseña incorrectos.";
+        // Este script solo muestra un mensaje de error si el login falla.
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginError = document.getElementById("login-error");
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('error')) {
+                loginError.textContent = "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
                 loginError.style.display = "block";
             }
-
-          } catch (error) {
-            console.error("Error de red o en la petición:", error);
-            loginError.textContent =
-              "Error de conexión. Inténtalo de nuevo más tarde.";
-            loginError.style.display = "block";
-          } finally {
-            loadingOverlay.style.display = "none"; // Ocultar overlay de carga
-          }
         });
-      });
     </script>
-  </body>
+</body>
 </html>

@@ -12,7 +12,6 @@
     />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/formulario.css" />
-    <link rel="stylesheet" href="css/especificaciones.css" />
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
@@ -20,80 +19,132 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <style>
-      /* Estilos específicos para reportes, adaptando el patrón de admin.html */
       .admin-container {
         max-width: 1600px;
         margin: 2em auto;
         padding: 0 2em;
       }
+      .report-controls {
+          background: #f9f9f9;
+          padding: 1.5em;
+          border-radius: 12px;
+          margin-bottom: 2em;
+      }
       .report-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         gap: 2em;
         margin-top: 2em;
       }
       .chart-card {
         background: #fff;
-        padding: 1.5em;
+        padding: 1.5em 2em;
         border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+      }
+      .chart-card h3 {
+          margin-top: 0;
+          font-size: 1.2em;
+          color: #555;
+      }
+      .chart-container {
+          flex-grow: 1;
+          position: relative;
+      }
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+      }
+
+      .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #c60e0f;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
     </style>
   </head>
   <body>
-    <script>
-      if (sessionStorage.getItem("sesionActiva") !== "true") {
-        window.location.href = "login-registro.html";
-      }
-    </script>
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <div class="loader"></div>
+      <p>Generando reportes, por favor espera...</p>
+    </div>
 
     <header>
-      <nav class="navbar">
-        <div class="brand">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
-        </div>
-        <ul class="menu" id="menu">
-          <li><a href="admin.html">Dashboard</a></li>
-          <li><a href="registro.html">Ventas</a></li>
-          <li><a href="gastos.html">Gastos</a></li>
-          <li class="active"><a href="reportes.html">Reportes</a></li>
-          <li><a href="inventario.html">Inventario</a></li>
-          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
-        </ul>
-        <div class="toggle-menu">
-          <i class="fas fa-bars" id="toggle_open"></i>
-          <i class="fas fa-times" id="toggle_close" style="display: none"></i>
-        </div>
-      </nav>
+        <nav class="navbar">
+            <div class="brand"><h2>COPY<span>FAST&</span>PRINT</h2></div>
+            <ul class="menu" id="menu">
+                <li><a href="admin.html">Admin</a></li>
+                <li><a href="ventas.html">Registro Ventas</a></li>
+                <li><a href="clientes.html">Registro Clientes</a></li>
+                <li><a href="gastos.html">Control Gastos</a></li>
+                <li><a href="reportes.html" class="active">Reportes</a></li>
+                <li><a href="#" id="btnCerrarSesion" class="btn-small">Cerrar Sesión</a></li>
+            </ul>
+            <div class="toggle-buttons">
+                <button id="toggle_open" aria-expanded="false" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                <button id="toggle_close" aria-expanded="false" class="menu-toggle"><i class="fas fa-times"></i></button>
+            </div>
+        </nav>
     </header>
 
-    <div class="admin-container">
+    <main class="admin-container">
       <div class="section-heading">
         <h1 style="color: #c60e0f">
-          <i class="fas fa-chart-line"></i> Reportes y Análisis
+          <i class="fas fa-chart-pie"></i> Reportes y Análisis
         </h1>
         <p>Visualización de métricas financieras y operativas del negocio.</p>
       </div>
 
       <div class="report-grid">
         <div class="chart-card">
-          <h3>Ventas vs. Gastos (Últimos 6 meses)</h3>
-          <canvas id="ventasGastosChart"></canvas>
+          <h3>Ventas vs. Gastos (Últimos 6 Meses)</h3>
+          <div class="chart-container">
+            <canvas id="ventasGastosChart"></canvas>
+          </div>
         </div>
         <div class="chart-card">
           <h3>Top 5 Categorías de Gasto</h3>
-          <canvas id="gastosCategoriaChart"></canvas>
+           <div class="chart-container">
+            <canvas id="gastosCategoriaChart"></canvas>
+          </div>
         </div>
         <div class="chart-card">
-          <h3>Estado de Créditos Pendientes</h3>
-          <canvas id="creditosChart"></canvas>
+          <h3>Composición de Ingresos del Mes</h3>
+           <div class="chart-container">
+            <canvas id="creditosChart"></canvas>
+          </div>
         </div>
         <div class="chart-card">
-          <h3>Ventas por Tipo de Servicio</h3>
-          <canvas id="servicioChart"></canvas>
+          <h3>Ventas por Categoría de Producto</h3>
+          <div class="chart-container">
+            <canvas id="ventasCategoriaChart"></canvas>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
 
     <script src="js/scripts.js"></script>
     <script src="js/reportes.js"></script>

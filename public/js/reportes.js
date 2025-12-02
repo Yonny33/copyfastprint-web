@@ -1,325 +1,160 @@
-// js/reportes.js
 document.addEventListener("DOMContentLoaded", () => {
-  // Configuración de Chart.js y funciones auxiliares
   const loadingOverlay = document.getElementById("loading-overlay");
 
-  // Función para cerrar sesión (dejada sin cambios)
-  document
-    .getElementById("btnCerrarSesion")
-    .addEventListener("click", function (e) {
+  // --- VERIFICACIÓN DE SESIÓN Y CERRAR SESIÓN ---
+  if (sessionStorage.getItem("sesionActiva") !== "true") {
+    window.location.href = "login-registro.html";
+    return;
+  }
+
+  const btnCerrarSesion = document.getElementById("btnCerrarSesion");
+  if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener("click", (e) => {
       e.preventDefault();
-      if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        sessionStorage.clear();
-        window.location.href = "login-registro.html";
-      }
+      sessionStorage.clear();
+      window.location.href = "login-registro.html";
     });
-
-  // Asumimos que formatVES existe globalmente o lo definimos aquí
-  function formatVES(numero) {
-    const num = parseFloat(numero);
-    if (isNaN(num)) return "Bs. 0.00";
-    return `Bs. ${num.toLocaleString("es-VE", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
   }
 
-  // Función auxiliar para obtener el nombre del mes
-  function getMesNombre(fechaISO) {
-    const date = new Date(fechaISO);
-    const options = { month: "short", year: "numeric" };
-    return date.toLocaleDateString("es-VE", options);
-  }
+  // --- URL DEL SCRIPT DE GOOGLE ---
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
 
-  // ==========================================================================
-  // === LÓGICA DE PROCESAMIENTO DE DATOS PARA GRÁFICOS (NUEVA FUNCIÓN) ===
-  // ==========================================================================
+  // --- FUNCIONES AUXILIARES ---
+  const formatVES = (value) => {
+    const number = parseFloat(value);
+    return isNaN(number)
+      ? "Bs. 0.00"
+      : `Bs. ${number.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const getMesNombre = (dateString) => {
+      const date = new Date(dateString + 'T00:00:00'); // Asegurar que se interprete como local
+      return date.toLocaleString('es-VE', { month: 'short', year: '2-digit' });
+  };
+
+  // --- PROCESAMIENTO DE DATOS PARA GRÁFICOS ---
   function procesarDatosParaReportes(ventas, gastos) {
-    const meses = new Map();
-    const categoriasGastos = new Map();
-    let totalCreditosPendientes = 0;
+    const hoy = new Date();
+    const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
+    
+    // Datos para Ventas vs Gastos (6 meses)
+    const dataMensual = new Map();
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        dataMensual.set(key, { label: getMesNombre(key + '-01'), ventas: 0, gastos: 0 });
+    }
 
-    // --- PROCESAMIENTO DE VENTAS ---
-    ventas.forEach((v) => {
-      const fecha = v.fecha;
-      const montoVenta = parseFloat(v.venta_bruta_ves) || 0;
-      const saldoPendiente = parseFloat(v.saldo_pendiente_ves) || 0;
-
-      if (fecha) {
-        const mes = fecha.substring(0, 7); // 'YYYY-MM'
-        if (!meses.has(mes)) {
-          meses.set(mes, { ventas: 0, gastos: 0 });
+    ventas.forEach(v => {
+        const fecha = v.fecha.substring(0, 7);
+        if (dataMensual.has(fecha)) {
+            dataMensual.get(fecha).ventas += parseFloat(v.venta_bruta_ves) || 0;
         }
-        meses.get(mes).ventas += montoVenta;
-      }
-
-      // Créditos Pendientes
-      if (saldoPendiente > 0) {
-        totalCreditosPendientes += saldoPendiente;
-      }
     });
 
-    // --- PROCESAMIENTO DE GASTOS ---
-    gastos.forEach((g) => {
-      const fecha = g.fecha;
-      const montoGasto = parseFloat(g.monto_total_ves) || 0;
-      const concepto = g.concepto || "Sin Categoría";
-
-      if (fecha) {
-        const mes = fecha.substring(0, 7); // 'YYYY-MM'
-        if (!meses.has(mes)) {
-          meses.set(mes, { ventas: 0, gastos: 0 });
+    gastos.forEach(g => {
+        const fecha = g.fecha.substring(0, 7);
+        if (dataMensual.has(fecha)) {
+            dataMensual.get(fecha).gastos += parseFloat(g.monto_total_ves) || 0;
         }
-        meses.get(mes).gastos += montoGasto;
-      }
-
-      // Categorías de Gasto
-      if (montoGasto > 0) {
-        categoriasGastos.set(
-          concepto,
-          (categoriasGastos.get(concepto) || 0) + montoGasto
-        );
-      }
     });
 
-    // --- ORGANIZAR DATOS POR MES PARA GRÁFICO ---
-    const sortedMeses = Array.from(meses.keys()).sort();
     const reporteMensual = {
-      labels: sortedMeses.map((mes) => getMesNombre(`${mes}-01`)),
-      ventas: sortedMeses.map((mes) => meses.get(mes).ventas),
-      gastos: sortedMeses.map((mes) => meses.get(mes).gastos),
+        labels: Array.from(dataMensual.values()).map(d => d.label),
+        ventas: Array.from(dataMensual.values()).map(d => d.ventas),
+        gastos: Array.from(dataMensual.values()).map(d => d.gastos),
     };
 
-    // --- ORGANIZAR DATOS DE GASTOS POR CATEGORÍA ---
-    const sortedCategorias = Array.from(categoriasGastos.entries())
-      .sort(([, a], [, b]) => b - a) // Ordenar de mayor a menor
-      .slice(0, 5); // Tomar solo el Top 5
+    // Datos para Top 5 Categorías de Gasto
+    const categoriasGastos = new Map();
+    gastos.forEach(g => {
+        const categoria = g.concepto || "Sin Categoría";
+        const monto = parseFloat(g.monto_total_ves) || 0;
+        categoriasGastos.set(categoria, (categoriasGastos.get(categoria) || 0) + monto);
+    });
+    const topGastos = [...categoriasGastos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-    const topGastos = {
-      labels: sortedCategorias.map(([concepto]) => concepto),
-      valores: sortedCategorias.map(([, monto]) => monto),
-    };
+    // Datos para Composición de Ingresos del Mes
+    let ingresosMes = 0;
+    let creditosMes = 0;
+    ventas.forEach(v => {
+        if (v.fecha.substring(0, 7) === mesActual) {
+            ingresosMes += parseFloat(v.abono_ves) || 0;
+            creditosMes += parseFloat(v.saldo_pendiente_ves) || 0;
+        }
+    });
+
+    // Datos para Ventas por Categoría
+    const categoriasVentas = new Map();
+    ventas.forEach(v => {
+        const categoria = v.descripcion || "No especificado";
+        const monto = parseFloat(v.venta_bruta_ves) || 0;
+        categoriasVentas.set(categoria, (categoriasVentas.get(categoria) || 0) + monto);
+    });
+    const topVentasCategoria = [...categoriasVentas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
 
     return {
-      reporteMensual,
-      topGastos,
-      totalCreditosPendientes,
+        reporteMensual,
+        topGastos: { labels: topGastos.map(g => g[0]), valores: topGastos.map(g => g[1]) },
+        composicionIngresos: { ingresos: ingresosMes, creditos: creditosMes },
+        ventasPorCategoria: { labels: topVentasCategoria.map(v => v[0]), valores: topVentasCategoria.map(v => v[1]) }
     };
   }
 
-  // ==========================================================================
-  // === LÓGICA DE CARGA DE DATOS Y RENDERIZADO (MODIFICADA) ===
-  // ==========================================================================
+  // --- RENDERIZADO DE GRÁFICOS ---
+  const renderChart = (ctx, type, data, options) => new Chart(ctx, { type, data, options });
+  const tooltipLabel = (context) => `${context.dataset.label}: ${formatVES(context.parsed.y)}`;
+  const pieTooltipLabel = (context) => `${context.label}: ${formatVES(context.parsed)}`;
+  const CHART_COLORS = [ '#C60E0F', '#FF9800', '#2196F3', '#4CAF50', '#9C27B0', '#F44336', '#00BCD4' ];
 
-  async function cargarReportes() {
+  // --- FUNCIÓN PRINCIPAL DE CARGA ---
+  async function cargarYRenderizarReportes() {
     if (loadingOverlay) loadingOverlay.style.display = "flex";
 
     try {
-      const response = await fetch(
-        "/.netlify/functions/obtener-data-admin?type=reporte"
-      );
+      const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getReportData`);
+      if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+      
       const result = await response.json();
-
-      if (!result.success || !result.data) {
-        throw new Error(
-          result.error || "No se pudieron obtener los datos de reportes."
-        );
-      }
+      if (result.status !== "success") throw new Error(result.message);
 
       const { ventas, gastos } = result.data;
-      const datosProcesados = procesarDatosParaReportes(ventas, gastos);
+      const datos = procesarDatosParaReportes(ventas, gastos);
 
-      // 1. Gráfico Ventas vs. Gastos
-      renderVentasGastosChart(datosProcesados.reporteMensual);
+      // 1. Ventas vs Gastos
+      renderChart(document.getElementById("ventasGastosChart"), 'line', {
+          labels: datos.reporteMensual.labels,
+          datasets: [
+              { label: "Ventas", data: datos.reporteMensual.ventas, borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.1)', tension: 0.1 },
+              { label: "Gastos", data: datos.reporteMensual.gastos, borderColor: '#C60E0F', backgroundColor: 'rgba(198, 14, 15, 0.1)', tension: 0.1 }
+          ]
+      }, { responsive: true, plugins: { tooltip: { callbacks: { label: tooltipLabel } } } });
 
-      // 2. Gráfico Top 5 Gastos
-      renderGastosCategoriaChart(datosProcesados.topGastos);
+      // 2. Top 5 Gastos
+      renderChart(document.getElementById("gastosCategoriaChart"), 'bar', {
+          labels: datos.topGastos.labels,
+          datasets: [{ label: "Monto de Gasto", data: datos.topGastos.valores, backgroundColor: CHART_COLORS }]
+      }, { responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
 
-      // 3. Gráfico de Créditos (Simplificado a un indicador y Donut Chart simple)
-      renderCreditosChart(datosProcesados.totalCreditosPendientes);
+      // 3. Composición Ingresos
+      renderChart(document.getElementById("creditosChart"), 'doughnut', {
+          labels: ['Ingresos Cobrados (Mes)', 'Créditos por Cobrar (Mes)'],
+          datasets: [{ data: [datos.composicionIngresos.ingresos, datos.composicionIngresos.creditos], backgroundColor: ['#4CAF50', '#FF9800'] }]
+      }, { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
 
-      // 4. Se omite el 'servicioChart' por falta de una columna clara de Servicio en el CSV de ventas.
-      // Se puede remplazar por un indicador simple o usar el 'CreditosChart' en su lugar.
-      // Aquí se deja un indicador simple para que no haya un error.
-      document.getElementById("servicioChartContainer").innerHTML = `
-          <div style="text-align: center; padding: 20px;">
-              <h4 style="color: #4CAF50;">Saldo Disponible Estimado</h4>
-              <p style="font-size: 2em; font-weight: bold;">${formatVES(
-                datosProcesados.totalCreditosPendientes * 0.5
-              )}</p>
-              <small>Fórmula: 50% de Créditos Pendientes (Estimación de liquidez).</small>
-          </div>`;
+      // 4. Ventas por Categoría
+      renderChart(document.getElementById("ventasCategoriaChart"), 'pie', {
+          labels: datos.ventasPorCategoria.labels,
+          datasets: [{ label: "Ventas", data: datos.ventasPorCategoria.valores, backgroundColor: CHART_COLORS }]
+      }, { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
+
     } catch (error) {
-      console.error("❌ Error al cargar reportes:", error);
-      alert(`⚠️ Error al cargar datos de reportes: ${error.message}`);
+      console.error("Error al cargar los reportes:", error);
+      document.querySelector(".admin-container").innerHTML = `<p style='color: red; text-align: center;'>Error al cargar reportes: ${error.message}</p>`;
     } finally {
       if (loadingOverlay) loadingOverlay.style.display = "none";
     }
   }
 
-  // ==========================================================================
-  // === RENDERIZADO DE GRÁFICOS (Modificados para usar nuevos datos) ===
-  // ==========================================================================
-
-  // Gráfico 1: Ventas vs. Gastos
-  function renderVentasGastosChart(data) {
-    const ctx = document.getElementById("ventasGastosChart").getContext("2d");
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: "Ventas (VES)",
-            data: data.ventas,
-            borderColor: "#4CAF50", // Éxito/Ingreso (Verde)
-            backgroundColor: "rgba(76, 175, 80, 0.1)",
-            tension: 0.1,
-          },
-          {
-            label: "Gastos (VES)",
-            data: data.gastos,
-            borderColor: "#c60e0f", // Principal/Alerta (Rojo)
-            backgroundColor: "rgba(198, 14, 15, 0.1)",
-            tension: 0.1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return formatVES(value).replace("Bs.", ""); // Solo el número para el eje
-              },
-            },
-          },
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                return `${context.dataset.label}: ${formatVES(
-                  context.parsed.y
-                )}`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  // Gráfico 2: Top 5 Categorías de Gasto
-  function renderGastosCategoriaChart(data) {
-    const ctx = document
-      .getElementById("gastosCategoriaChart")
-      .getContext("2d");
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: "Monto de Gasto (VES)",
-            data: data.valores,
-            backgroundColor: [
-              "#c60e0f",
-              "#FF9800",
-              "#2196F3",
-              "#4CAF50",
-              "#9C27B0",
-            ],
-            borderColor: "#fff",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return formatVES(value).replace("Bs.", "");
-              },
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                return `${context.label}: ${formatVES(context.parsed.y)}`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  // Gráfico 3: Estado de Créditos Pendientes (Usando un Donut/Doughnut simple)
-  function renderCreditosChart(totalCreditos) {
-    const totalVentas =
-      parseFloat(
-        document
-          .getElementById("ingresosMes")
-          .textContent.replace("Bs. ", "")
-          .replace(/\./g, "")
-          .replace(/,/g, ".")
-      ) || 0;
-
-    const data = {
-      labels: ["Créditos Pendientes", "Ingresos Mes (Cerrados)"],
-      datasets: [
-        {
-          data: [totalCreditos, totalVentas - totalCreditos],
-          backgroundColor: ["#f44336", "#4CAF50"],
-          hoverOffset: 4,
-        },
-      ],
-    };
-
-    const ctx = document.getElementById("creditosChart").getContext("2d");
-    new Chart(ctx, {
-      type: "doughnut",
-      data: data,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const label = context.label || "";
-                const value = context.parsed;
-                return `${label}: ${formatVES(value)}`;
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // Se agrega el total de créditos al contenedor
-    document.getElementById("totalCreditosValue").textContent =
-      formatVES(totalCreditos);
-  }
-
-  // ==========================================================================
-  // === INICIO ===
-  // ==========================================================================
-  // Asegurarse de que el dashboard cargue primero para que 'ingresosMes' esté disponible para 'renderCreditosChart'
-  // Si 'admin-dashboard.js' se carga correctamente, no hay necesidad de duplicar el código aquí.
-  // Pero para que 'reportes.js' funcione de forma independiente:
-  cargarReportes();
+  cargarYRenderizarReportes();
 });
