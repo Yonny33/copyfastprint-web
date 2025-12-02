@@ -72,15 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // De lo contrario, ocultarla.
         if (category === "all" || cardCategory === category) {
           card.classList.remove("hidden"); // Remover la clase 'hidden'
-          // Opcional: Si quieres una transición más elaborada al mostrar,
-          // puedes añadir un pequeño retraso o usar otras clases/estilos aquí.
-          // card.style.opacity = '1';
-          // card.style.transform = 'scale(1)';
         } else {
           card.classList.add("hidden"); // Añadir la clase 'hidden'
-          // Opcional: Si quieres una transición de desaparición suave
-          // card.style.opacity = '0';
-          // card.style.transform = 'scale(0.8)';
         }
       });
     });
@@ -120,7 +113,6 @@ if (scrollToTopBtn) {
 // =================== LIGHTBOX CON NAVEGACIÓN (CONDICIONAL) ===================
 
 // Solo ejecutar si estamos en una página con la galería.
-// Comprobamos si existen los elementos principales del lightbox.
 const lightboxModal = document.getElementById("lightbox-modal");
 const galleryImages = Array.from(document.querySelectorAll(".design-card img"));
 
@@ -172,7 +164,8 @@ if (lightboxModal && galleryImages.length > 0) {
     const mensaje = encodeURIComponent(
       `Hola, me interesa el diseño: ${titulo} en color: ${color}. Enlace de la imagen: ${imagenUrl}`
     );
-    whatsappBtn.href = `https://wa.me/+5804120766642?text=${mensaje}`;
+    // NÚMERO DE WHATSAPP ACTUALIZADO
+    whatsappBtn.href = `https://wa.me/584220135069?text=${mensaje}`;
 
     lightboxModal.style.display = "flex";
     document.body.style.overflow = "hidden";
