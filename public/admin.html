@@ -1,407 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel Administrativo - COPYFAST&PRINT</title>
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <link rel="stylesheet" href="/css/formulario.css" />
-    <link rel="stylesheet" href="/css/especificaciones.css" />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
-    />
-
-    <style>
-      /* Variables y Reutilización de Estilos */
-      :root {
-        --color-primary: #c60e0f; /* Rojo/Vinotinto */
-        --color-dark: #222;
-        --color-light: #fff;
-        --color-success: #4caf50;
-        --color-warning: #ff9800;
-        --color-info: #2196f3;
-        --color-pendiente: #f44336;
-      }
-
-      /* Contenedor principal del Admin */
-      .admin-container {
-        max-width: 1600px;
-        margin: 2em auto;
-        padding: 0 2em;
-      }
-
-      /* Encabezado del Dashboard */
-      .admin-header {
-        background: linear-gradient(
-          135deg,
-          var(--color-primary) 0%,
-          #9c0b0c 100%
-        );
-        color: var(--color-light);
-        padding: 2em;
-        border-radius: 12px;
-        margin-bottom: 2em;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .admin-header h1 {
-        margin: 0;
-        font-size: 2em;
-      }
-
-      .admin-actions a {
-        background: var(--color-light);
-        color: var(--color-primary);
-        padding: 0.75em 1.5em;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background 0.3s, transform 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5em;
-        margin-top: 1em;
-      }
-
-      .admin-actions a:hover {
-        background: #eee;
-        transform: translateY(-2px);
-      }
-
-      /* Grid de Indicadores (Dashboard Cards) */
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2em;
-        margin-bottom: 3em;
-      }
-
-      .indicator-card {
-        background: var(--color-light);
-        padding: 1.5em;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-left: 5px solid; /* Usaremos esto para el color de la tarjeta */
-      }
-
-      .indicator-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-      }
-
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1em;
-      }
-
-      .card-header h3 {
-        margin: 0;
-        font-size: 1.1em;
-        color: #666;
-        font-weight: 500;
-      }
-
-      .card-header i {
-        font-size: 1.5em;
-        color: #ccc;
-      }
-
-      .card-value {
-        font-size: 2.5em;
-        font-weight: 700;
-        color: var(--color-dark);
-        margin: 0.2em 0;
-        display: block;
-      }
-
-      .card-description {
-        font-size: 0.9em;
-        color: #999;
-      }
-
-      /* Colores específicos para las tarjetas */
-      .card-ventas {
-        border-left-color: var(--color-success);
-      }
-      .card-ingresos {
-        border-left-color: var(--color-info);
-      }
-      .card-creditos {
-        border-left-color: var(--color-pendiente);
-      }
-      .card-gastos {
-        border-left-color: var(--color-primary);
-      }
-      .card-clientes {
-        border-left-color: var(--color-warning);
-      }
-
-      /* Sección de Acciones Rápidas */
-      .quick-actions {
-        margin-top: 2em;
-        margin-bottom: 3em;
-      }
-
-      .quick-actions h2 {
-        font-size: 1.5em;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 0.5em;
-        margin-bottom: 1em;
-      }
-
-      .action-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5em;
-      }
-
-      .action-btn {
-        background: var(--color-primary);
-        color: var(--color-light);
-        padding: 1.5em 2em;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: bold;
-        text-align: center;
-        flex: 1 1 200px; /* Permite que el botón crezca/se encoja */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: background 0.3s, transform 0.3s;
-      }
-
-      .action-btn i {
-        display: block;
-        font-size: 2.5em;
-        margin-bottom: 0.3em;
-      }
-
-      .action-btn:hover {
-        background: #9c0b0c;
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-      }
-
-      /* Estilo para el estado del usuario (movido del JS) */
-      .user-info-status {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #fff;
-        padding: 1em;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        z-index: 999;
-      }
-
-      /* Responsive */
-      @media (max-width: 768px) {
-        .admin-header {
-          flex-direction: column;
-          align-items: flex-start;
-          padding: 1.5em;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - COPYFAST&PRINT</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
+    <script>
+        if (!sessionStorage.getItem('usuario')) {
+            window.location.href = 'login-registro.html';
         }
-
-        .admin-header h1 {
-          font-size: 1.5em;
-          margin-bottom: 0.5em;
-        }
-
-        .admin-actions {
-          width: 100%;
-          text-align: center;
-        }
-
-        .admin-actions a {
-          width: 100%;
-          margin-top: 0.5em;
-          justify-content: center;
-        }
-
-        .dashboard-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .action-buttons {
-          flex-direction: column;
-        }
-
-        .user-info-status {
-          right: 10px;
-          bottom: 10px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none">
-      <div class="loader"></div>
-      <p>Cargando datos del panel...</p>
-    </div>
-
+    </script>
+</head>
+<body>
     <header>
-      <nav class="navbar">
-        <div class="brand">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard Administrativo</h1>
+        <div id="userInfo">
+            <p>Usuario: <span id="username"></span></p>
+            <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
         </div>
-        <ul class="menu" id="menu">
-          <li><a href="admin.html" class="active">Admin</a></li>
-          <li><a href="ventas.html">Registro Ventas</a></li>
-          <li><a href="clientes.html">Registro Clientes</a></li>
-          <li><a href="gastos.html">Control Gastos</a></li>
-          <li>
-            <a href="#" id="btnCerrarSesion" class="btn-small">Cerrar Sesión</a>
-          </li>
-        </ul>
-        <div class="toggle-buttons">
-          <button id="toggle_open" aria-expanded="false" class="menu-toggle">
-            <i class="fas fa-bars"></i>
-          </button>
-          <button id="toggle_close" aria-expanded="false" class="menu-toggle">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </nav>
     </header>
-
-    <main class="admin-container">
-      <div class="admin-header">
-        <h1>Dashboard Principal</h1>
-        <div class="admin-actions">
-          <a href="ventas.html">
-            <i class="fas fa-cash-register"></i> Registrar Venta
-          </a>
-          <a href="gastos.html">
-            <i class="fas fa-receipt"></i> Registrar Gasto
-          </a>
-        </div>
-      </div>
-
-      <div class="dashboard-grid">
-        <div class="indicator-card card-ventas">
-          <div class="card-header">
-            <h3>Ventas del Día</h3>
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <span class="card-value" id="ventasDia">Cargando...</span>
-          <p class="card-description">Monto total de ventas registradas hoy</p>
-        </div>
-
-        <div class="indicator-card card-ingresos">
-          <div class="card-header">
-            <h3>Ingresos (Mes)</h3>
-            <i class="fas fa-wallet"></i>
-          </div>
-          <span class="card-value" id="ingresosMes">Cargando...</span>
-          <p class="card-description">Total facturado este mes</p>
-        </div>
-
-        <div class="indicator-card card-creditos">
-          <div class="card-header">
-            <h3>Créditos Pendientes</h3>
-            <i class="fas fa-hand-holding-dollar"></i>
-          </div>
-          <span class="card-value" id="creditosPendientes">Cargando...</span>
-          <p class="card-description">Monto total que deben los clientes</p>
-        </div>
-
-        <div class="indicator-card card-gastos">
-          <div class="card-header">
-            <h3>Gastos del Día</h3>
-            <i class="fas fa-receipt"></i>
-          </div>
-          <span class="card-value" id="gastosDia">Cargando...</span>
-          <p class="card-description">Total de egresos registrados hoy</p>
-        </div>
-
-        <div class="indicator-card card-clientes">
-          <div class="card-header">
-            <h3>Clientes Pendientes</h3>
-            <i class="fas fa-user-tag"></i>
-          </div>
-          <span class="card-value" id="clientesPendientes">Cargando...</span>
-          <p class="card-description">Total de clientes con saldo en deuda</p>
-        </div>
-      </div>
-
-      <section class="quick-actions">
-        <h2>Acciones Rápidas</h2>
-        <div class="action-buttons">
-          <a href="ventas.html" class="action-btn">
-            <i class="fas fa-cart-plus"></i>
-            <span>Nueva Venta</span>
-          </a>
-          <a href="gastos.html" class="action-btn">
-            <i class="fas fa-money-bill-transfer"></i>
-            <span>Nuevo Gasto</span>
-          </a>
-          <a href="clientes.html" class="action-btn">
-            <i class="fas fa-users"></i>
-            <span>Gestión Clientes</span>
-          </a>
-          <a href="inventario.html" class="action-btn" disabled>
-            <i class="fas fa-boxes"></i>
-            <span>Inventario (Próx.)</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="quick-actions">
-        <h2>Reportes Clave</h2>
-        <p>Espacio reservado para gráficos de tendencia de ventas y gastos.</p>
-      </section>
+    <nav>
+        <a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <!-- Enlaces corregidos y con cache-busting para gastos -->
+        <a href="public/registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
+        <a href="public/registro-gastos.html?v=2"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
+        <a href="public/reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
+        <a href="public/clientes.html"><i class="fas fa-users"></i> Clientes</a>
+        <a href="public/inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
+    </nav>
+    <main>
+        <section class="dashboard-summary">
+            <div class="summary-card">
+                <h3><i class="fas fa-sun"></i> Ventas del Día</h3>
+                <p id="ventasDia">Cargando...</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-calendar-alt"></i> Ingresos del Mes</h3>
+                <p id="ingresosMes">Cargando...</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-hand-holding-usd"></i> Créditos Pendientes</h3>
+                <p id="creditosPendientes">Cargando...</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-receipt"></i> Gastos del Día</h3>
+                <p id="gastosDia">Cargando...</p>
+            </div>
+            <div class="summary-card">
+                <h3><i class="fas fa-user-clock"></i> Clientes Pendientes</h3>
+                <p id="clientesPendientes">Cargando...</p>
+            </div>
+        </section>
     </main>
-
-    <a href="#" id="scroll-to-top" class="scroll-to-top">
-      <i class="fas fa-chevron-up"></i>
-    </a>
-
-    <footer class="footer">
-      <div class="footer-content">
-        <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Tu Solución Integral en Impresión y Personalización</h5>
-      </div>
-      <div class="social-networks">
-        <a
-          href="https://www.instagram.com/copyfastprint/"
-          target="_blank"
-          aria-label="Instagram"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/profile.php?id=61578120201237"
-          target="_blank"
-          aria-label="Facebook"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a
-          href="https://co.pinterest.com/copyfastprint/"
-          target="_blank"
-          aria-label="Pinterest"
-          ><i class="fab fa-pinterest"></i
-        ></a>
-        <a
-          href="https://www.tiktok.com/@copyfastprint"
-          target="_blank"
-          aria-label="TikTok"
-          ><i class="fab fa-tiktok"></i
-        ></a>
-      </div>
+    <footer>
+        <p>&copy; 2024 COPYFAST&PRINT. Todos los derechos reservados.</p>
     </footer>
-
-    <script src="/js/scripts.js"></script>
-    <script src="/js/admin-dashboard.js"></script>
-  </body>
+    <script src="js/admin.js"></script>
+</body>
 </html>

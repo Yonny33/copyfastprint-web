@@ -6,24 +6,29 @@
     <title>Registro de Gastos - COPYFAST&PRINT</title>
     <link rel="stylesheet" href="../css/estilos.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
+    <script>
+        if (!sessionStorage.getItem('usuario')) {
+            window.location.href = "../login-registro.html";
+        }
+    </script>
 </head>
 <body>
     <header>
         <h1><i class="fas fa-dollar-sign"></i> Registro de Gastos</h1>
     </header>
     <nav>
+        <!-- ENLACES DE NAVEGACIÓN CORREGIDOS Y SIMPLIFICADOS -->
         <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="../registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
-        <a href="../registro-gastos.html" class="active"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
-        <a href="../reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
-        <a href="../clientes.html"><i class="fas fa-users"></i> Clientes</a>
-        <a href="../inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
+        <a href="registro-ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
+        <a href="registro-gastos.html" class="active"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
+        <a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
+        <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+        <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
     </nav>
     <main>
         <section class="form-container">
             <h2>Nuevo Gasto</h2>
             <form id="registroGastoForm">
-                <!-- Nombres de campo alineados con la nueva estructura -->
                 <div class="form-group">
                     <label for="fecha">Fecha del Gasto:</label>
                     <input type="date" id="fecha" name="fecha" required>
