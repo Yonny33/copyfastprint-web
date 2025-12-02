@@ -5,64 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión - COPYFAST&PRINT</title>
     <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <link rel="stylesheet" href="/css/formulario.css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
     <style>
       body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        background-color: #f0f2f5;
+        height: 100vh;
         margin: 0;
+        background-color: #f4f4f4;
       }
       .login-container {
-        background-color: #fff;
-        padding: 2.5em;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        padding: 3em 4em;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 400px;
         text-align: center;
       }
-      .login-container h2 {
+      h2 {
         color: #c60e0f;
         margin-bottom: 1.5em;
         font-size: 2em;
       }
-      .login-container .form-group {
-        margin-bottom: 1.5em;
+      .form-group {
         text-align: left;
+        margin-bottom: 1.5em;
       }
-      .login-container label {
+      label {
         display: block;
         margin-bottom: 0.5em;
-        color: #333;
+        color: #555;
         font-weight: 600;
       }
-      .login-container input[type="text"],
-      .login-container input[type="password"] {
+      input[type="text"],
+      input[type="password"] {
         width: 100%;
-        padding: 0.8em 1em;
-        border: 1px solid #ddd;
+        padding: 0.8em;
+        border: 1px solid #ccc;
         border-radius: 8px;
-        font-size: 1em;
         box-sizing: border-box;
+        transition: border-color 0.2s;
       }
-      .login-container button {
-        width: 100%;
-        padding: 1em;
+      input[type="text"]:focus,
+      input[type="password"]:focus {
+        outline: none;
+        border-color: #c60e0f;
+      }
+      button {
         background-color: #c60e0f;
         color: #fff;
         border: none;
+        padding: 0.9em 1.5em;
         border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
         font-size: 1.1em;
         font-weight: 700;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.2s;
+        margin-top: 1em;
       }
-      .login-container button:hover {
+      button:hover {
         background-color: #9c0b0c;
       }
       .error-message {
@@ -70,15 +75,14 @@
         margin-top: 1em;
         font-size: 0.9em;
         font-weight: 600;
+        display: none; /* Oculto por defecto */
       }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Iniciar Sesión</h2>
-        <!-- Este formulario ahora envía los datos directamente al script de Google -->
-        <form method="POST" action="https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec">
-            <input type="hidden" name="action" value="login">
+        <form id="loginForm">
             <div class="form-group">
                 <label for="username">Usuario:</label>
                 <input type="text" id="username" name="username" required />
@@ -87,20 +91,67 @@
                 <label for="password">Contraseña:</label>
                 <input type="password" id="password" name="password" required />
             </div>
-            <button type="submit">Entrar</button>
-            <p id="login-error" class="error-message" style="display: none;"></p>
+            <button type="submit" id="loginButton">Entrar</button>
+            <div id="login-error" class="error-message"></div>
         </form>
     </div>
 
     <script>
-        // Este script solo muestra un mensaje de error si el login falla.
-        document.addEventListener("DOMContentLoaded", function () {
-            const loginError = document.getElementById("login-error");
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('error')) {
-                loginError.textContent = "Usuario o contraseña incorrectos. Inténtalo de nuevo.";
-                loginError.style.display = "block";
+        document.addEventListener("DOMContentLoaded", () => {
+            // Redirigir si ya hay una sesión activa
+            if (sessionStorage.getItem("sesionActiva") === "true") {
+                window.location.href = "admin.html";
             }
+
+            const loginForm = document.getElementById("loginForm");
+            const loginButton = document.getElementById("loginButton");
+            const loginError = document.getElementById("login-error");
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+
+            loginForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                loginButton.textContent = "Verificando...";
+                loginButton.disabled = true;
+                loginError.style.display = "none";
+
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                const payload = {
+                    action: "loginUser",
+                    data: {
+                        username: username,
+                        password: password
+                    }
+                };
+
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: "POST",
+                        redirect: "follow",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8", // Requerido por Google Apps Script
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === "success") {
+                        sessionStorage.setItem("sesionActiva", "true");
+                        sessionStorage.setItem("usuario", result.user);
+                        window.location.href = "admin.html"; // Redirigir al dashboard
+                    } else {
+                        throw new Error(result.message || "Usuario o contraseña incorrectos.");
+                    }
+                } catch (error) {
+                    loginError.textContent = error.message;
+                    loginError.style.display = "block";
+                } finally {
+                    loginButton.textContent = "Entrar";
+                    loginButton.disabled = false;
+                }
+            });
         });
     </script>
 </body>
