@@ -12,17 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    const clientData = Object.fromEntries(formData.entries());
 
-    data.action = "registrarCliente";
-    data.sheetName = "Clientes";
+    // Payload corregido para que coincida con el backend
+    const payload = {
+      action: "saveClient", // 1. Nombre de la acción corregido
+      data: clientData      // 2. Datos anidados en la estructura correcta
+    };
 
     try {
       const response = await fetch(
         "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec",
         {
           method: "POST",
-          body: JSON.stringify(data),
+          body: JSON.stringify(payload), // Enviar el payload corregido
         }
       );
 

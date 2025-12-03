@@ -21,76 +21,9 @@
       name="description"
       content="Panel de registro interno para ventas y control de crédito de COPYFAST&PRINT."
     />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/favicons/android-icon-192x192.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="/favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="/favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/favicons/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="/favicons/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="/favicons/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/favicons/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/favicons/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/favicons/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="stylesheet" href="/css/main.css" />
     <link
       rel="stylesheet"
@@ -104,7 +37,6 @@
     </div>
 
     <script>
-      // Verifica la sesión antes de cargar el contenido
       if (sessionStorage.getItem("sesionActiva") !== "true") {
         window.location.href = "login-registro.html";
       }
@@ -135,94 +67,63 @@
           <div class="section-heading">
             <h2>📝 Registro de Venta</h2>
             <p>
-              Completa los datos de la venta para realizar el registro.
+              Completa los datos para registrar una nueva venta. Los cálculos se hacen automáticamente.
             </p>
           </div>
 
           <form id="registro-ventas-form" class="form-grid">
-            <div class="form-separator full-width">
-              <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="cliente">Seleccionar Cliente *</label>
-              <select id="cliente" name="cliente" required>
-                <option value="">Cargando clientes...</option>
-              </select>
-            </div>
-
+            
             <div class="form-separator full-width">
               <h3><i class="fas fa-receipt"></i> Detalle de la Venta</h3>
             </div>
 
-            <div class="form-group full-width">
-              <label for="descripcion"
-                >Descripción del Servicio/Producto *</label
-              >
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                rows="3"
-                required
-              ></textarea>
+            <div class="form-group">
+              <label for="fecha">Fecha *</label>
+              <input type="date" id="fecha" name="fecha" required />
             </div>
 
             <div class="form-group">
-              <label for="tipoServicio">Tipo de Servicio</label>
-              <select id="tipoServicio" name="tipoServicio">
-                <option value="Sublimacion">Sublimación</option>
-                <option value="DTF">DTF</option>
-                <option value="Impresion">Impresión/Fotocopia</option>
-                <option value="Diseno">Diseño Gráfico</option>
-                <option value="Otro">Otro</option>
+              <label for="cliente">Cliente *</label>
+              <select id="cliente" name="cliente" required>
+                <option value="">Cargando clientes...</option>
               </select>
+               <input type="hidden" id="id_cliente" name="id_cliente" />
             </div>
-
-            <!-- Nuevo campo cantidad (necesario para la hoja) -->
-            <div class="form-group">
-              <label for="cantidad">Cantidad</label>
-              <input
-                type="number"
-                id="cantidad"
-                name="cantidad"
-                min="1"
-                step="1"
-                value="1"
-                required
-              />
-            </div>
-
-            <!-- montoTotal renombrado a precio_unitario (coincide con registrar-venta) -->
-            <div class="form-group">
-              <label for="precioUnitario">Precio Unitario (Bs.) *</label>
-              <input
-                type="number"
-                id="precioUnitario"
-                name="precio_unitario"
-                step="0.01"
-                min="0.01"
-                required
-              />
-            </div>
-
-            <!-- montoPagado renombrado a abono -->
-            <div class="form-group">
-              <label for="montoPagado">Monto Pagado (Bs.) *</label>
-              <input
-                type="number"
-                id="montoPagado"
-                name="abono"
-                step="0.01"
-                min="0"
-                required
-              />
-              <span id="pago-error" class="error-message"></span>
+            
+            <div class="form-group full-width">
+              <label for="descripcion">Descripción del Servicio/Producto *</label>
+              <textarea id="descripcion" name="descripcion" rows="2" required></textarea>
             </div>
 
             <div class="form-group">
-              <label for="metodoPago">Método de Pago *</label>
-              <select id="metodoPago" name="metodoPago" required>
-                <option value="">Selecciona una</option>
+              <label for="cantidad">Cantidad *</label>
+              <input type="number" id="cantidad" name="cantidad" min="1" step="1" value="1" required />
+            </div>
+
+            <div class="form-group">
+              <label for="precio_unitario">Precio Unitario (Bs.) *</label>
+              <input type="number" id="precio_unitario" name="precio_unitario" step="0.01" min="0.01" required />
+            </div>
+
+            <div class="form-group">
+                <label for="venta_bruta">Venta Bruta (Bs.)</label>
+                <input type="number" id="venta_bruta" name="venta_bruta" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="abono_recibido">Abono Recibido (Bs.) *</label>
+              <input type="number" id="abono_recibido" name="abono_recibido" step="0.01" min="0" required />
+            </div>
+
+            <div class="form-group">
+              <label for="saldo_pendiente">Saldo Pendiente (Bs.)</label>
+              <input type="number" id="saldo_pendiente" name="saldo_pendiente" readonly />
+            </div>
+
+            <div class="form-group">
+              <label for="metodo_pago">Método de Pago *</label>
+              <select id="metodo_pago" name="metodo_pago" required>
+                <option value="">Selecciona uno</option>
                 <option value="Efectivo">Efectivo</option>
                 <option value="Transferencia">Transferencia</option>
                 <option value="Pago-Movil">Pago Móvil</option>
@@ -231,12 +132,7 @@
                 <option value="Otro">Otro</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="fechaVenta">Fecha de Venta *</label>
-              <input type="date" id="fechaVenta" name="fecha" required />
-            </div>
-
+            
             <div class="form-group full-width">
               <button type="submit" class="calculate-btn">
                 <i class="fas fa-save"></i> Registrar Venta
@@ -251,19 +147,15 @@
 
       <div class="info-column">
         <div class="info-box highlight">
-          <h3><i class="fas fa-info-circle"></i> Venta a Crédito</h3>
+          <h3><i class="fas fa-calculator"></i> Cálculos Automáticos</h3>
           <p>
-            Si el **Monto Pagado** es menor al **Monto Total**, la venta se
-            registrará automáticamente como **Venta a Crédito** con el saldo
-            pendiente.
+            La <strong>Venta Bruta</strong> y el <strong>Saldo Pendiente</strong> se calculan solos para evitar errores.
           </p>
         </div>
-
         <div class="info-box info">
           <h3><i class="fas fa-check"></i> Campos Requeridos</h3>
           <p>
-            Los campos marcados con un asterisco (<span class="required">*</span
-            >) son obligatorios para el registro.
+            Los campos marcados con (*) son obligatorios.
           </p>
         </div>
       </div>
@@ -299,29 +191,25 @@
     <script src="/js/scripts.js"></script>
     <script src="/js/registro-ventas.js"></script>
     <script>
-      // Botón de cerrar sesión
-      document
-        .getElementById("btnCerrarSesion")
-        .addEventListener("click", function (e) {
+      document.getElementById("btnCerrarSesion").addEventListener("click", function (e) {
           e.preventDefault();
           if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
             sessionStorage.clear();
             window.location.href = "login-registro.html";
           }
-        });
+      });
 
-      // Mostrar nombre del usuario logueado
       const usuario = sessionStorage.getItem("usuario");
       if (usuario) {
         const userInfo = document.createElement("div");
         userInfo.style.cssText =
           "position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 999;";
         userInfo.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 0.5em;">
-            <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
+          <div style='''display: flex; align-items: center; gap: 0.5em;'''>
+            <i class='''fas fa-user-circle''' style='''font-size: 1.5em; color: #c60e0f;'''></i>
             <div>
-              <strong style="display: block; color: #333;">Usuario: ${usuario}</strong>
-              <small style="color: #666;">Sesión iniciada</small>
+              <strong style='''display: block; color: #333;'''>Usuario: ${usuario}</strong>
+              <small style='''color: #666;'''>Sesión iniciada</small>
             </div>
           </div>
         `;

@@ -5,84 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar Sesión - COPYFAST&PRINT</title>
     <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
+    <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
-    <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f4f4f4;
-      }
-      .login-container {
-        background: #fff;
-        padding: 3em 4em;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-      }
-      h2 {
-        color: #c60e0f;
-        margin-bottom: 1.5em;
-        font-size: 2em;
-      }
-      .form-group {
-        text-align: left;
-        margin-bottom: 1.5em;
-      }
-      label {
-        display: block;
-        margin-bottom: 0.5em;
-        color: #555;
-        font-weight: 600;
-      }
-      input[type="text"],
-      input[type="password"] {
-        width: 100%;
-        padding: 0.8em;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
-        transition: border-color 0.2s;
-      }
-      input[type="text"]:focus,
-      input[type="password"]:focus {
-        outline: none;
-        border-color: #c60e0f;
-      }
-      button {
-        background-color: #c60e0f;
-        color: #fff;
-        border: none;
-        padding: 0.9em 1.5em;
-        border-radius: 8px;
-        cursor: pointer;
-        width: 100%;
-        font-size: 1.1em;
-        font-weight: 700;
-        transition: background-color 0.2s;
-        margin-top: 1em;
-      }
-      button:hover {
-        background-color: #9c0b0c;
-      }
-      .error-message {
-        color: #e74c3c;
-        margin-top: 1em;
-        font-size: 0.9em;
-        font-weight: 600;
-        display: none; /* Oculto por defecto */
-      }
-    </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
+        <form id="loginForm" class="form-container">
             <div class="form-group">
                 <label for="username">Usuario:</label>
                 <input type="text" id="username" name="username" required />
@@ -91,8 +20,10 @@
                 <label for="password">Contraseña:</label>
                 <input type="password" id="password" name="password" required />
             </div>
-            <button type="submit" id="loginButton">Entrar</button>
-            <div id="login-error" class="error-message"></div>
+            <div class="form-actions">
+                <button type="submit" id="loginButton" class="btn-submit">Entrar</button>
+            </div>
+            <div id="login-error" class="error-message" style="display: none;"></div>
         </form>
     </div>
 
@@ -130,7 +61,7 @@
                         method: "POST",
                         redirect: "follow",
                         headers: {
-                            "Content-Type": "text/plain;charset=utf-8", // Requerido por Google Apps Script
+                            "Content-Type": "text/plain;charset=utf-8",
                         },
                         body: JSON.stringify(payload)
                     });
@@ -140,7 +71,7 @@
                     if (result.status === "success") {
                         sessionStorage.setItem("sesionActiva", "true");
                         sessionStorage.setItem("usuario", result.user);
-                        window.location.href = "admin.html"; // Redirigir al dashboard
+                        window.location.href = "admin.html";
                     } else {
                         throw new Error(result.message || "Usuario o contraseña incorrectos.");
                     }

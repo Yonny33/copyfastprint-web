@@ -3,74 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - COPYFAST&PRINT</title>
-    <!-- RUTA CORREGIDA: Apuntando a styles.css -->
+    <title>Panel de Administración - Fortaleza Inquebrantable</title>
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
-    <script>
-        if (!sessionStorage.getItem('usuario')) {
-            window.location.href = 'login-registro.html';
-        }
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="admin-page">
-    <header>
-        <h1><i class="fas fa-tachometer-alt"></i> Dashboard Administrativo</h1>
-        <div id="userInfo">
-            <p>Usuario: <span id="username"></span></p>
-            <button id="logoutButton"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
-        </div>
-    </header>
-    <nav>
-        <a href="admin.html?v=8" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="registro-ventas.html?v=8"><i class="fas fa-cash-register"></i> Registrar Venta</a>
-        <a href="registro-gastos.html?v=8"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
-        <a href="reportes.html?v=8"><i class="fas fa-chart-line"></i> Reportes</a>
-        <a href="clientes.html?v=8"><i class="fas fa-users"></i> Clientes</a>
-        <a href="inventario.html?v=8"><i class="fas fa-box-open"></i> Inventario</a>
-    </nav>
-    <main>
-        <section class="dashboard-summary">
-            <div class="summary-card">
-                <h3><i class="fas fa-sun"></i> Ventas del Día</h3>
-                <p id="ventasDia">Cargando...</p>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="Logo Fortaleza Inquebrantable">
+                </a>
             </div>
-            <div class="summary-card">
-                <h3><i class="fas fa-calendar-alt"></i> Ingresos del Mes</h3>
-                <p id="ingresosMes">Cargando...</p>
+            <nav>
+                <ul>
+                    <li class="active"><a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign"></i> Ventas</a></li>
+                    <li><a href="abonos.html"><i class="fas fa-hand-holding-usd"></i> Abonos</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-receipt"></i> Gastos</a></li>
+                    <li><a href="clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+                    <li><a href="inventario.html"><i class="fas fa-boxes"></i> Inventario</a></li>
+                    <li><a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a></li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                 <a href="#" id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </div>
-            <div class="summary-card">
-                <h3><i class="fas fa-hand-holding-usd"></i> Créditos Pendientes</h3>
-                <p id="creditosPendientes">Cargando...</p>
+        </aside>
+        <main class="main-content">
+            <header>
+                <h1>Dashboard</h1>
+                <p>Resumen general de la actividad de tu negocio.</p>
+            </header>
+            <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                <div class="spinner"></div>
             </div>
-            <div class="summary-card">
-                <h3><i class="fas fa-receipt"></i> Gastos del Día</h3>
-                <p id="gastosDia">Cargando...</p>
-            </div>
-            <div class="summary-card">
-                <h3><i class="fas fa-user-clock"></i> Clientes Pendientes</h3>
-                <p id="clientesPendientes">Cargando...</p>
-            </div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 COPYFAST&PRINT. Todos los derechos reservados.</p>
-    </footer>
-    <script src="js/admin-dashboard.js?v=8"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const username = sessionStorage.getItem('usuario');
-            if (username) {
-                document.getElementById('username').textContent = username;
-            }
-
-            document.getElementById('logoutButton').addEventListener('click', () => {
-                if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                    sessionStorage.clear();
-                    window.location.href = 'login-registro.html';
-                }
-            });
-        });
-    </script>
+            <section class="dashboard-cards">
+                <div class="card">
+                    <h3>Ventas del Día</h3>
+                    <p id="ventas-dia">Cargando...</p>
+                </div>
+                <div class="card">
+                    <h3>Ingresos del Mes</h3>
+                    <p id="ingresos-mes">Cargando...</p>
+                </div>
+                <div class="card">
+                    <h3>Créditos Pendientes</h3>
+                    <p id="creditos-pendientes">Cargando...</p>
+                </div>
+                <div class="card">
+                    <h3>Gastos del Día</h3>
+                    <p id="gastos-dia">Cargando...</p>
+                </div>
+                <div class="card">
+                    <h3>Clientes con Deuda</h3>
+                    <p id="clientes-pendientes">Cargando...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="js/admin-dashboard.js"></script>
 </body>
 </html>
