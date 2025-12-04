@@ -1,133 +1,304 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventario y Stock - COPYFAST&PRINT</title>
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicons/favicon-96x96.png" />
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
 
     <style>
-      :root { --color-primary: #c60e0f; }
-      .admin-container { max-width: 1600px; margin: 2em auto; padding: 0 2em; }
-      .inventory-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5em; flex-wrap: wrap; gap: 1em; }
-      .inventory-table-container { overflow-x: auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-      .inventory-table { width: 100%; border-collapse: collapse; }
-      .inventory-table th, .inventory-table td { padding: 1em 1.5em; text-align: left; border-bottom: 1px solid #eee; }
-      .inventory-table th { background-color: #f9f9f9; font-weight: 700; color: var(--color-primary); text-transform: uppercase; font-size: 0.85em; }
-      .inventory-table tr:hover { background-color: #fff9f9; }
-      .stock-bajo { color: #D32F2F; font-weight: 700; }
-      .stock-optimo { color: #388E3C; }
-      .btn-add { background-color: var(--color-primary); color: #fff; padding: 0.7em 1.2em; border-radius: 8px; text-decoration: none; font-weight: 700; transition: background 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5em; }
-      .btn-add:hover { background-color: #9c0b0c; }
-      .search-input { padding: 0.7em 1em; border: 1px solid #ccc; border-radius: 8px; width: 300px; max-width: 100%; }
-      .action-btn { cursor: pointer; background: none; border: none; font-size: 1.2em; color: #777; transition: color 0.2s; padding: 5px; }
-      .action-btn.edit:hover { color: #2196F3; }
-      .action-btn.delete:hover { color: #F44336; }
+      :root {
+        --color-primary: #c60e0f;
+      }
+      .admin-container {
+        max-width: 1600px;
+        margin: 2em auto;
+        padding: 0 2em;
+      }
+      .inventory-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5em;
+        flex-wrap: wrap;
+        gap: 1em;
+      }
+      .inventory-table-container {
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      }
+      .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .inventory-table th,
+      .inventory-table td {
+        padding: 1em 1.5em;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      .inventory-table th {
+        background-color: #f9f9f9;
+        font-weight: 700;
+        color: var(--color-primary);
+        text-transform: uppercase;
+        font-size: 0.85em;
+      }
+      .inventory-table tr:hover {
+        background-color: #fff9f9;
+      }
+      .stock-bajo {
+        color: #d32f2f;
+        font-weight: 700;
+      }
+      .stock-optimo {
+        color: #388e3c;
+      }
+      .btn-add {
+        background-color: var(--color-primary);
+        color: #fff;
+        padding: 0.7em 1.2em;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+      }
+      .btn-add:hover {
+        background-color: #9c0b0c;
+      }
+      .search-input {
+        padding: 0.7em 1em;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 300px;
+        max-width: 100%;
+      }
+      .action-btn {
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 1.2em;
+        color: #777;
+        transition: color 0.2s;
+        padding: 5px;
+      }
+      .action-btn.edit:hover {
+        color: #2196f3;
+      }
+      .action-btn.delete:hover {
+        color: #f44336;
+      }
 
       /* Estilos del Modal */
-      .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-      .modal-content { background-color: #fefefe; margin: 5% auto; padding: 25px 35px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-      .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-      .modal-header h2 { margin: 0; color: var(--color-primary); }
-      .close-btn { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; transition: color 0.2s; }
-      .close-btn:hover, .close-btn:focus { color: #333; }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 25px 35px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+      }
+      .modal-header h2 {
+        margin: 0;
+        color: var(--color-primary);
+      }
+      .close-btn {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .close-btn:hover,
+      .close-btn:focus {
+        color: #333;
+      }
     </style>
-</head>
-<body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none;"><div class="loader"></div></div>
+  </head>
+  <body>
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="loader"></div>
+    </div>
     <header>
-        <nav class="navbar">
-            <div class="brand"><h2>COPY<span>FAST&</span>PRINT</h2></div>
-            <ul class="menu" id="menu">
-                <li><a href="admin.html">Admin</a></li>
-                <li><a href="ventas.html">Ventas</a></li>
-                <li><a href="clientes.html">Clientes</a></li>
-                <li><a href="gastos.html">Gastos</a></li>
-                <li><a href="reportes.html">Reportes</a></li>
-                <li><a href="inventario.html" class="active">Inventario</a></li>
-                <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
-            </ul>
-            <div class="toggle-buttons">
-                <button id="toggle_open" class="menu-toggle"><i class="fas fa-bars"></i></button>
-                <button id="toggle_close" class="menu-toggle"><i class="fas fa-times"></i></button>
-            </div>
-        </nav>
+      <nav class="navbar">
+        <div class="brand"><h2>COPY<span>FAST&</span>PRINT</h2></div>
+        <ul class="menu" id="menu">
+          <li><a href="admin.html">Admin</a></li>
+          <li><a href="ventas.html">Ventas</a></li>
+          <li><a href="clientes.html">Clientes</a></li>
+          <li><a href="gastos.html">Gastos</a></li>
+          <li><a href="reportes.html">Reportes</a></li>
+          <li><a href="inventario.html" class="active">Inventario</a></li>
+          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
+        </ul>
+        <div class="toggle-buttons">
+          <button id="toggle_open" class="menu-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <button id="toggle_close" class="menu-toggle">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </nav>
     </header>
 
     <main class="admin-container">
-        <div class="section-heading">
-            <h1 style="color: #c60e0f"><i class="fas fa-boxes-stacked"></i> Inventario y Stock</h1>
-            <p>Control de materiales, insumos y productos terminados.</p>
-        </div>
+      <div class="section-heading">
+        <h1 style="color: #c60e0f">
+          <i class="fas fa-boxes-stacked"></i> Inventario y Stock
+        </h1>
+        <p>Control de materiales, insumos y productos terminados.</p>
+      </div>
 
-        <div class="inventory-controls">
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre o código..." />
-            <button class="btn-add" id="btnAddProduct"><i class="fas fa-plus-circle"></i> Agregar Producto</button>
-        </div>
+      <div class="inventory-controls">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Buscar por nombre o código..."
+        />
+        <button class="btn-add" id="btnAddProduct">
+          <i class="fas fa-plus-circle"></i> Agregar Producto
+        </button>
+      </div>
 
-        <div class="inventory-table-container">
-            <table class="inventory-table">
-                <thead>
-                    <tr>
-                        <th>CÓDIGO</th>
-                        <th>PRODUCTO</th>
-                        <th>STOCK</th>
-                        <th>UNIDAD</th>
-                        <th>STOCK MÍN.</th>
-                        <th>PROVEEDOR</th>
-                        <th>ACCIONES</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-            </table>
-        </div>
+      <div class="inventory-table-container">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>CÓDIGO</th>
+              <th>PRODUCTO</th>
+              <th>STOCK</th>
+              <th>UNIDAD</th>
+              <th>STOCK MÍN.</th>
+              <th>PROVEEDOR</th>
+              <th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-body"></tbody>
+        </table>
+      </div>
     </main>
 
     <!-- Modal para Agregar/Editar Producto -->
     <div id="productModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Agregar Producto</h2>
-                <span class="close-btn" id="closeModal">&times;</span>
-            </div>
-            <form id="productForm" class="form-container">
-                <input type="hidden" id="id_producto" name="id_producto">
-                <div class="form-group">
-                    <label for="codigo">CÓDIGO</label>
-                    <input type="text" id="codigo" name="codigo" required>
-                </div>
-                <div class="form-group">
-                    <label for="nombre">NOMBRE DEL PRODUCTO</label>
-                    <input type="text" id="nombre" name="nombre" required>
-                </div>
-                <div class="form-group-row">
-                    <div class="form-group">
-                        <label for="stock_actual">STOCK ACTUAL</label>
-                        <input type="number" id="stock_actual" name="stock_actual" required step="any">
-                    </div>
-                    <div class="form-group">
-                        <label for="unidad_medida">UNIDAD (Ej: und, m, kg)</label>
-                        <input type="text" id="unidad_medida" name="unidad_medida" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="stock_minimo">STOCK MÍNIMO (Opcional)</label>
-                    <input type="number" id="stock_minimo" name="stock_minimo" step="any">
-                </div>
-                <div class="form-group">
-                    <label for="proveedor">PROVEEDOR (Opcional)</label>
-                    <input type="text" id="proveedor" name="proveedor">
-                </div>
-                <div class="form-actions">
-                  <button type="submit" class="btn-submit">Guardar Producto</button>
-                </div>
-            </form>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Agregar Producto</h2>
+          <span class="close-btn" id="closeModal">&times;</span>
         </div>
+        <form id="productForm" class="form-container">
+          <input type="hidden" id="id_producto" name="id_producto" />
+          <div class="form-group">
+            <label for="codigo">CÓDIGO</label>
+            <input type="text" id="codigo" name="codigo" required />
+          </div>
+          <div class="form-group">
+            <label for="nombre">NOMBRE DEL PRODUCTO</label>
+            <input type="text" id="nombre" name="nombre" required />
+          </div>
+          <div class="form-group-row">
+            <div class="form-group">
+              <label for="stock_actual">STOCK ACTUAL</label>
+              <input
+                type="number"
+                id="stock_actual"
+                name="stock_actual"
+                required
+                step="any"
+              />
+            </div>
+            <div class="form-group">
+              <label for="unidad_medida">UNIDAD (Ej: und, m, kg)</label>
+              <input
+                type="text"
+                id="unidad_medida"
+                name="unidad_medida"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="stock_minimo">STOCK MÍNIMO (Opcional)</label>
+            <input
+              type="number"
+              id="stock_minimo"
+              name="stock_minimo"
+              step="any"
+            />
+          </div>
+          <div class="form-group">
+            <label for="proveedor">PROVEEDOR (Opcional)</label>
+            <input type="text" id="proveedor" name="proveedor" />
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">Guardar Producto</button>
+          </div>
+        </form>
+      </div>
     </div>
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
+      </div>
+    </footer>
 
     <script src="js/scripts.js"></script>
     <script src="js/registro-inventario.js"></script>
-</body>
+  </body>
 </html>

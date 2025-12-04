@@ -1,88 +1,166 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de Gastos - COPYFAST&PRINT</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.1.1/css/all.css">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="/favicons/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+
+    <link rel="stylesheet" href="/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
+    />
     <script>
-        if (!sessionStorage.getItem('usuario')) {
-            window.location.href = "login-registro.html";
-        }
+      if (!sessionStorage.getItem("usuario")) {
+        window.location.href = "login-registro.html";
+      }
     </script>
-</head>
-<body class="admin-page">
+  </head>
+  <body class="admin-page">
     <header>
-        <h1><i class="fas fa-dollar-sign"></i> Registro de Gastos</h1>
+      <h1><i class="fas fa-dollar-sign"></i> Registro de Gastos</h1>
     </header>
     <nav>
-        <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
-        <a href="registro-gastos.html" class="active"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
-        <a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
-        <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
-        <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
+      <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="ventas.html"
+        ><i class="fas fa-cash-register"></i> Registrar Venta</a
+      >
+      <a href="registro-gastos.html" class="active"
+        ><i class="fas fa-dollar-sign"></i> Registrar Gasto</a
+      >
+      <a href="reportes.html"><i class="fas fa-chart-line"></i> Reportes</a>
+      <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+      <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
     </nav>
     <main>
-        <section class="form-container">
-            <h2>Nuevo Gasto</h2>
-            <form id="registro-gastos-form">
-                <div class="form-group">
-                    <label for="fecha">Fecha del Gasto:</label>
-                    <input type="date" id="fecha" name="fecha" required>
-                </div>
-                <div class="form-group">
-                    <label for="rit">RIF / Cédula:</label>
-                    <input type="text" id="rit" name="rit" required placeholder="Ej: J-12345678-9">
-                </div>
-                <div class="form-group">
-                    <label for="proveedor">Proveedor:</label>
-                    <input type="text" id="proveedor" name="proveedor" required placeholder="Nombre del proveedor">
-                </div>
-                <div class="form-group">
-                    <label for="descripcion">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="monto">Monto (VES):</label>
-                    <input type="number" id="monto" name="monto" step="0.01" required placeholder="Monto total en Bolívares">
-                </div>
-                <div class="form-group">
-                    <label for="metodo_pago">Método de Pago:</label>
-                    <select id="metodo_pago" name="metodo_pago" required>
-                        <option value="" disabled selected>Seleccione un método</option>
-                        <option value="Efectivo VES">Efectivo VES</option>
-                        <option value="Efectivo USD">Efectivo USD</option>
-                        <option value="Transferencia">Transferencia</option>
-                        <option value="Pago Móvil">Pago Móvil</option>
-                        <option value="Zelle">Zelle</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="categoria">Categoría:</label>
-                    <input type="text" id="categoria" name="categoria" required placeholder="Ej: Papelería, Alquiler, Servicios">
-                </div>
-                <input type="hidden" id="usuario" name="usuario">
-                <div class="form-actions">
-                    <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Gasto</button>
-                </div>
-            </form>
-        </section>
+      <section class="form-container">
+        <h2>Nuevo Gasto</h2>
+        <form id="registro-gastos-form">
+          <div class="form-group">
+            <label for="fecha">Fecha del Gasto:</label>
+            <input type="date" id="fecha" name="fecha" required />
+          </div>
+          <div class="form-group">
+            <label for="rit">RIF / Cédula:</label>
+            <input
+              type="text"
+              id="rit"
+              name="rit"
+              required
+              placeholder="Ej: J-12345678-9"
+            />
+          </div>
+          <div class="form-group">
+            <label for="proveedor">Proveedor:</label>
+            <input
+              type="text"
+              id="proveedor"
+              name="proveedor"
+              required
+              placeholder="Nombre del proveedor"
+            />
+          </div>
+          <div class="form-group">
+            <label for="descripcion">Descripción:</label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              rows="3"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="monto">Monto:</label>
+            <input
+              type="number"
+              id="monto"
+              name="monto"
+              step="0.01"
+              required
+              placeholder="Monto total en Bolívares"
+            />
+          </div>
+          <div class="form-group">
+            <label for="metodo_pago">Método de Pago:</label>
+            <select id="metodo_pago" name="metodo_pago" required>
+              <option value="" disabled selected>Seleccione un método</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Pago Móvil">Pago Móvil</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="categoria">Categoría:</label>
+            <input
+              type="text"
+              id="categoria"
+              name="categoria"
+              required
+              placeholder="Ej: Papelería, Alquiler, Servicios"
+            />
+          </div>
+          <input type="hidden" id="usuario" name="usuario" />
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">
+              <i class="fas fa-save"></i> Registrar Gasto
+            </button>
+          </div>
+        </form>
+      </section>
     </main>
-    <footer>
-        <p>&copy; 2024 COPYFAST&PRINT. Todos los derechos reservados.</p>
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
+      </div>
     </footer>
+    <script src="/js/scripts.js"></script>
     <script src="/js/registro-gastos.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const usuario = sessionStorage.getItem('usuario');
-            if(usuario) {
-                document.getElementById('usuario').value = usuario;
-            }
-            document.getElementById('fecha').value = new Date().toISOString().slice(0, 10);
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        const usuario = sessionStorage.getItem("usuario");
+        if (usuario) {
+          document.getElementById("usuario").value = usuario;
+        }
+        document.getElementById("fecha").value = new Date()
+          .toISOString()
+          .slice(0, 10);
+      });
     </script>
-</body>
+  </body>
 </html>

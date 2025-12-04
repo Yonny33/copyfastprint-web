@@ -10,7 +10,7 @@
       sizes="96x96"
       href="/favicons/favicon-96x96.png"
     />
-    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="/css/main.css" />
     <link
       rel="stylesheet"
       href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
@@ -24,10 +24,10 @@
         padding: 0 2em;
       }
       .report-controls {
-          background: #f9f9f9;
-          padding: 1.5em;
-          border-radius: 12px;
-          margin-bottom: 2em;
+        background: #f9f9f9;
+        padding: 1.5em;
+        border-radius: 12px;
+        margin-bottom: 2em;
       }
       .report-grid {
         display: grid;
@@ -44,13 +44,13 @@
         flex-direction: column;
       }
       .chart-card h3 {
-          margin-top: 0;
-          font-size: 1.2em;
-          color: #555;
+        margin-top: 0;
+        font-size: 1.2em;
+        color: #555;
       }
       .chart-container {
-          flex-grow: 1;
-          position: relative;
+        flex-grow: 1;
+        position: relative;
       }
       .loading-overlay {
         position: fixed;
@@ -86,21 +86,27 @@
     </style>
   </head>
   <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="loader"></div>
       <p>Generando reportes, por favor espera...</p>
     </div>
 
     <header>
-        <h1><i class="fas fa-chart-pie"></i> Reportes y Análisis</h1>
+      <h1><i class="fas fa-chart-pie"></i> Reportes y Análisis</h1>
     </header>
     <nav>
-        <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-        <a href="ventas.html"><i class="fas fa-cash-register"></i> Registrar Venta</a>
-        <a href="registro-gastos.html"><i class="fas fa-dollar-sign"></i> Registrar Gasto</a>
-        <a href="reportes.html" class="active"><i class="fas fa-chart-line"></i> Reportes</a>
-        <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
-        <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
+      <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="ventas.html"
+        ><i class="fas fa-cash-register"></i> Registrar Venta</a
+      >
+      <a href="registro-gastos.html"
+        ><i class="fas fa-dollar-sign"></i> Registrar Gasto</a
+      >
+      <a href="reportes.html" class="active"
+        ><i class="fas fa-chart-line"></i> Reportes</a
+      >
+      <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+      <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
     </nav>
 
     <main class="admin-container">
@@ -117,13 +123,13 @@
         </div>
         <div class="chart-card">
           <h3>Top 5 Categorías de Gasto</h3>
-           <div class="chart-container">
+          <div class="chart-container">
             <canvas id="gastosCategoriaChart"></canvas>
           </div>
         </div>
         <div class="chart-card">
           <h3>Composición de Ingresos del Mes</h3>
-           <div class="chart-container">
+          <div class="chart-container">
             <canvas id="creditosChart"></canvas>
           </div>
         </div>
@@ -135,6 +141,28 @@
         </div>
       </div>
     </main>
+    <footer class="footer">
+      <div class="footer-content">
+        <h2>COPY<span>FAST&</span>PRINT</h2>
+        <h5>Tu Solución Integral en Impresión y Personalización</h5>
+      </div>
+      <div class="social-networks">
+        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/profile.php?id=61578120201237"
+          target="_blank"
+          ><i class="fab fa-facebook"></i
+        ></a>
+        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+          ><i class="fab fa-pinterest"></i
+        ></a>
+        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+          ><i class="fab fa-tiktok"></i
+        ></a>
+      </div>
+    </footer>
 
     <script src="js/scripts.js"></script>
     <script src="js/reportes.js"></script>

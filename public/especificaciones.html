@@ -1,449 +1,149 @@
+
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Especificaciones Técnicas - Copy Fast & Print</title>
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/favicons/android-icon-192x192.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="/favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="/favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/favicons/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="/favicons/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="/favicons/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/favicons/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/favicons/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/favicons/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link rel="manifest" href="/favicons/manifest.json" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta
-      name="msapplication-TileImage"
-      content="/favicons/ms-icon-144x144.png"
-    />
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="stylesheet" href="/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
-    />
-  </head>
-  <body>
-    <header>
-      <nav class="navbar">
-        <div class="brand">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5Q94FLN3');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Cómo Funciona? DTF vs. Sublimación - COPYFAST&PRINT</title>
+    <meta name="description" content="Entiende las diferencias clave entre las técnicas de impresión DTF y Sublimación para elegir la mejor opción para tu proyecto."/>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#A91D3A">
+
+    <!-- CSS y Fuentes -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">COPYFAST&PRINT</a>
+            <nav>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="diseño.html">Diseños</a></li>
+                    <li><a href="acercade.html">Acerca de</a></li>
+                    <li><a href="cotizacion.html">Cotización</a></li>
+                    <li><a href="especificaciones.html" class="active">¿Cómo Funciona?</a></li>
+                </ul>
+            </nav>
+            <div class="nav-toggle" id="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
-        <ul class="menu" id="menu">
-          <li><a href="index.html">Inicio</a></li>
-          <li><a href="diseño.html">Diseños</a></li>
-          <li><a href="acercade.html">Acerca de</a></li>
-          <li><a href="formulario.html">Cotización</a></li>
-          <li>
-            <a href="especificaciones.html" class="active">¿Como Funciona?</a>
-          </li>
-        </ul>
-        <div class="toggle_menu">
-          <i class="fas fa-bars" id="toggle_open"></i>
-          <i class="fas fa-times" id="toggle_close"></i>
-        </div>
-      </nav>
     </header>
 
     <main>
-      <section class="section-heading">
-        <h2>Especificaciones <span>Técnicas</span></h2>
-        <div class="divider"></div>
-        <p>
-          Requisitos de archivo para garantizar la mejor calidad en tu impresión
-          DTF o Sublimación
-        </p>
-      </section>
+        <div class="container">
+            <div class="section-heading">
+                <h2>¿Cómo Funciona?</h2>
+                <div class="divider"></div>
+                <p>Entiende las diferencias entre <span class="keyword">DTF</span> y <span class="keyword">Sublimación</span> para elegir la mejor opción.</p>
+            </div>
 
-      <!-- Tabs de selección -->
-      <div class="tabs-container">
-        <button class="tab-btn active" data-tab="general">
-          Requisitos Generales
-        </button>
-        <button class="tab-btn" data-tab="dtf">DTF Específico</button>
-        <button class="tab-btn" data-tab="sublimacion">
-          Sublimación Específica
-        </button>
-        <button class="tab-btn" data-tab="prendas">Prendas Compatibles</button>
-      </div>
+            <!-- Sección de Comparación -->
+            <section class="comparison-section">
+                <!-- Tarjeta DTF -->
+                <div class="tech-card dtf">
+                    <div class="tech-card-header">
+                        <i class="fas fa-tshirt"></i>
+                        <h3>DTF (Direct to Film)</h3>
+                    </div>
+                    <p class="tech-card-description">Es como una <span class="keyword">calcomanía de alta tecnología</span>. Imprimimos tu diseño en un film especial que luego transferimos a la tela con calor. Es perfecto para diseños con colores vibrantes que deben destacar en <span class="keyword">cualquier color de prenda</span>, incluyendo negro.</p>
+                    <ul class="tech-list">
+                        <li><i class="fas fa-check-circle"></i><span class="keyword">Ideal para:</span> Algodón, poliéster y mezclas.</li>
+                        <li><i class="fas fa-paint-brush"></i><span class="keyword">Tacto:</span> Ligero y flexible, se siente como una capa suave sobre la tela.</li>
+                        <li><i class="fas fa-palette"></i><span class="keyword">Colores:</span> Vibrantes y opacos, perfectos para prendas oscuras.</li>
+                        <li><i class="fas fa-award"></i><span class="keyword">Durabilidad:</span> Excelente, resiste más de 50 lavadas sin problema.</li>
+                        <li><i class="fas fa-box-open"></i><span class="keyword">Productos:</span> Camisetas, sudaderas, gorras, jeans.</li>
+                    </ul>
+                </div>
 
-      <!-- Tab: General -->
-      <div id="general" class="tab-content active">
-        <div class="specs-grid">
-          <div class="spec-card">
-            <div class="spec-icon">📐</div>
-            <h3>Resolución</h3>
-            <p><strong>Mínimo:</strong> 300 DPI</p>
-            <p><strong>Recomendado:</strong> 600 DPI</p>
-            <p class="desc">
-              Mayor DPI = Mayor detalle y nitidez en la impresión
-            </p>
-          </div>
+                <!-- Tarjeta Sublimación -->
+                <div class="tech-card sublimation">
+                    <div class="tech-card-header">
+                        <i class="fas fa-mug-hot"></i>
+                        <h3>Sublimación</h3>
+                    </div>
+                    <p class="tech-card-description">Aquí, la tinta se convierte en gas y <span class="keyword">se fusiona permanentemente</span> con las fibras de la tela o el material. El diseño se vuelve parte del producto, por lo que es <span class="keyword">imposible de sentir al tacto</span>. Funciona solo en materiales de poliéster o con recubrimiento especial.</p>
+                    <ul class="tech-list">
+                        <li><i class="fas fa-check-circle"></i><span class="keyword">Ideal para:</span> 100% Poliéster y productos especiales para sublimar.</li>
+                        <li><i class="fas fa-paint-brush"></i><span class="keyword">Tacto:</span> Cero tacto. El diseño es parte del material.</li>
+                        <li><i class="fas fa-palette"></i><span class="keyword">Colores:</span> Brillantes y permanentes, mejores en fondos blancos o claros.</li>
+                        <li><i class="fas fa-infinity"></i><span class="keyword">Durabilidad:</span> Permanente. No se agrieta ni se desvanece jamás.</li>
+                        <li><i class="fas fa-box-open"></i><span class="keyword">Productos:</span> Tazas, mousepads, ropa deportiva, cojines.</li>
+                    </ul>
+                </div>
+            </section>
 
-          <div class="spec-card">
-            <div class="spec-icon">📋</div>
-            <h3>Formatos Aceptados</h3>
-            <p>PNG (preferido con fondo transparente)</p>
-            <p>PDF (vectorial)</p>
-            <p>PSD / AI (nativos)</p>
-            <p>JPG (alta calidad)</p>
-          </div>
+            <!-- Sección de Requisitos de Archivo -->
+            <section class="file-reqs-section">
+                <div class="section-heading">
+                    <h2>Requisitos de Archivo</h2>
+                    <div class="divider"></div>
+                    <p>Para asegurar la máxima calidad, por favor envía tus diseños así:</p>
+                </div>
+                <div class="reqs-grid">
+                    <div class="req-item">
+                        <i class="fas fa-file-image"></i>
+                        <h4>Formato Ideal</h4>
+                        <p>Envíanos tu archivo en <span class="keyword">PNG con fondo transparente</span>. También aceptamos PDF, AI, PSD o JPG en alta calidad.</p>
+                    </div>
+                    <div class="req-item">
+                        <i class="fas fa-ruler-combined"></i>
+                        <h4>Resolución Mínima</h4>
+                        <p>Tu diseño debe tener al menos <span class="keyword">300 DPI</span>. Esto garantiza una impresión nítida y detallada, sin pixelarse.</p>
+                    </div>
+                    <div class="req-item">
+                        <i class="fas fa-vector-square"></i>
+                        <h4>Diseños y Textos</h4>
+                        <p>Si es posible, convierte los textos a curvas u objetos. Esto evita problemas con las fuentes al abrir tu archivo.</p>
+                    </div>
+                </div>
+            </section>
 
-          <div class="spec-card">
-            <div class="spec-icon">🎨</div>
-            <h3>Modo de Color</h3>
-            <p><strong>CMYK:</strong> Profesional</p>
-            <p><strong>RGB:</strong> Convertible</p>
-            <p class="desc">Nosotros hacemos conversión si es necesario</p>
-          </div>
+            <!-- Sección CTA -->
+            <section class="cta-section">
+                <h2>¿Ya sabes qué técnica necesitas?</h2>
+                <p>Excelente. Ahora solo tienes que enviarnos tu idea para cotizarla. Si aún tienes dudas, ¡no te preocupes! Contáctanos y te asesoramos sin costo.</p>
+                <div class="cta-buttons">
+                    <a href="cotizacion.html" class="btn-cta-primary">Cotizar mi Proyecto</a>
+                    <a href="https://wa.me/584220135069" class="btn-cta-secondary" target="_blank">Hablar con un Asesor</a>
+                </div>
+            </section>
 
-          <div class="spec-card">
-            <div class="spec-icon">📏</div>
-            <h3>Tamaño de Archivo</h3>
-            <p><strong>Máximo:</strong> 500 MB</p>
-            <p><strong>Recomendado:</strong> Máximo 50 MB</p>
-            <p class="desc">Archivos más pequeños = procesamiento más rápido</p>
-          </div>
-
-          <div class="spec-card">
-            <div class="spec-icon">📐</div>
-            <h3>Dimensiones de Impresión</h3>
-            <p><strong>Mínimo:</strong> 5cm x 5cm</p>
-            <p><strong>Máximo DTF:</strong> 40cm x 60cm</p>
-            <p><strong>Máximo Sublimación:</strong> Según producto</p>
-          </div>
-
-          <div class="spec-card">
-            <div class="spec-icon">⚡</div>
-            <h3>Margen de Seguridad</h3>
-            <p><strong>Recomendado:</strong> 1cm - 2cm</p>
-            <p class="desc">Distancia mínima del borde para evitar cortes</p>
-          </div>
         </div>
-
-        <div class="alert-box">
-          <i class="fas fa-lightbulb"></i>
-          <div>
-            <h4>Consejo Importante</h4>
-            <p>
-              Si tienes dudas sobre tu archivo, envíanoslo por WhatsApp y
-              revisamos sin compromiso. Nuestro equipo ajustará lo que sea
-              necesario.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab: DTF -->
-      <div id="dtf" class="tab-content">
-        <div class="specs-grid">
-          <div class="spec-card highlight-dtf">
-            <div class="spec-icon">🎯</div>
-            <h3>Colores Sólidos</h3>
-            <p>DTF funciona mejor con colores sólidos y definidos</p>
-            <p class="desc">
-              Evita gradientes suaves, opta por transiciones definidas
-            </p>
-          </div>
-
-          <div class="spec-card highlight-dtf">
-            <div class="spec-icon">🖼️</div>
-            <h3>Fondo Transparente</h3>
-            <p>Ideal: PNG con fondo transparente</p>
-            <p class="desc">
-              Si tienes fondo blanco, especifica para conversión
-            </p>
-          </div>
-
-          <div class="spec-card highlight-dtf">
-            <div class="spec-icon">🔍</div>
-            <h3>Detalles Finos</h3>
-            <p>DTF soporta líneas muy finas (hasta 0.5pt)</p>
-            <p class="desc">Perfecto para tipografías pequeñas y detalles</p>
-          </div>
-
-          <div class="spec-card highlight-dtf">
-            <div class="spec-icon">🌈</div>
-            <h3>Capa Blanca</h3>
-            <p>Incluimos capa blanca automática para prendas oscuras</p>
-            <p class="desc">Esto garantiza que los colores se vean vibrantes</p>
-          </div>
-        </div>
-
-        <div class="comparison-table">
-          <h3>Tabla de Especificaciones DTF</h3>
-          <table>
-            <tr>
-              <th>Característica</th>
-              <th>Requisito</th>
-            </tr>
-            <tr>
-              <td>Resolución mínima</td>
-              <td>300 DPI</td>
-            </tr>
-            <tr>
-              <td>Formato preferido</td>
-              <td>PNG con transparencia</td>
-            </tr>
-            <tr>
-              <td>Modo de color</td>
-              <td>CMYK o RGB</td>
-            </tr>
-            <tr>
-              <td>Tamaño máximo</td>
-              <td>40cm x 60cm</td>
-            </tr>
-            <tr>
-              <td>Margen mínimo</td>
-              <td>1cm del borde</td>
-            </tr>
-            <tr>
-              <td>Tipo de diseño ideal</td>
-              <td>Colores sólidos, ilustraciones</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tab: Sublimación -->
-      <div id="sublimacion" class="tab-content">
-        <div class="specs-grid">
-          <div class="spec-card highlight-sublimacion">
-            <div class="spec-icon">🌈</div>
-            <h3>Colores RGB Vibrantes</h3>
-            <p>Sublimación brilla con paletas de colores RGB</p>
-            <p class="desc">Gradientes y degradaciones se ven espectaculares</p>
-          </div>
-
-          <div class="spec-card highlight-sublimacion">
-            <div class="spec-icon">📸</div>
-            <h3>Fotografías</h3>
-            <p>Ideal para fotos de alta resolución</p>
-            <p class="desc">Calidad fotográfica garantizada en el producto</p>
-          </div>
-
-          <div class="spec-card highlight-sublimacion">
-            <div class="spec-icon">✨</div>
-            <h3>Saturación de Color</h3>
-            <p>Colores 100% saturados recomendados</p>
-            <p class="desc">Evita colores muy claros o desaturados</p>
-          </div>
-
-          <div class="spec-card highlight-sublimacion">
-            <div class="spec-icon">⚪</div>
-            <h3>Fondo Blanco</h3>
-            <p>Rellena áreas blancas con color sólido</p>
-            <p class="desc">Los espacios en blanco se verán transparentes</p>
-          </div>
-        </div>
-
-        <div class="comparison-table">
-          <h3>Tabla de Especificaciones Sublimación</h3>
-          <table>
-            <tr>
-              <th>Característica</th>
-              <th>Requisito</th>
-            </tr>
-            <tr>
-              <td>Resolución mínima</td>
-              <td>300 DPI (600 para fotos)</td>
-            </tr>
-            <tr>
-              <td>Formato preferido</td>
-              <td>PNG o JPG alta calidad</td>
-            </tr>
-            <tr>
-              <td>Modo de color</td>
-              <td>RGB preferiblemente</td>
-            </tr>
-            <tr>
-              <td>Tipo de diseño ideal</td>
-              <td>Fotos, gradientes, ilustraciones</td>
-            </tr>
-            <tr>
-              <td>Color de fondo</td>
-              <td>Llena con color (no transparencias)</td>
-            </tr>
-            <tr>
-              <td>Duración de color</td>
-              <td>Permanente, no se desvanece</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tab: Prendas -->
-      <div id="prendas" class="tab-content">
-        <div class="prendas-container">
-          <div class="prenda-item">
-            <h3>Camisetas DTF</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> 100% Algodón</li>
-              <li><i class="fas fa-check"></i> Piel de durazno</li>
-              <li><i class="fas fa-check"></i> Mezclas (mín. 65% algodón)</li>
-              <li>
-                <i class="fas fa-check"></i> Disponible en todos los colores
-              </li>
-              <li><i class="fas fa-times"></i> No: Poliéster puro</li>
-            </ul>
-          </div>
-
-          <div class="prenda-item">
-            <h3>Sudaderas DTF</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> 80% algodón mínimo</li>
-              <li><i class="fas fa-check"></i> Color negro recomendado</li>
-              <li>
-                <i class="fas fa-check"></i> Excelente para diseños grandes
-              </li>
-              <li><i class="fas fa-check"></i> Durabilidad extrema</li>
-            </ul>
-          </div>
-
-          <div class="prenda-item">
-            <h3>Gorras DTF</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> Algodón 100%</li>
-              <li>
-                <i class="fas fa-check"></i> Área de impresión: 15cm x 10cm máx.
-              </li>
-              <li>
-                <i class="fas fa-check"></i> Delantera, laterales o trasera
-              </li>
-              <li><i class="fas fa-check"></i> Durabilidad probada</li>
-            </ul>
-          </div>
-
-          <div class="prenda-item">
-            <h3>Tazas Sublimadas</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> Cerámica blanca 11oz</li>
-              <li><i class="fas fa-check"></i> Cobertura 360°</li>
-              <li><i class="fas fa-check"></i> Apta para lavavajillas</li>
-              <li><i class="fas fa-check"></i> Color permanente</li>
-            </ul>
-          </div>
-
-          <div class="prenda-item">
-            <h3>Mousepads Sublimados</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> Goma antideslizante</li>
-              <li><i class="fas fa-check"></i> Tamaño: 24cm x 20cm</li>
-              <li><i class="fas fa-check"></i> Base de tela</li>
-              <li><i class="fas fa-check"></i> Durabilidad extrema</li>
-            </ul>
-          </div>
-
-          <div class="prenda-item">
-            <h3>Cojines Sublimados</h3>
-            <ul class="prenda-specs">
-              <li><i class="fas fa-check"></i> Poliéster 100%</li>
-              <li><i class="fas fa-check"></i> Tamaño: 40cm x 40cm</li>
-              <li><i class="fas fa-check"></i> Fondo color sólido</li>
-              <li><i class="fas fa-check"></i> Relleno incluido</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="alert-box warning">
-          <i class="fas fa-exclamation-triangle"></i>
-          <div>
-            <h4>Importante</h4>
-            <p>
-              Antes de enviar tu archivo, especifica qué prenda deseas y el
-              color. Esto nos ayuda a preparar correctamente tu diseño.
-            </p>
-          </div>
-        </div>
-      </div>
     </main>
 
     <footer class="footer">
-      <div class="footer-content">
-        <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Tu Solución Integral en Impresión y Personalización</h5>
-      </div>
-      <div class="social-networks">
-        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/profile.php?id=61578120201237"
-          target="_blank"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-pinterest"></i
-        ></a>
-        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
-          ><i class="fab fa-tiktok"></i
-        ></a>
-      </div>
+        <div class="footer-content">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+          <h5>Tu Solución Integral en Impresión y Personalización</h5>
+        </div>
+        <div class="social-networks">
+          <a href="https://www.instagram.com/copyfastprint/" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="https://wa.me/584220135069" target="_blank"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.facebook.com/profile.php?id=61578120201237" target="_blank"><i class="fab fa-facebook"></i></a>
+          <a href="https://co.pinterest.com/copyfastprint/" target="_blank"><i class="fab fa-pinterest"></i></a>
+          <a href="https://www.tiktok.com/@copyfastprint" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
     </footer>
-    <script src="/js/scripts.js"></script>
-    <script src="/js/especificaciones.js"></script>
-  </body>
+
+    <!-- Scripts -->
+    <script src="/js/nav-mobile.js"></script>
+
+</body>
 </html>
