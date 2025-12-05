@@ -7,8 +7,8 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Ventas - Admin COPYFAST&PRINT</title>
-    <meta name="description" content="Panel de administración para el registro de ventas.">
+    <title>Registro de Gastos - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para el registro de gastos operativos.">
     
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
@@ -35,8 +35,8 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
-                    <li class="active"><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
-                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                    <li class="active"><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
                     <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
                     <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
                     <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
@@ -50,9 +50,9 @@
         <!-- Contenido principal -->
         <main class="admin-main-content">
             <div class="section-heading">
-                <h2>Registro de Venta</h2>
+                <h2>Registro de Gasto</h2>
                 <div class="divider"></div>
-                <p>Completa los datos para registrar una nueva venta. Los cálculos se hacen automáticamente.</p>
+                <p>Añade los detalles de un nuevo gasto operativo o de compra.</p>
             </div>
 
             <!-- Formulario y columna de información -->
@@ -60,42 +60,42 @@
                 
                 <!-- Columna del formulario -->
                 <div class="form-container">
-                    <form id="registro-ventas-form">
+                    <form id="registro-gastos-form">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="fecha">Fecha *</label>
+                                <label for="fecha">Fecha del Gasto *</label>
                                 <input type="date" id="fecha" name="fecha" required>
                             </div>
                             <div class="form-group">
-                                <label for="cliente">Cliente *</label>
-                                <select id="cliente" name="cliente" required>
-                                    <option value="">Cargando clientes...</option>
-                                </select>
-                                <input type="hidden" id="id_cliente" name="id_cliente">
+                                <label for="proveedor">Nombre del Proveedor *</label>
+                                <input type="text" id="proveedor" name="proveedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="rit">RIF / Cédula</label>
+                                <input type="text" id="rit" name="rit">
+                            </div>
+                             <div class="form-group">
+                                <label for="monto">Monto Total (Bs.) *</label>
+                                <input type="number" id="monto" name="monto" step="0.01" min="0.01" required>
                             </div>
                             <div class="form-group full-width">
-                                <label for="descripcion">Descripción del Servicio/Producto *</label>
-                                <textarea id="descripcion" name="descripcion" rows="2" required></textarea>
+                                <label for="descripcion">Descripción del Gasto *</label>
+                                <textarea id="descripcion" name="descripcion" rows="3" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="cantidad">Cantidad *</label>
-                                <input type="number" id="cantidad" name="cantidad" min="1" step="1" value="1" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="precio_unitario">Precio Unitario (Bs.) *</label>
-                                <input type="number" id="precio_unitario" name="precio_unitario" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="venta_bruta">Venta Bruta (Bs.)</label>
-                                <input type="number" id="venta_bruta" name="venta_bruta" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="abono_recibido">Abono Recibido (Bs.) *</label>
-                                <input type="number" id="abono_recibido" name="abono_recibido" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="saldo_pendiente">Saldo Pendiente (Bs.)</label>
-                                <input type="number" id="saldo_pendiente" name="saldo_pendiente" readonly>
+                                <label for="categoria">Categoría *</label>
+                                <select id="categoria" name="categoria" required>
+                                    <option value="">Selecciona una categoría</option>
+                                    <option value="Servicios Publicos">Servicios Públicos (Agua, Luz, Teléfono)</option>
+                                    <option value="Materiales y Suministros">Materiales y Suministros</option>
+                                    <option value="Alquiler">Alquiler</option>
+                                    <option value="Salarios">Salarios</option>
+                                    <option value="Mantenimiento y Reparaciones">Mantenimiento y Reparaciones</option>
+                                    <option value="Marketing y Publicidad">Marketing y Publicidad</option>
+                                    <option value="Transporte">Transporte</option>
+                                    <option value="Impuestos">Impuestos</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="metodo_pago">Método de Pago *</label>
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Venta</button>
+                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Gasto</button>
                             <button type="reset" class="btn-secondary"><i class="fas fa-trash-alt"></i> Limpiar</button>
                         </div>
                     </form>
@@ -119,12 +119,12 @@
                 <!-- Columna de información -->
                 <aside class="form-sidebar">
                     <div class="info-box">
-                        <h3><i class="fas fa-calculator"></i> Cálculos Automáticos</h3>
-                        <p>La <strong>Venta Bruta</strong> y el <strong>Saldo Pendiente</strong> se calculan solos para evitar errores manuales.</p>
+                        <h3><i class="fas fa-clipboard-check"></i> Control Financiero</h3>
+                        <p>Registrar cada gasto es fundamental para mantener un control preciso de la salud financiera del negocio.</p>
                     </div>
                     <div class="info-box">
-                        <h3><i class="fas fa-check-circle"></i> Campos Requeridos</h3>
-                        <p>Asegúrate de completar todos los campos marcados con un asterisco (*).</p>
+                        <h3><i class="fas fa-info-circle"></i> ¿Qué es RIF?</h3>
+                        <p>Es el Registro de Información Fiscal, el número de identificación tributaria en Venezuela. Puedes dejarlo en blanco si no aplica.</p>
                     </div>
                 </aside>
 
@@ -141,11 +141,11 @@
 
     <!-- Scripts -->
     <script src="/js/auth.js"></script>
-    <script src="/js/registro-ventas.js"></script>
+    <script src="/js/registro-gastos.js"></script>
     <script>
         // Lógica de sesión y cierre de sesión
         document.addEventListener('DOMContentLoaded', function() {
-            setupAuth('Ventas'); // El nombre de usuario se muestra aquí
+            setupAuth('Gastos'); // El nombre de usuario se muestra aquí
         });
     </script>
 

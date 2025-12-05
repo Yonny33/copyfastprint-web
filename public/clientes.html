@@ -1,245 +1,123 @@
+
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5Q94FLN3");
-    </script>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Clientes - COPYFAST&PRINT</title>
-    <meta
-      name="description"
-      content="Panel de registro interno para clientes de COPYFAST&PRINT."
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/favicons/android-icon-192x192.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="/favicons/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="/favicons/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="/favicons/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="/favicons/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="/favicons/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="/favicons/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="/favicons/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="/favicons/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5Q94FLN3');</script>
 
-    <link rel="stylesheet" href="/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
-    />
-  </head>
-  <body>
-    <script>
-      // Verifica la sesión antes de cargar el contenido
-      if (sessionStorage.getItem("sesionActiva") !== "true") {
-        window.location.href = "login-registro.html";
-      }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Clientes - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de clientes.">
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
 
-    <header>
-      <nav class="navbar">
-        <div class="brand">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
-        </div>
-        <ul class="menu" id="menu">
-          <li><a href="admin.html">Admin</a></li>
-          <li><a href="ventas.html">Registro Ventas</a></li>
-          <li><a href="clientes.html" class="active">Registro Clientes</a></li>
-          <li><a href="gastos.html">Registro Gastos</a></li>
-          <li><a href="#" id="btnCerrarSesion">Cerrar Sesión</a></li>
-        </ul>
-        <div class="menu-toggle" id="menu_toggle">
-          <i class="fas fa-bars" id="toggle_open"></i>
-          <i class="fas fa-times" id="toggle_close" style="display: none"></i>
-        </div>
-      </nav>
-    </header>
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <div class="container main-content">
-      <div class="form-wrapper">
-        <section class="form-section">
-          <div class="section-heading">
-            <h2>📝 Registro de Clientes</h2>
-            <p>
-              Completa los datos del cliente para registrarlo en el sistema.
-            </p>
-          </div>
+    <!-- Contenedor principal del panel de administración -->
+    <div class="admin-grid-container">
 
-          <form id="registro-clientes-form" class="form-grid">
-            <div class="form-separator full-width">
-              <h3><i class="fas fa-user"></i> Datos del Cliente</h3>
+        <!-- Barra lateral de navegación -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>COPY<span>FAST&</span>PRINT</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li class="active"><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                    <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="admin-main-content">
+            <div class="section-heading">
+                <h2>Gestión de Clientes</h2>
+                <div class="divider"></div>
+                <p>Añade nuevos clientes o actualiza la información de los existentes.</p>
             </div>
 
-            <div class="form-group">
-              <label for="cedula">Cédula / RIF *</label>
-              <input type="text" id="cedula" name="cedula" required />
-            </div>
+            <!-- Formulario y columna de información -->
+            <div class="form-layout">
+                
+                <!-- Columna del formulario -->
+                <div class="form-container">
+                    <form id="registro-clientes-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="id_cliente">Cédula / RIF *</label>
+                                <input type="text" id="id_cliente" name="id_cliente" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nombre">Nombre / Razón Social *</label>
+                                <input type="text" id="nombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono *</label>
+                                <input type="tel" id="telefono" name="telefono" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email (Opcional)</label>
+                                <input type="email" id="email" name="email">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Guardar Cliente</button>
+                            <button type="reset" class="btn-secondary"><i class="fas fa-trash-alt"></i> Limpiar</button>
+                        </div>
+                    </form>
+                </div>
 
-            <div class="form-group">
-              <label for="nombre">Nombre / Razón Social *</label>
-              <input type="text" id="nombre" name="nombre" required />
-            </div>
+                <!-- Columna de información -->
+                <aside class="form-sidebar">
+                    <div class="info-box">
+                        <h3><i class="fas fa-id-card"></i> Identificador Único</h3>
+                        <p>La <strong>Cédula o RIF</strong> es el dato clave que identifica a cada cliente de forma única en el sistema. No se puede repetir.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3><i class="fas fa-list-alt"></i> Próximamente: Lista de Clientes</h3>
+                        <p>Aquí se mostrará una tabla con todos los clientes registrados para que puedas editarlos o eliminarlos fácilmente.</p>
+                    </div>
+                </aside>
 
-            <div class="form-group">
-              <label for="telefono">Teléfono *</label>
-              <input type="tel" id="telefono" name="telefono" required />
             </div>
+        </main>
 
-            <div class="form-group">
-              <label for="email">Email (Opcional)</label>
-              <input type="email" id="email" name="email" />
-            </div>
-
-            <div class="form-group full-width">
-              <button type="submit" class="calculate-btn">
-                <i class="fas fa-save"></i> Registrar Cliente
-              </button>
-              <button type="reset" class="btn-secondary">
-                <i class="fas fa-trash-alt"></i> Limpiar Formulario
-              </button>
-            </div>
-          </form>
-        </section>
-      </div>
-
-      <div class="info-column">
-        <div class="info-box info">
-          <h3><i class="fas fa-check"></i> Campos Requeridos</h3>
-          <p>
-            Los campos marcados con un asterisco (<span class="required">*</span
-            >) son obligatorios para el registro.
-          </p>
-        </div>
-      </div>
     </div>
 
-    <footer class="footer">
-      <div class="footer-content">
-        <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Tu Solución Integral en Impresión y Personalización</h5>
-      </div>
-      <div class="social-networks">
-        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/profile.php?id=61578120201237"
-          target="_blank"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-pinterest"></i
-        ></a>
-        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
-          ><i class="fab fa-tiktok"></i
-        ></a>
-      </div>
-    </footer>
+    <!-- Overlay de carga -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
+    </div>
 
-    <a href="#" id="scroll-to-top" class="scroll-to-top">
-      <i class="fas fa-chevron-up"></i>
-    </a>
-
-    <script src="/js/scripts.js"></script>
+    <!-- Scripts -->
+    <script src="/js/auth.js"></script>
     <script src="/js/registro-clientes.js"></script>
     <script>
-      // Botón de cerrar sesión
-      document
-        .getElementById("btnCerrarSesion")
-        .addEventListener("click", function (e) {
-          e.preventDefault();
-          if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-            sessionStorage.clear();
-            window.location.href = "login-registro.html";
-          }
+        // Lógica de sesión y cierre de sesión
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAuth('Clientes');
         });
-
-      // Mostrar nombre del usuario logueado
-      const usuario = sessionStorage.getItem("usuario");
-      if (usuario) {
-        const userInfo = document.createElement("div");
-        userInfo.style.cssText =
-          "position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 1em; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 999;";
-        userInfo.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 0.5em;">
-            <i class="fas fa-user-circle" style="font-size: 1.5em; color: #c60e0f;"></i>
-            <div>
-              <strong style="display: block; color: #333;">Usuario: ${usuario}</strong>
-              <small style="color: #666;">Sesión iniciada</small>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(userInfo);
-      }
     </script>
-  </body>
+
+</body>
 </html>

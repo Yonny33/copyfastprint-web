@@ -1,125 +1,117 @@
+
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel de Administración - Fortaleza Inquebrantable</title>
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link rel="stylesheet" href="/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-  </head>
-  <body>
-    <div class="admin-container">
-      <aside class="sidebar">
-        <div class="logo">
-          <a href="index.html">
-            <img src="/img/logo.png" alt="Logo Fortaleza Inquebrantable" />
-          </a>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - COPYFAST&PRINT</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
+    <meta name="theme-color" content="#A91D3A">
+
+    <!-- CSS y Fuentes -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <a href="index.html" class="logo">COPYFAST<span>&</span>PRINT</a>
+            <nav>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="diseño.html">Diseños</a></li>
+                    <li><a href="acercade.html">Acerca de</a></li>
+                    <li><a href="cotizacion.html">Cotización</a></li>
+                    <li><a href="especificaciones.html">¿Cómo Funciona?</a></li>
+                    <li><a href="login-registro.html" class="active">Admin</a></li>
+                </ul>
+            </nav>
+            <div class="nav-toggle" id="nav-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
         </div>
-        <nav>
-          <ul>
-            <li class="active">
-              <a href="admin.html"
-                ><i class="fas fa-tachometer-alt"></i> Dashboard</a
-              >
-            </li>
-            <li>
-              <a href="ventas.html"
-                ><i class="fas fa-dollar-sign"></i> Ventas</a
-              >
-            </li>
-            <li>
-              <a href="abonos.html"
-                ><i class="fas fa-hand-holding-usd"></i> Abonos</a
-              >
-            </li>
-            <li>
-              <a href="registro-gastos.html"><i class="fas fa-receipt"></i> Gastos</a>
-            </li>
-            <li>
-              <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
-            </li>
-            <li>
-              <a href="inventario.html"
-                ><i class="fas fa-boxes"></i> Inventario</a
-              >
-            </li>
-            <li>
-              <a href="reportes.html"
-                ><i class="fas fa-chart-line"></i> Reportes</a
-              >
-            </li>
-          </ul>
-        </nav>
-        <div class="user-info">
-          <a href="#" id="btnCerrarSesion" class="logout-btn"
-            ><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a
-          >
+    </header>
+
+    <main>
+        <div class="admin-grid-container">
+            <aside class="admin-sidebar">
+                <div class="sidebar-header">
+                    <h3>Panel Admin</h3>
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li class="active"><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+                        <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                        <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                        <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                        <li><a href="inventario.html"><i class="fas fa-boxes fa-fw"></i> Inventario</a></li>
+                        <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer">
+                    <a href="#" id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</a>
+                </div>
+            </aside>
+            
+            <section class="admin-main-content">
+                <div class="section-heading">
+                    <h2>Dashboard</h2>
+                    <div class="divider"></div>
+                    <p>Resumen general de la actividad de tu negocio.</p>
+                </div>
+
+                <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                </div>
+
+                <div class="dashboard-cards-grid">
+                    <div class="admin-card">
+                        <div class="card-icon"><i class="fas fa-calendar-day"></i></div>
+                        <div class="card-content">
+                            <h4>Ventas del Día</h4>
+                            <p id="ventas-dia">Cargando...</p>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="card-content">
+                            <h4>Ingresos del Mes</h4>
+                            <p id="ingresos-mes">Cargando...</p>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                        <div class="card-content">
+                            <h4>Créditos Pendientes</h4>
+                            <p id="creditos-pendientes">Cargando...</p>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="card-content">
+                            <h4>Gastos del Día</h4>
+                            <p id="gastos-dia">Cargando...</p>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <div class="card-icon"><i class="fas fa-user-clock"></i></div>
+                        <div class="card-content">
+                            <h4>Clientes con Deuda</h4>
+                            <p id="clientes-pendientes">Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-      </aside>
-      <main class="main-content">
-        <header>
-          <h1>Dashboard</h1>
-          <p>Resumen general de la actividad de tu negocio.</p>
-        </header>
-        <div id="loading-overlay" class="loading-overlay" style="display: none">
-          <div class="spinner"></div>
-        </div>
-        <section class="dashboard-cards">
-          <div class="card">
-            <h3>Ventas del Día</h3>
-            <p id="ventas-dia">Cargando...</p>
-          </div>
-          <div class="card">
-            <h3>Ingresos del Mes</h3>
-            <p id="ingresos-mes">Cargando...</p>
-          </div>
-          <div class="card">
-            <h3>Créditos Pendientes</h3>
-            <p id="creditos-pendientes">Cargando...</p>
-          </div>
-          <div class="card">
-            <h3>Gastos del Día</h3>
-            <p id="gastos-dia">Cargando...</p>
-          </div>
-          <div class="card">
-            <h3>Clientes con Deuda</h3>
-            <p id="clientes-pendientes">Cargando...</p>
-          </div>
-        </section>
-      </main>
-      <footer class="footer">
-        <div class="footer-content">
-          <h2>COPY<span>FAST&</span>PRINT</h2>
-          <h5>Tu Solución Integral en Impresión y Personalización</h5>
-        </div>
-        <div class="social-networks">
-          <a href="https://www.instagram.com/copyfastprint/" target="_blank"
-            ><i class="fab fa-instagram"></i
-          ></a>
-          <a
-            href="https://www.facebook.com/profile.php?id=61578120201237"
-            target="_blank"
-            ><i class="fab fa-facebook"></i
-          ></a>
-          <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
-            ><i class="fab fa-pinterest"></i
-          ></a>
-          <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
-            ><i class="fab fa-tiktok"></i
-          ></a>
-        </div>
-      </footer>
-    </div>
-    <script src="/js/scripts.js"></script>
+    </main>
+
+    <script src="/js/nav-mobile.js"></script>
     <script src="/js/admin-dashboard.js"></script>
-  </body>
+</body>
 </html>

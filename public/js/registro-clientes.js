@@ -1,50 +1,54 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("registro-clientes-form");
-  if (!form) return;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registro-clientes-form');
+    const loadingOverlay = document.getElementById('loading-overlay');
 
-    const submitButton = form.querySelector('button[type="submit"]');
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
-    }
+    // URL de tu Web App de Google Apps Script (URL UNIFICADA)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxchdGk6s_IEi9y-kPG7y_2pY-Yv2QkI2yv62a_25D9l9dM4dO7L9sYvG-Jv2c_8KjW/exec';
 
-    const formData = new FormData(form);
-    const clientData = Object.fromEntries(formData.entries());
+    if (!form) return;
 
-    // Payload corregido para que coincida con el backend
-    const payload = {
-      action: "saveClient", // 1. Nombre de la acción corregido
-      data: clientData      // 2. Datos anidados en la estructura correcta
-    };
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-    try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec",
-        {
-          method: "POST",
-          body: JSON.stringify(payload), // Enviar el payload corregido
-        }
-      );
+        if(loadingOverlay) loadingOverlay.style.display = 'flex';
 
-      const result = await response.json();
+        const clientData = {
+            id_cliente: document.getElementById('id_cliente').value,
+            nombre: document.getElementById('nombre').value,
+            telefono: document.getElementById('telefono').value,
+            email: document.getElementById('email').value,
+        };
 
-      if (result.status === "success") {
-        alert("¡Cliente registrado con éxito!");
-        form.reset();
-      } else {
-        throw new Error(result.message || "No se pudo registrar el cliente.");
-      }
-    } catch (error) {
-      console.error("Error al registrar el cliente:", error);
-      alert(`Error al registrar el cliente: ${error.message}`);
-    } finally {
-      if (submitButton) {
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-save"></i> Registrar Cliente';
-      }
-    }
-  });
+        const payload = {
+            action: 'saveClient',
+            data: clientData
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8',
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if(loadingOverlay) loadingOverlay.style.display = 'none';
+
+            if (result.status === 'success') {
+                alert(result.message || '¡Cliente guardado con éxito!');
+                form.reset();
+            } else {
+                throw new Error(result.message || 'No se pudo guardar el cliente.');
+            }
+        })
+        .catch(error => {
+            if(loadingOverlay) loadingOverlay.style.display = 'none';
+            console.error('Error al guardar el cliente:', error);
+            alert(`Error: ${error.message}`);
+        });
+    });
 });
