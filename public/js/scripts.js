@@ -1,39 +1,39 @@
 // ==========================================================================
-// ===  FUNCIONALIDAD DEL MENÚ RESPONSIVE  ===
+// ===  FUNCIONALIDAD DEL MENÚ RESPONSIVE (CORREGIDO)  ===
 // ==========================================================================
 
-// Obtener elementos del DOM para el menú
-const menu = document.getElementById("menu");
-const toggleOpen = document.getElementById("toggle_open");
-const toggleClose = document.getElementById("toggle_close");
+// Obtener los elementos del DOM por sus IDs correctos
+const navLinks = document.getElementById("nav-links");
+const navToggle = document.getElementById("nav-toggle");
 
-// Verificar que los elementos del menú existen antes de añadir escuchadores
-if (menu && toggleOpen && toggleClose) {
-  // Agregar eventos a los botones de apertura y cierre
-  
-  toggleOpen.addEventListener("click", toggleMenu);
-  toggleClose.addEventListener("click", toggleMenu);
+// Verificar que los elementos existen antes de añadir escuchadores
+if (navLinks && navToggle) {
+    const navIcon = navToggle.querySelector("i"); // Obtener el elemento <i> del ícono
 
-  function toggleMenu() {
-    // Alternar la clase para mostrar/ocultar el menú
-    menu.classList.toggle("show-menu");
+    // Añadir el evento de clic al botón de la hamburguesa
+    navToggle.addEventListener("click", () => {
+        // Alternar la clase "show-menu" en la lista de enlaces para mostrarla/ocultarla
+        navLinks.classList.toggle("show-menu");
 
-    // Verificar si el menú está abierto
-    const isMenuOpen = menu.classList.contains("show-menu");
+        // Verificar si el menú está abierto
+        const isMenuOpen = navLinks.classList.contains("show-menu");
 
-    // Controlar la visibilidad de los iconos de apertura/cierre
-    toggleOpen.style.display = isMenuOpen ? "none" : "block";
-    toggleClose.style.display = isMenuOpen ? "block" : "none";
+        // Cambiar el ícono de barras a una 'X' y viceversa
+        if (isMenuOpen) {
+            navIcon.classList.remove("fa-bars");
+            navIcon.classList.add("fa-times");
+        } else {
+            navIcon.classList.remove("fa-times");
+            navIcon.classList.add("fa-bars");
+        }
 
-    // Mejorar accesibilidad: actualizar el atributo aria-expanded
-    toggleOpen.setAttribute("aria-expanded", isMenuOpen);
-    toggleClose.setAttribute("aria-expanded", isMenuOpen);
-  }
+        // Mejorar accesibilidad: actualizar el atributo aria-expanded
+        navToggle.setAttribute("aria-expanded", isMenuOpen);
+    });
 } else {
-  console.warn(
-    "Algunos elementos del menú (ID: menu, toggle_open, toggle_close) no se encontraron en el DOM."
-  );
+  console.warn("No se encontraron los elementos del menú (ID: nav-links, nav-toggle).");
 }
+
 
 // ==========================================================================
 // ===  FUNCIONALIDAD DEL CATÁLOGO DE DISEÑOS (FILTRADO)  ===
@@ -81,33 +81,37 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================================================
-// ===  FUNCIONALIDAD: BOTÓN SCROLL TO TOP  ===
+// ===  FUNCIONALIDAD DEL BOTÓN "IR ARRIBA"  ===
 // ==========================================================================
 
-const scrollToTopBtn = document.getElementById("scroll-to-top");
+// Obtener el botón del DOM
+const backToTopButton = document.getElementById("back-to-top");
 
-if (scrollToTopBtn) {
-  // 1. Mostrar/Ocultar el botón al hacer scroll
-  window.addEventListener("scroll", () => {
-    // Muestra el botón si el scroll vertical es mayor a 300px (ajustable)
-    if (window.scrollY > 300) {
-      scrollToTopBtn.classList.add("show");
+// Verificar que el botón existe antes de añadir escuchadores
+if (backToTopButton) {
+  // Función para mostrar u ocultar el botón basado en la posición del scroll
+  const scrollFunction = () => {
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+      backToTopButton.style.display = "block";
     } else {
-      scrollToTopBtn.classList.remove("show");
+      backToTopButton.style.display = "none";
     }
-  });
+  };
 
-  // 2. Desplazamiento suave al hacer clic
-  scrollToTopBtn.addEventListener("click", (e) => {
-    e.preventDefault(); // Evita el salto instantáneo del enlace '#'
+  // Escuchar el evento de scroll en la ventana
+  window.onscroll = () => {
+    scrollFunction();
+  };
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // Desplazamiento suave para PC y móvil
-    });
-  });
-} else {
-  console.warn("El elemento 'scroll-to-top' no se encontró en el DOM.");
+  // Función para volver arriba cuando se hace clic
+  const topFunction = (event) => {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
+    document.body.scrollTop = 0; // Para Safari
+    document.documentElement.scrollTop = 0; // Para Chrome, Firefox, IE y Opera
+  };
+
+  // Escuchar el evento de clic en el botón
+  backToTopButton.addEventListener("click", topFunction);
 }
 
 // =================== LIGHTBOX CON NAVEGACIÓN (CONDICIONAL) ===================
