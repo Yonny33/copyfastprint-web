@@ -29,8 +29,12 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <header class="header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">COPYFAST&PRINT</a>
+        <div class="nav-container container">
+            <div class="logo">
+                <a href="index.html" class="logo-part">COPYFAST</a>
+                <a href="login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
+                <a href="index.html" class="logo-part">PRINT</a>
+            </div>
             <nav>
                 <ul class="nav-links" id="nav-links">
                     <li><a href="index.html">Inicio</a></li>
@@ -46,131 +50,126 @@
         </div>
     </header>
 
-    <main>
-        <div class="container">
-            <div class="section-heading">
-                <h2>Solicita tu Cotización</h2>
-                <div class="divider"></div>
-                <p>Completa el formulario y te contactaremos en menos de 24 horas.</p>
-            </div>
+    <main class="container" style="padding-top: 40px; padding-bottom: 40px;">
+        <div class="section-heading">
+            <h2>Solicita tu Cotización</h2>
+            <div class="divider"></div>
+            <p>Completa el formulario y te contactaremos en menos de 24 horas.</p>
+        </div>
 
-            <div class="form-layout">
-                <div class="form-main">
-                    <form id="cotizacion-form" class="cotizacion-form" novalidate>
-                        <div class="form-grid">
-                            <!-- Columna Izquierda -->
-                            <div class="form-column">
-                                <div class="form-group">
-                                    <label for="nombre">Nombre Completo *</label>
-                                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="telefono">Teléfono / WhatsApp *</label>
-                                    <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3101234567" required>
-                                </div>
-                            </div>
-                            <!-- Columna Derecha -->
-                            <div class="form-column">
-                                <div class="form-group">
-                                    <label for="email">Email *</label>
-                                    <input type="email" id="email" name="email" placeholder="Ej: tu@correo.com" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="empresa">Empresa (Opcional)</label>
-                                    <input type="text" id="empresa" name="empresa" placeholder="Ej: Mi Negocio SAS">
-                                </div>
-                            </div>
-                        </div>
-
+        <div class="quote-layout">
+            <div class="quote-form-wrapper">
+                <form id="cotizacion-form" class="quote-form" novalidate>
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label>Tipo de Servicio *</label>
-                            <div class="radio-buttons">
-                                <label><input type="radio" name="servicio" value="dtf" required> DTF (Direct-to-Film)</label>
-                                <label><input type="radio" name="servicio" value="sublimacion" required> Sublimación</label>
-                                <label><input type="radio" name="servicio" value="otro" required> Otro / No estoy seguro</label>
-                            </div>
+                            <label for="nombre">Nombre Completo *</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej: María Rojas" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="descripcion">Describe tu Proyecto *</label>
-                            <textarea id="descripcion" name="descripcion" placeholder="Detalla aquí tu idea: qué producto deseas, colores, tamaños, ubicación de los diseños, etc." rows="5" required></textarea>
+                            <label for="telefono">Teléfono / WhatsApp *</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="Ej: 3101234567" required>
                         </div>
-
-                        <div class="form-grid">
-                            <div class="form-column">
-                                <div class="form-group">
-                                    <label for="cantidad">Cantidad de Unidades *</label>
-                                    <input type="number" id="cantidad" name="cantidad" placeholder="1" min="1" required>
-                                </div>
-                            </div>
-                            <div class="form-column">
-                               <div class="form-group">
-                                    <label for="fechaRequerida">¿Para cuándo lo necesitas? *</label>
-                                    <input type="date" id="fechaRequerida" name="fechaRequerida" required>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" placeholder="Ej: tu@correo.com" required>
                         </div>
+                        <div class="form-group">
+                            <label for="empresa">Empresa (Opcional)</label>
+                            <input type="text" id="empresa" name="empresa" placeholder="Ej: Mi Negocio Creativo">
+                        </div>
+                    </div>
 
-                        <div class="form-group file-upload">
-                            <label for="archivo">Adjunta tu diseño (Opcional, máx 10MB)</label>
-                            <input type="file" id="archivo" name="archivo" accept=".png,.jpg,.jpeg,.pdf,.ai,.psd">
+                    <div class="form-group">
+                        <label>Tipo de Servicio Requerido *</label>
+                        <div class="radio-group">
+                            <label class="radio-label"><input type="radio" name="servicio" value="dtf" required> DTF (Direct-to-Film)</label>
+                            <label class="radio-label"><input type="radio" name="servicio" value="sublimacion" required> Sublimación</label>
+                            <label class="radio-label"><input type="radio" name="servicio" value="otro" required> Otro / No estoy seguro</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Describe tu Proyecto *</label>
+                        <textarea id="descripcion" name="descripcion" placeholder="Detalla aquí tu idea: qué producto deseas (camiseta, taza, gorra...), colores, tamaños, ubicación de los diseños, etc." rows="5" required></textarea>
+                    </div>
+
+                    <div class="form-grid-half">
+                        <div class="form-group">
+                            <label for="cantidad">Cantidad de Unidades *</label>
+                            <input type="number" id="cantidad" name="cantidad" placeholder="1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaRequerida">¿Para cuándo lo necesitas? *</label>
+                            <input type="date" id="fechaRequerida" name="fechaRequerida" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="archivo">Adjunta tu diseño (Opcional, máx 10MB)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="archivo" name="archivo" accept=".png,.jpg,.jpeg,.pdf,.ai,.psd" class="file-upload-input">
                             <label for="archivo" class="file-upload-label">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <span>Seleccionar archivo...</span>
+                                <span class="file-upload-text">Seleccionar archivo...</span>
                             </label>
-                            <span class="file-name"></span>
                         </div>
-                        
-                        <div class="form-actions">
-                            <button type="submit" class="btn-submit">
-                                <i class="fas fa-paper-plane"></i> Enviar Cotización
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="form-sidebar">
-                    <div class="info-box">
-                        <h3><i class="fas fa-headset"></i> ¿Tienes Dudas?</h3>
-                        <p>Si prefieres, contáctanos directamente por WhatsApp para una asesoría más rápida.</p>
-                        <a href="https://wa.me/584220135069" class="btn-whatsapp" target="_blank">
-                            <i class="fab fa-whatsapp"></i> Chatear Ahora
-                        </a>
+                        <span class="file-name-display"></span>
                     </div>
-                    <div class="info-box">
-                        <h3><i class="fas fa-lightbulb"></i> Consejos Clave</h3>
-                        <ul class="tips-list">
-                            <li>Sé lo más detallado posible en tu descripción.</li>
-                            <li>Adjunta un archivo de referencia si lo tienes.</li>
-                            <li>Verifica tu información de contacto.</li>
-                        </ul>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <i class="fas fa-paper-plane"></i> Enviar Cotización
+                        </button>
                     </div>
-                    <div class="info-box">
-                        <h3><i class="fas fa-calculator"></i> Conversor de Divisas</h3>
-                        <p>Usa nuestra herramienta para estimar costos en tu moneda local.</p>
-                        <a href="conversor-divisas.html" class="btn-secondary">Ir a la Calculadora</a>
-                    </div>
-                </div>
+                </form>
             </div>
+
+            <aside class="quote-sidebar">
+                <div class="info-box">
+                    <h3><i class="fas fa-headset"></i> ¿Tienes Dudas?</h3>
+                    <p>Si prefieres, contáctanos directamente por WhatsApp para una asesoría más rápida y personalizada.</p>
+                    <a href="https://wa.me/584220135069" class="btn-whatsapp" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Chatear Ahora
+                    </a>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-lightbulb"></i> Consejos Clave</h3>
+                    <ul>
+                        <li>Sé lo más detallado posible en la descripción de tu proyecto.</li>
+                        <li>Adjunta un archivo de referencia (logo, diseño) si ya lo tienes.</li>
+                        <li>Verifica que tu nombre, email y teléfono estén correctos.</li>
+                    </ul>
+                </div>
+                <div class="info-box">
+                    <h3><i class="fas fa-calculator"></i> Conversor de Divisas</h3>
+                    <p>Usa nuestra herramienta para estimar costos en tu moneda local de forma sencilla.</p>
+                    <a href="conversor-divisas.html" class="btn-secondary">Ir a la Calculadora</a>
+                </div>
+            </aside>
         </div>
     </main>
 
     <footer class="footer">
-        <div class="footer-content">
-            <h2>COPY<span>FAST&</span>PRINT</h2>
-            <h5>Tu Solución Integral en Impresión y Personalización</h5>
-        </div>
-        <div class="social-networks">
-            <a href="https://www.instagram.com/copyfastprint/" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://wa.me/584220135069" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://www.facebook.com/profile.php?id=61578120201237" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="https://co.pinterest.com/copyfastprint/" target="_blank"><i class="fab fa-pinterest"></i></a>
-            <a href="https://www.tiktok.com/@copyfastprint" target="_blank"><i class="fab fa-tiktok"></i></a>
+        <div class="container">
+            <div class="footer-content">
+                <h2>COPY<span>FAST&</span>PRINT</h2>
+                <h5>Tu Solución Integral en Impresión y Personalización</h5>
+            </div>
+            <div class="social-networks">
+                <a href="https://www.instagram.com/copyfastprint/" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/584220135069" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://www.facebook.com/profile.php?id=61578120201237" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://co.pinterest.com/copyfastprint/" target="_blank"><i class="fab fa-pinterest"></i></a>
+                <a href="https://www.tiktok.com/@copyfastprint" target="_blank"><i class="fab fa-tiktok"></i></a>
+            </div>
         </div>
     </footer>
 
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
+
     <!-- Scripts -->
-    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/main.js"></script>
     <script src="/js/formulario-cotizacion.js"></script>
 
 </body>

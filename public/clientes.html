@@ -24,14 +24,9 @@
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <!-- Contenedor principal del panel de administración -->
     <div class="admin-grid-container">
-
-        <!-- Barra lateral de navegación -->
         <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <h3>COPY<span>FAST&</span>PRINT</h3>
-            </div>
+            <div class="sidebar-header"><h3>COPY<span>FAST&</span>PRINT</h3></div>
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
@@ -47,24 +42,20 @@
             </div>
         </aside>
 
-        <!-- Contenido principal -->
         <main class="admin-main-content">
             <div class="section-heading">
                 <h2>Gestión de Clientes</h2>
                 <div class="divider"></div>
-                <p>Añade nuevos clientes o actualiza la información de los existentes.</p>
+                <p>Añade nuevos clientes. El sistema asignará un ID único automáticamente.</p>
             </div>
 
-            <!-- Formulario y columna de información -->
             <div class="form-layout">
-                
-                <!-- Columna del formulario -->
                 <div class="form-container">
                     <form id="registro-clientes-form">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="id_cliente">Cédula / RIF *</label>
-                                <input type="text" id="id_cliente" name="id_cliente" required>
+                                <label for="cedula">Cédula / RIF *</label>
+                                <input type="text" id="cedula" name="cedula" required>
                             </div>
                             <div class="form-group">
                                 <label for="nombre">Nombre / Razón Social *</label>
@@ -81,41 +72,34 @@
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Guardar Cliente</button>
-                            <button type="reset" class="btn-secondary"><i class="fas fa-trash-alt"></i> Limpiar</button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Columna de información -->
                 <aside class="form-sidebar">
                     <div class="info-box">
-                        <h3><i class="fas fa-id-card"></i> Identificador Único</h3>
-                        <p>La <strong>Cédula o RIF</strong> es el dato clave que identifica a cada cliente de forma única en el sistema. No se puede repetir.</p>
+                        <h3><i class="fas fa-id-card"></i> ID Automático</h3>
+                        <p>El sistema generará un <strong>ID de cliente</strong> único y secuencial (ej: 000001) para cada nuevo registro. La Cédula/RIF se usa para evitar duplicados.</p>
                     </div>
                     <div class="info-box">
                         <h3><i class="fas fa-list-alt"></i> Próximamente: Lista de Clientes</h3>
                         <p>Aquí se mostrará una tabla con todos los clientes registrados para que puedas editarlos o eliminarlos fácilmente.</p>
                     </div>
                 </aside>
-
             </div>
         </main>
-
     </div>
 
-    <!-- Overlay de carga -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;">
       <div class="spinner"></div>
       <p>Procesando...</p>
     </div>
 
-    <!-- Scripts -->
     <script src="/js/auth.js"></script>
     <script src="/js/registro-clientes.js"></script>
     <script>
-        // Lógica de sesión y cierre de sesión
         document.addEventListener('DOMContentLoaded', function() {
-            setupAuth('Clientes');
+            setupAuth();
         });
     </script>
 

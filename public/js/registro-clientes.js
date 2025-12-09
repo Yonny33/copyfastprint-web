@@ -1,54 +1,60 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registro-clientes-form');
-    const loadingOverlay = document.getElementById('loading-overlay');
-
-    // URL de tu Web App de Google Apps Script (URL UNIFICADA)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxchdGk6s_IEi9y-kPG7y_2pY-Yv2QkI2yv62a_25D9l9dM4dO7L9sYvG-Jv2c_8KjW/exec';
-
     if (!form) return;
 
-    form.addEventListener('submit', function(e) {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+
+    const showLoading = () => loadingOverlay.style.display = 'flex';
+    const hideLoading = () => loadingOverlay.style.display = 'none';
+
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        if(loadingOverlay) loadingOverlay.style.display = 'flex';
+        const usuario = sessionStorage.getItem('usuario');
+        if (!usuario) {
+            alert('Error: Sesión no válida. Por favor, inicie sesión de nuevo.');
+            window.location.href = "login.html";
+            return;
+        }
 
-        const clientData = {
-            id_cliente: document.getElementById('id_cliente').value,
-            nombre: document.getElementById('nombre').value,
-            telefono: document.getElementById('telefono').value,
-            email: document.getElementById('email').value,
-        };
+        showLoading();
 
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        // SOLUCIÓN DEFINITIVA: La acción debe coincidir con el nombre de la función en Apps Script.
         const payload = {
             action: 'saveClient',
-            data: clientData
+            usuario: usuario, // El backend podría usarlo para logs o auditoría.
+            ...data
         };
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            credentials: 'omit',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if(loadingOverlay) loadingOverlay.style.display = 'none';
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
 
             if (result.status === 'success') {
-                alert(result.message || '¡Cliente guardado con éxito!');
+                alert(result.message || '¡Cliente registrado con éxito!');
                 form.reset();
             } else {
-                throw new Error(result.message || 'No se pudo guardar el cliente.');
+                throw new Error(result.message || 'Ocurrió un error desconocido al registrar el cliente.');
             }
-        })
-        .catch(error => {
-            if(loadingOverlay) loadingOverlay.style.display = 'none';
-            console.error('Error al guardar el cliente:', error);
+        } catch (error) {
+            console.error('Error al registrar el cliente:', error);
             alert(`Error: ${error.message}`);
-        });
-    });
+        } finally {
+            hideLoading();
+        }
+    };
+
+    form.addEventListener('submit', handleFormSubmit);
 });

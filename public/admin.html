@@ -12,106 +12,142 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
     <link rel="manifest" href="/favicons/manifest.json">
-    <meta name="theme-color" content="#A91D3A">
 
-    <!-- CSS y Fuentes -->
+    <!-- CSS y Font Awesome -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-    <header class="header">
-        <div class="nav-container">
-            <a href="index.html" class="logo">COPYFAST<span>&</span>PRINT</a>
-            <nav>
-                <ul class="nav-links" id="nav-links">
-                    <li><a href="index.html">Inicio</a></li>
-                    <li><a href="diseño.html">Diseños</a></li>
-                    <li><a href="acercade.html">Acerca de</a></li>
-                    <li><a href="cotizacion.html">Cotización</a></li>
-                    <li><a href="especificaciones.html">¿Cómo Funciona?</a></li>
-                    <li><a href="login-registro.html" class="active">Admin</a></li>
+<body class="admin-page">
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div><p>Cargando...</p>
+    </div>
+
+    <div class="admin-grid-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>COPY<span>FAST&</span>PRINT</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                    <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
                 </ul>
             </nav>
-            <div class="nav-toggle" id="nav-toggle">
-                <i class="fas fa-bars"></i>
+            <div class="sidebar-footer">
+                <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
             </div>
-        </div>
-    </header>
+        </aside>
 
-    <main>
-        <div class="admin-grid-container">
-            <aside class="admin-sidebar">
-                <div class="sidebar-header">
-                    <h3>Panel Admin</h3>
+        <main class="admin-main-content">
+            <div class="section-heading">
+                <h2>Dashboard</h2>
+                <div class="divider"></div>
+                <p>Resumen general de la actividad de tu negocio.</p>
+            </div>
+
+            <!-- Fila 1: Indicadores Clave (KPIs) en el orden solicitado -->
+            <div class="kpi-grid">
+                <!-- Ingresos y Gastos -->
+                <div class="kpi-card">
+                    <div class="kpi-icon ingresos"><i class="fas fa-chart-line"></i></div>
+                    <div class="kpi-info">
+                        <h3>Ingresos del Mes</h3>
+                        <p id="kpi-ingresos-mes">Cargando...</p>
+                    </div>
                 </div>
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li class="active"><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
-                        <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
-                        <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
-                        <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
-                        <li><a href="inventario.html"><i class="fas fa-boxes fa-fw"></i> Inventario</a></li>
-                        <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
-                    </ul>
-                </nav>
-                <div class="sidebar-footer">
-                    <a href="#" id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</a>
-                </div>
-            </aside>
-            
-            <section class="admin-main-content">
-                <div class="section-heading">
-                    <h2>Dashboard</h2>
-                    <div class="divider"></div>
-                    <p>Resumen general de la actividad de tu negocio.</p>
+                <div class="kpi-card">
+                    <div class="kpi-icon gastos"><i class="fas fa-receipt"></i></div>
+                    <div class="kpi-info">
+                        <h3>Gastos del Mes</h3>
+                        <p id="kpi-gastos-mes">Cargando...</p>
+                    </div>
                 </div>
 
-                <div id="loading-overlay" class="loading-overlay" style="display: none;">
-                    <div class="spinner"></div>
-                </div>
-
-                <div class="dashboard-cards-grid">
-                    <div class="admin-card">
-                        <div class="card-icon"><i class="fas fa-calendar-day"></i></div>
-                        <div class="card-content">
-                            <h4>Ventas del Día</h4>
-                            <p id="ventas-dia">Cargando...</p>
-                        </div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-                        <div class="card-content">
-                            <h4>Ingresos del Mes</h4>
-                            <p id="ingresos-mes">Cargando...</p>
-                        </div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="card-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                        <div class="card-content">
-                            <h4>Créditos Pendientes</h4>
-                            <p id="creditos-pendientes">Cargando...</p>
-                        </div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                        <div class="card-content">
-                            <h4>Gastos del Día</h4>
-                            <p id="gastos-dia">Cargando...</p>
-                        </div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="card-icon"><i class="fas fa-user-clock"></i></div>
-                        <div class="card-content">
-                            <h4>Clientes con Deuda</h4>
-                            <p id="clientes-pendientes">Cargando...</p>
-                        </div>
+                <!-- Clientes -->
+                <div class="kpi-card">
+                    <div class="kpi-icon clientes"><i class="fas fa-user-plus"></i></div>
+                    <div class="kpi-info">
+                        <h3>Clientes Nuevos (Mes)</h3>
+                        <p id="kpi-clientes-nuevos">Cargando...</p>
                     </div>
                 </div>
-            </section>
-        </div>
-    </main>
+                <div class="kpi-card">
+                    <div class="kpi-icon deuda"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="kpi-info">
+                        <h3>Clientes con Deudas</h3>
+                        <p id="kpi-clientes-deudas">Cargando...</p>
+                    </div>
+                </div>
 
-    <script src="/js/nav-mobile.js"></script>
-    <script src="/js/admin-dashboard.js"></script>
+                <!-- Inventario -->
+                <div class="kpi-card">
+                    <div class="kpi-icon inventario"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="kpi-info">
+                        <h3>Alertas de Inventario</h3>
+                        <p id="kpi-alertas-inventario">Cargando...</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon inventario"><i class="fas fa-boxes"></i></div>
+                    <div class="kpi-info">
+                        <h3>Items en Stock</h3>
+                        <p id="kpi-items-stock">Cargando...</p>
+                    </div>
+                </div>
+
+                <!-- Balances -->
+                <div class="kpi-card">
+                    <div class="kpi-icon balance"><i class="fas fa-balance-scale"></i></div>
+                    <div class="kpi-info">
+                        <h3>Balance Neto (Mes)</h3>
+                        <p id="kpi-balance-neto">Cargando...</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon balance"><i class="fas fa-university"></i></div>
+                    <div class="kpi-info">
+                        <h3>Balance General</h3>
+                        <p id="kpi-balance-general">Cargando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 2: Gráfico Principal -->
+            <div class="chart-container card">
+                <h3><i class="fas fa-chart-bar"></i> Ingresos vs. Gastos (Últimos 30 días)</h3>
+                <canvas id="ingresos-gastos-chart"></canvas>
+            </div>
+
+            <!-- Fila 3: Actividad Reciente -->
+            <div class="card-table">
+                    <h3><i class="fas fa-history"></i> Últimas Ventas</h3>
+                    <div class="table-responsive">
+                        <table id="tabla-ultimas-ventas">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Las filas se insertarán con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </main>
+    </div>
+
+    <!-- Scripts de la aplicación -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
 </body>
 </html>

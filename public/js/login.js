@@ -1,16 +1,14 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Si ya hay una sesión, redirigir al panel de administración
     if (sessionStorage.getItem("sesionActiva") === "true") {
         window.location.href = "admin.html";
-        return; // Detener la ejecución para evitar que el resto del código se corra innecesariamente
+        return;
     }
 
     const loginForm = document.getElementById("loginForm");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("login-error");
 
-    // URL del Web App de Google Apps Script para la autenticación
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
 
     loginForm.addEventListener("submit", async (e) => {
@@ -19,11 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
         loginButton.disabled = true;
         loginError.style.display = "none";
 
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
+        const usernameValue = document.getElementById("username").value.trim();
+        const passwordValue = document.getElementById("password").value.trim();
 
-        // Validar que los campos no estén vacíos
-        if (!username || !password) {
+        if (!usernameValue || !passwordValue) {
             loginError.textContent = "Por favor, ingresa tu usuario y contraseña.";
             loginError.style.display = "block";
             loginButton.innerHTML = 'Entrar';
@@ -31,12 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // --- CORRECCIÓN FINAL: Alineado con el script de Google ---
         const payload = {
             action: "loginUser",
-            data: {
-                username: username,
-                password: password
-            }
+            username: usernameValue,
+            password: passwordValue
         };
 
         try {
@@ -50,17 +46,21 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const result = await response.json();
+            
+            console.log("Respuesta completa del servidor:", result);
 
             if (result.status === "success") {
-                // Guardar estado de la sesión y redirigir
                 sessionStorage.setItem("sesionActiva", "true");
-                sessionStorage.setItem("usuario", result.user);
+                if (result.user) {
+                    sessionStorage.setItem("usuario", result.user);
+                }
                 window.location.href = "admin.html";
             } else {
                 throw new Error(result.message || "Usuario o contraseña incorrectos.");
             }
         } catch (error) {
-            // Mostrar mensaje de error
+            console.error("Error detallado en el proceso de login:", error);
+            
             loginError.textContent = error.message;
             loginError.style.display = "block";
             loginButton.innerHTML = 'Entrar';

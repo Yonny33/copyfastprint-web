@@ -1,170 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reportes y Análisis - COPYFAST&PRINT</title>
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="/favicons/favicon-96x96.png"
-    />
-    <link rel="stylesheet" href="/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v6.1.1/css/all.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la visualización de reportes de ventas y gastos.">
 
-    <style>
-      .admin-container {
-        max-width: 1600px;
-        margin: 2em auto;
-        padding: 0 2em;
-      }
-      .report-controls {
-        background: #f9f9f9;
-        padding: 1.5em;
-        border-radius: 12px;
-        margin-bottom: 2em;
-      }
-      .report-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 2em;
-        margin-top: 2em;
-      }
-      .chart-card {
-        background: #fff;
-        padding: 1.5em 2em;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
-      }
-      .chart-card h3 {
-        margin-top: 0;
-        font-size: 1.2em;
-        color: #555;
-      }
-      .chart-container {
-        flex-grow: 1;
-        position: relative;
-      }
-      .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        flex-direction: column;
-      }
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
 
-      .loader {
-        border: 8px solid #f3f3f3;
-        border-top: 8px solid #c60e0f;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-      }
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Librería para Gráficos (Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="admin-grid-container">
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none">
-      <div class="loader"></div>
-      <p>Generando reportes, por favor espera...</p>
+        <!-- Barra lateral de navegación -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>COPY<span>FAST&</span>PRINT</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                    <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+                    <li class="active"><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal (REESTRUCTURADO) -->
+        <main class="admin-main-content">
+            <div class="section-heading">
+                <h2>Reportes Financieros</h2>
+                <div class="divider"></div>
+                <p>Análisis visual de ventas y gastos.</p>
+            </div>
+
+            <!-- Fila Superior: Controles y Gráficos -->
+            <div class="report-grid-top">
+                <div class="card-form">
+                    <h3><i class="fas fa-filter"></i> Filtros</h3>
+                    <div class="filter-controls">
+                        <div class="form-group">
+                            <label for="start-date">Fecha de Inicio:</label>
+                            <input type="date" id="start-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date">Fecha de Fin:</label>
+                            <input type="date" id="end-date">
+                        </div>
+                        <div class="form-actions filter-buttons">
+                            <button id="filter-btn" class="btn-submit">Aplicar Filtro</button>
+                            <button id="reset-btn" class="btn-cancel">Limpiar</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="card-chart">
+                        <h3><i class="fas fa-chart-pie"></i> Total Ventas</h3>
+                        <canvas id="total-ventas-chart"></canvas>
+                    </div>
+                    <div class="card-chart">
+                        <h3><i class="fas fa-chart-pie"></i> Total Gastos</h3>
+                        <canvas id="total-gastos-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila Inferior: Tablas de Reportes -->
+            <div class="report-grid-bottom">
+                <div class="card-table">
+                    <h3 id="ventas-table-title">Últimas 10 Ventas</h3>
+                    <div id="summary-ventas" class="report-summary"></div>
+                    <div class="table-responsive">
+                        <table id="ventas-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-table">
+                    <h3 id="gastos-table-title">Últimos 10 Gastos</h3>
+                    <div id="summary-gastos" class="report-summary"></div>
+                    <div class="table-responsive">
+                        <table id="gastos-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <header>
-      <h1><i class="fas fa-chart-pie"></i> Reportes y Análisis</h1>
-    </header>
-    <nav>
-      <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-      <a href="ventas.html"
-        ><i class="fas fa-cash-register"></i> Registrar Venta</a
-      >
-      <a href="registro-gastos.html"
-        ><i class="fas fa-dollar-sign"></i> Registrar Gasto</a
-      >
-      <a href="reportes.html" class="active"
-        ><i class="fas fa-chart-line"></i> Reportes</a
-      >
-      <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
-      <a href="inventario.html"><i class="fas fa-box-open"></i> Inventario</a>
-    </nav>
-
-    <main class="admin-container">
-      <div class="section-heading">
-        <p>Visualización de métricas financieras y operativas del negocio.</p>
-      </div>
-
-      <div class="report-grid">
-        <div class="chart-card">
-          <h3>Ventas vs. Gastos (Últimos 6 Meses)</h3>
-          <div class="chart-container">
-            <canvas id="ventasGastosChart"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>Top 5 Categorías de Gasto</h3>
-          <div class="chart-container">
-            <canvas id="gastosCategoriaChart"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>Composición de Ingresos del Mes</h3>
-          <div class="chart-container">
-            <canvas id="creditosChart"></canvas>
-          </div>
-        </div>
-        <div class="chart-card">
-          <h3>Ventas por Categoría de Producto</h3>
-          <div class="chart-container">
-            <canvas id="ventasCategoriaChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </main>
-    <footer class="footer">
-      <div class="footer-content">
-        <h2>COPY<span>FAST&</span>PRINT</h2>
-        <h5>Tu Solución Integral en Impresión y Personalización</h5>
-      </div>
-      <div class="social-networks">
-        <a href="https://www.instagram.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-instagram"></i
-        ></a>
-        <a
-          href="https://www.facebook.com/profile.php?id=61578120201237"
-          target="_blank"
-          ><i class="fab fa-facebook"></i
-        ></a>
-        <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
-          ><i class="fab fa-pinterest"></i
-        ></a>
-        <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
-          ><i class="fab fa-tiktok"></i
-        ></a>
-      </div>
-    </footer>
-
-    <script src="js/scripts.js"></script>
-    <script src="js/reportes.js"></script>
-  </body>
+    <!-- Overlay y Scripts -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div><p>Procesando...</p>
+    </div>
+    <script src="/js/auth.js"></script>
+    <script src="/js/reportes.js"></script>
+</body>
 </html>

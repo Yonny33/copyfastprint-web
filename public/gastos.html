@@ -111,7 +111,6 @@
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Gasto</button>
-                            <button type="reset" class="btn-secondary"><i class="fas fa-trash-alt"></i> Limpiar</button>
                         </div>
                     </form>
                 </div>
@@ -143,9 +142,10 @@
     <script src="/js/auth.js"></script>
     <script src="/js/registro-gastos.js"></script>
     <script>
-        // Lógica de sesión y cierre de sesión
         document.addEventListener('DOMContentLoaded', function() {
-            setupAuth('Gastos'); // El nombre de usuario se muestra aquí
+            // Llama a la función de autenticación global.
+            // Esta función se encarga de verificar la sesión y configurar el botón de cierre de sesión.
+            setupAuth();
         });
     </script>
 

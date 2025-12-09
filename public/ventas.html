@@ -1,15 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5Q94FLN3');</script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Ventas - Admin COPYFAST&PRINT</title>
-    <meta name="description" content="Panel de administración para el registro de ventas.">
-    
+    <meta name="description" content="Panel de administración para el registro de ventas y control de saldos.">
+
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
@@ -21,9 +17,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-
     <!-- Contenedor principal del panel de administración -->
     <div class="admin-grid-container">
 
@@ -52,18 +45,16 @@
             <div class="section-heading">
                 <h2>Registro de Venta</h2>
                 <div class="divider"></div>
-                <p>Completa los datos para registrar una nueva venta. Los cálculos se hacen automáticamente.</p>
+                <p>Añade los detalles de una nueva venta y su estado de pago.</p>
             </div>
 
-            <!-- Formulario y columna de información -->
+            <!-- Layout del formulario -->
             <div class="form-layout">
-                
-                <!-- Columna del formulario -->
                 <div class="form-container">
                     <form id="registro-ventas-form">
-                        <div class="form-grid">
+                        <div class="form-grid-col-2">
                             <div class="form-group">
-                                <label for="fecha">Fecha *</label>
+                                <label for="fecha">Fecha de Venta *</label>
                                 <input type="date" id="fecha" name="fecha" required>
                             </div>
                             <div class="form-group">
@@ -71,30 +62,35 @@
                                 <select id="cliente" name="cliente" required>
                                     <option value="">Cargando clientes...</option>
                                 </select>
-                                <input type="hidden" id="id_cliente" name="id_cliente">
                             </div>
-                            <div class="form-group full-width">
-                                <label for="descripcion">Descripción del Servicio/Producto *</label>
-                                <textarea id="descripcion" name="descripcion" rows="2" required></textarea>
-                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="producto">Producto *</label>
+                            <select id="producto" name="producto" required>
+                                <option value="">Cargando productos...</option>
+                            </select>
+                        </div>
+                        <div class="form-grid-col-4">
                             <div class="form-group">
                                 <label for="cantidad">Cantidad *</label>
-                                <input type="number" id="cantidad" name="cantidad" min="1" step="1" value="1" required>
+                                <input type="number" id="cantidad" name="cantidad" value="1" min="0" required>
                             </div>
                             <div class="form-group">
-                                <label for="precio_unitario">Precio Unitario (Bs.) *</label>
-                                <input type="number" id="precio_unitario" name="precio_unitario" step="0.01" min="0.01" required>
+                                <label for="precio_unitario">Precio Unitario *</label>
+                                <input type="number" id="precio_unitario" name="precio_unitario" min="0" step="0.01" required>
                             </div>
                             <div class="form-group">
-                                <label for="venta_bruta">Venta Bruta (Bs.)</label>
+                                <label for="venta_bruta">Venta Bruta</label>
                                 <input type="number" id="venta_bruta" name="venta_bruta" readonly>
                             </div>
                             <div class="form-group">
-                                <label for="abono_recibido">Abono Recibido (Bs.) *</label>
-                                <input type="number" id="abono_recibido" name="abono_recibido" step="0.01" min="0" required>
+                                <label for="abono_recibido">Abono Recibido *</label>
+                                <input type="number" id="abono_recibido" name="abono_recibido" min="0" step="0.01" required>
                             </div>
-                            <div class="form-group">
-                                <label for="saldo_pendiente">Saldo Pendiente (Bs.)</label>
+                        </div>
+                         <div class="form-grid-col-2">
+                             <div class="form-group">
+                                <label for="saldo_pendiente">Saldo Pendiente</label>
                                 <input type="number" id="saldo_pendiente" name="saldo_pendiente" readonly>
                             </div>
                             <div class="form-group">
@@ -111,23 +107,23 @@
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Venta</button>
-                            <button type="reset" class="btn-secondary"><i class="fas fa-trash-alt"></i> Limpiar</button>
                         </div>
                     </form>
                 </div>
-
-                <!-- Columna de información -->
-                <aside class="form-sidebar">
+                 <aside class="form-sidebar">
                     <div class="info-box">
                         <h3><i class="fas fa-calculator"></i> Cálculos Automáticos</h3>
-                        <p>La <strong>Venta Bruta</strong> y el <strong>Saldo Pendiente</strong> se calculan solos para evitar errores manuales.</p>
+                        <p>La <strong>Venta Bruta</strong> y el <strong>Saldo Pendiente</strong> se calculan solos para evitar errores.</p>
+                    </div>
+                     <div class="info-box">
+                        <h3><i class="fas fa-box-open"></i> Productos</h3>
+                        <p>Selecciona un producto de la lista. El stock se descontará automáticamente al registrar la venta. Si no encuentras un producto, añádelo en la sección "Inventario".</p>
                     </div>
                     <div class="info-box">
-                        <h3><i class="fas fa-check-circle"></i> Campos Requeridos</h3>
-                        <p>Asegúrate de completar todos los campos marcados con un asterisco (*).</p>
+                        <h3><i class="fas fa-users"></i> Clientes</h3>
+                        <p>Si un cliente no aparece en la lista, debes añadirlo primero desde la sección "Clientes" para poder asociarle una venta.</p>
                     </div>
                 </aside>
-
             </div>
         </main>
 
@@ -139,15 +135,8 @@
       <p>Procesando...</p>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts. Se añade un parámetro para evitar problemas de caché. -->
     <script src="/js/auth.js"></script>
-    <script src="/js/registro-ventas.js"></script>
-    <script>
-        // Lógica de sesión y cierre de sesión
-        document.addEventListener('DOMContentLoaded', function() {
-            setupAuth('Ventas'); // El nombre de usuario se muestra aquí
-        });
-    </script>
-
+    <script src="/js/ventas.js?v=2.0"></script>
 </body>
 </html>

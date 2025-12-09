@@ -1,71 +1,79 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registro-gastos-form');
+    if (!form) return;
+
     const loadingOverlay = document.getElementById('loading-overlay');
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
 
-    // URL de tu Web App de Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxchdGk6s_IEi9y-kPG7y_2pY-Yv2QkI2yv62a_25D9l9dM4dO7L9sYvG-Jv2c_8KjW/exec';
+    const showLoading = () => loadingOverlay.style.display = 'flex';
+    const hideLoading = () => loadingOverlay.style.display = 'none';
 
-    // Asignar la fecha actual al campo de fecha por defecto
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
+    const setInitialDate = () => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const formattedToday = `${yyyy}-${mm}-${dd}`;
+        const dateInput = document.getElementById('fecha');
+        if (dateInput) {
+            dateInput.value = formattedToday;
+        }
+    };
 
-    form.addEventListener('submit', function(e) {
+    const handleFormSubmit = async (e) => {
         e.preventDefault();
+        showLoading();
 
         const usuario = sessionStorage.getItem('usuario');
         if (!usuario) {
-            alert('Error: No se ha encontrado información del usuario. Por favor, inicie sesión de nuevo.');
+            alert('La sesión ha caducado. Por favor, inicie sesión de nuevo.');
+            window.location.href = 'login.html';
+            hideLoading();
             return;
         }
 
-        // Mostrar overlay de carga
-        if(loadingOverlay) loadingOverlay.style.display = 'flex';
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-        // Construir el objeto de datos del formulario
-        const formData = {
+        // **SOLUCIÓN DEFINITIVA: Combinar los datos del formulario en el nivel superior del payload**
+        const payload = {
             action: 'registrarGasto',
-            fecha: document.getElementById('fecha').value,
-            proveedor: document.getElementById('proveedor').value,
-            rit: document.getElementById('rit').value,
-            monto: document.getElementById('monto').value,
-            descripcion: document.getElementById('descripcion').value,
-            categoria: document.getElementById('categoria').value,
-            metodo_pago: document.getElementById('metodo_pago').value,
-            usuario: usuario
+            usuario: usuario,
+            ...data // Utilizar el spread operator para incluir todos los campos del formulario
         };
 
-        // Enviar los datos a Google Apps Script
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors', 
-            credentials: 'omit', 
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Ocultar overlay de carga
-            if(loadingOverlay) loadingOverlay.style.display = 'none';
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                },
+                body: JSON.stringify(payload)
+            });
 
-            if (data.status === 'success') {
+            // Primero, verificar si la respuesta es OK. Si no, algo falló a nivel de red o servidor.
+            if (!response.ok) {
+                throw new Error(`Error de red o servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
                 alert('¡Gasto registrado con éxito!');
                 form.reset();
-                // Re-asignar la fecha actual después de limpiar el formulario
-                document.getElementById('fecha').value = `${yyyy}-${mm}-${dd}`;
+                setInitialDate();
             } else {
-                throw new Error(data.message || 'Ocurrió un error desconocido.');
+                throw new Error(result.message || 'Ocurrió un error desconocido al procesar el gasto.');
             }
-        })
-        .catch(error => {
-            if(loadingOverlay) loadingOverlay.style.display = 'none';
-            console.error('Error al registrar el gasto:', error);
-            alert(`Error al registrar el gasto: ${error.message}`);
-        });
-    });
+        } catch (error) {
+            console.error('Error detallado al registrar el gasto:', error);
+            alert(`Se produjo un error crítico. Por favor, revisa la consola para más detalles. Mensaje: ${error.message}`);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    setInitialDate();
+    form.addEventListener('submit', handleFormSubmit);
 });

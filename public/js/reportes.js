@@ -1,160 +1,220 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const loadingOverlay = document.getElementById("loading-overlay");
+document.addEventListener('DOMContentLoaded', function() {
+    // --- CONSTANTES Y URL DEL SCRIPT ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
 
-  // --- VERIFICACIÓN DE SESIÓN Y CERRAR SESIÓN ---
-  if (sessionStorage.getItem("sesionActiva") !== "true") {
-    window.location.href = "login-registro.html";
-    return;
-  }
+    // --- ELEMENTOS DEL DOM ---
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
+    const filterBtn = document.getElementById('filter-btn');
+    const resetBtn = document.getElementById('reset-btn');
 
-  const btnCerrarSesion = document.getElementById("btnCerrarSesion");
-  if (btnCerrarSesion) {
-    btnCerrarSesion.addEventListener("click", (e) => {
-      e.preventDefault();
-      sessionStorage.clear();
-      window.location.href = "login-registro.html";
-    });
-  }
+    // Tablas y resúmenes
+    const ventasTableBody = document.querySelector('#ventas-table tbody');
+    const gastosTableBody = document.querySelector('#gastos-table tbody');
+    const ventasTableTitle = document.getElementById('ventas-table-title');
+    const gastosTableTitle = document.getElementById('gastos-table-title');
+    const summaryVentas = document.getElementById('summary-ventas');
+    const summaryGastos = document.getElementById('summary-gastos');
 
-  // --- URL DEL SCRIPT DE GOOGLE ---
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+    // Contextos de los gráficos
+    const ventasChartCtx = document.getElementById('total-ventas-chart')?.getContext('2d');
+    const gastosChartCtx = document.getElementById('total-gastos-chart')?.getContext('2d');
 
-  // --- FUNCIONES AUXILIARES ---
-  const formatVES = (value) => {
-    const number = parseFloat(value);
-    return isNaN(number)
-      ? "Bs. 0.00"
-      : `Bs. ${number.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
+    // --- ALMACENES DE DATOS Y GRÁFICOS ---
+    let originalVentas = [];
+    let originalGastos = [];
+    let totalVentasChart = null;
+    let totalGastosChart = null;
 
-  const getMesNombre = (dateString) => {
-      const date = new Date(dateString + 'T00:00:00'); // Asegurar que se interprete como local
-      return date.toLocaleString('es-VE', { month: 'short', year: '2-digit' });
-  };
-
-  // --- PROCESAMIENTO DE DATOS PARA GRÁFICOS ---
-  function procesarDatosParaReportes(ventas, gastos) {
-    const hoy = new Date();
-    const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0');
-    
-    // Datos para Ventas vs Gastos (6 meses)
-    const dataMensual = new Map();
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
-        const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-        dataMensual.set(key, { label: getMesNombre(key + '-01'), ventas: 0, gastos: 0 });
-    }
-
-    ventas.forEach(v => {
-        const fecha = v.fecha.substring(0, 7);
-        if (dataMensual.has(fecha)) {
-            dataMensual.get(fecha).ventas += parseFloat(v.venta_bruta_ves) || 0;
-        }
-    });
-
-    gastos.forEach(g => {
-        const fecha = g.fecha.substring(0, 7);
-        if (dataMensual.has(fecha)) {
-            dataMensual.get(fecha).gastos += parseFloat(g.monto_total_ves) || 0;
-        }
-    });
-
-    const reporteMensual = {
-        labels: Array.from(dataMensual.values()).map(d => d.label),
-        ventas: Array.from(dataMensual.values()).map(d => d.ventas),
-        gastos: Array.from(dataMensual.values()).map(d => d.gastos),
+    // --- FUNCIONES AUXILIARES ---
+    const showLoading = (show) => {
+        if (loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none';
     };
 
-    // Datos para Top 5 Categorías de Gasto
-    const categoriasGastos = new Map();
-    gastos.forEach(g => {
-        const categoria = g.concepto || "Sin Categoría";
-        const monto = parseFloat(g.monto_total_ves) || 0;
-        categoriasGastos.set(categoria, (categoriasGastos.get(categoria) || 0) + monto);
-    });
-    const topGastos = [...categoriasGastos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-    // Datos para Composición de Ingresos del Mes
-    let ingresosMes = 0;
-    let creditosMes = 0;
-    ventas.forEach(v => {
-        if (v.fecha.substring(0, 7) === mesActual) {
-            ingresosMes += parseFloat(v.abono_ves) || 0;
-            creditosMes += parseFloat(v.saldo_pendiente_ves) || 0;
-        }
-    });
-
-    // Datos para Ventas por Categoría
-    const categoriasVentas = new Map();
-    ventas.forEach(v => {
-        const categoria = v.descripcion || "No especificado";
-        const monto = parseFloat(v.venta_bruta_ves) || 0;
-        categoriasVentas.set(categoria, (categoriasVentas.get(categoria) || 0) + monto);
-    });
-    const topVentasCategoria = [...categoriasVentas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
-
-    return {
-        reporteMensual,
-        topGastos: { labels: topGastos.map(g => g[0]), valores: topGastos.map(g => g[1]) },
-        composicionIngresos: { ingresos: ingresosMes, creditos: creditosMes },
-        ventasPorCategoria: { labels: topVentasCategoria.map(v => v[0]), valores: topVentasCategoria.map(v => v[1]) }
+    const formatCurrency = (amount) => {
+        return `Bs. ${Number(amount).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
-  }
 
-  // --- RENDERIZADO DE GRÁFICOS ---
-  const renderChart = (ctx, type, data, options) => new Chart(ctx, { type, data, options });
-  const tooltipLabel = (context) => `${context.dataset.label}: ${formatVES(context.parsed.y)}`;
-  const pieTooltipLabel = (context) => `${context.label}: ${formatVES(context.parsed)}`;
-  const CHART_COLORS = [ '#C60E0F', '#FF9800', '#2196F3', '#4CAF50', '#9C27B0', '#F44336', '#00BCD4' ];
+    const parseDate = (dateString) => {
+        if (!dateString) return null;
+        const date = new Date(dateString.split(' ')[0] + 'T00:00:00');
+        return isNaN(date.getTime()) ? null : date;
+    };
 
-  // --- FUNCIÓN PRINCIPAL DE CARGA ---
-  async function cargarYRenderizarReportes() {
-    if (loadingOverlay) loadingOverlay.style.display = "flex";
+    // --- FUNCIONES DE GRÁFICOS ---
+    const createTotalChart = (ctx, label, totalAmount, color) => {
+        if (!ctx) return null;
 
-    try {
-      const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getReportData`);
-      if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
-      
-      const result = await response.json();
-      if (result.status !== "success") throw new Error(result.message);
+        // Destruir el gráfico anterior si existe para evitar solapamientos
+        if (ctx.chart) {
+            ctx.chart.destroy();
+        }
 
-      const { ventas, gastos } = result.data;
-      const datos = procesarDatosParaReportes(ventas, gastos);
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [label],
+                datasets: [{
+                    data: [totalAmount > 0 ? totalAmount : 1], // Se pone 1 si es 0 para que el gráfico no se rompa
+                    backgroundColor: [totalAmount > 0 ? color : '#E0E0E0'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    title: {
+                        display: true,
+                        text: formatCurrency(totalAmount),
+                        position: 'bottom',
+                        align: 'center',
+                        font: { size: 16, weight: 'bold' },
+                        color: '#333'
+                    }
+                }
+            }
+        });
+        ctx.chart = chart; // Guardar la referencia en el contexto
+        return chart;
+    };
 
-      // 1. Ventas vs Gastos
-      renderChart(document.getElementById("ventasGastosChart"), 'line', {
-          labels: datos.reporteMensual.labels,
-          datasets: [
-              { label: "Ventas", data: datos.reporteMensual.ventas, borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.1)', tension: 0.1 },
-              { label: "Gastos", data: datos.reporteMensual.gastos, borderColor: '#C60E0F', backgroundColor: 'rgba(198, 14, 15, 0.1)', tension: 0.1 }
-          ]
-      }, { responsive: true, plugins: { tooltip: { callbacks: { label: tooltipLabel } } } });
+    // --- FUNCIONES DE RENDERIZADO DE TABLAS ---
+    const renderVentasTable = (ventas) => {
+        if (!ventasTableBody) return;
+        ventasTableBody.innerHTML = '';
+        let totalPeriodo = 0;
 
-      // 2. Top 5 Gastos
-      renderChart(document.getElementById("gastosCategoriaChart"), 'bar', {
-          labels: datos.topGastos.labels,
-          datasets: [{ label: "Monto de Gasto", data: datos.topGastos.valores, backgroundColor: CHART_COLORS }]
-      }, { responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
+        if (!ventas || ventas.length === 0) {
+            ventasTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay ventas para mostrar.</td></tr>';
+        } else {
+            ventas.forEach(v => {
+                totalPeriodo += parseFloat(v.venta_bruta) || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${v.fecha ? v.fecha.split(' ')[0] : 'N/A'}</td>
+                    <td>${v.nombre || 'Cliente General'}</td>
+                    <td>${formatCurrency(v.venta_bruta)}</td>
+                    <td><span class="status ${String(v.estado_pedido).toLowerCase()}">${v.estado_pedido || 'N/A'}</span></td>
+                `;
+                ventasTableBody.appendChild(row);
+            });
+        }
+        if (summaryVentas) summaryVentas.textContent = `Total del Periodo: ${formatCurrency(totalPeriodo)}`;
+    };
 
-      // 3. Composición Ingresos
-      renderChart(document.getElementById("creditosChart"), 'doughnut', {
-          labels: ['Ingresos Cobrados (Mes)', 'Créditos por Cobrar (Mes)'],
-          datasets: [{ data: [datos.composicionIngresos.ingresos, datos.composicionIngresos.creditos], backgroundColor: ['#4CAF50', '#FF9800'] }]
-      }, { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
+    const renderGastosTable = (gastos) => {
+        if (!gastosTableBody) return;
+        gastosTableBody.innerHTML = '';
+        let totalPeriodo = 0;
 
-      // 4. Ventas por Categoría
-      renderChart(document.getElementById("ventasCategoriaChart"), 'pie', {
-          labels: datos.ventasPorCategoria.labels,
-          datasets: [{ label: "Ventas", data: datos.ventasPorCategoria.valores, backgroundColor: CHART_COLORS }]
-      }, { responsive: true, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: pieTooltipLabel } } } });
+        if (!gastos || gastos.length === 0) {
+            gastosTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay gastos para mostrar.</td></tr>';
+        } else {
+            gastos.forEach(g => {
+                totalPeriodo += parseFloat(g.monto) || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${g.fecha ? g.fecha.split(' ')[0] : 'N/A'}</td>
+                    <td>${g.descripcion || 'N/A'}</td>
+                    <td>${g.categoria || 'N/A'}</td>
+                    <td>${formatCurrency(g.monto)}</td>
+                `;
+                gastosTableBody.appendChild(row);
+            });
+        }
+        if (summaryGastos) summaryGastos.textContent = `Total del Periodo: ${formatCurrency(totalPeriodo)}`;
+    };
 
-    } catch (error) {
-      console.error("Error al cargar los reportes:", error);
-      document.querySelector(".admin-container").innerHTML = `<p style='color: red; text-align: center;'>Error al cargar reportes: ${error.message}</p>`;
-    } finally {
-      if (loadingOverlay) loadingOverlay.style.display = "none";
+    // --- LÓGICA DE FILTRADO Y CARGA ---
+    const applyFilters = () => {
+        const startDate = startDateInput.value ? parseDate(startDateInput.value) : null;
+        const endDate = endDateInput.value ? parseDate(endDateInput.value) : null;
+        if (endDate) endDate.setHours(23, 59, 59, 999);
+
+        if (!startDate || !endDate) {
+            alert("Por favor, selecciona una fecha de inicio y una de fin.");
+            return;
+        }
+
+        const filteredVentas = originalVentas.filter(v => {
+            const vDate = parseDate(v.fecha);
+            return vDate && vDate >= startDate && vDate <= endDate;
+        });
+
+        const filteredGastos = originalGastos.filter(g => {
+            const gDate = parseDate(g.fecha);
+            return gDate && gDate >= startDate && gDate <= endDate;
+        });
+
+        if(ventasTableTitle) ventasTableTitle.textContent = "Ventas del Periodo";
+        if(gastosTableTitle) gastosTableTitle.textContent = "Gastos del Periodo";
+        renderVentasTable(filteredVentas);
+        renderGastosTable(filteredGastos);
+    };
+
+    const resetFilters = () => {
+        if(startDateInput) startDateInput.value = '';
+        if(endDateInput) endDateInput.value = '';
+
+        // Ordenar por fecha descendente para obtener los últimos
+        const sortedVentas = [...originalVentas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        const sortedGastos = [...originalGastos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        const ultimas10Ventas = sortedVentas.slice(0, 10);
+        const ultimos10Gastos = sortedGastos.slice(0, 10);
+
+        if(ventasTableTitle) ventasTableTitle.textContent = "Últimas 10 Ventas";
+        if(gastosTableTitle) gastosTableTitle.textContent = "Últimos 10 Gastos";
+        renderVentasTable(ultimas10Ventas);
+        renderGastosTable(ultimos10Gastos);
+    };
+
+    const loadReportData = async () => {
+        showLoading(true);
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getReportData`);
+            if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+            
+            const result = await response.json();
+            if (result.status === 'success' && result.data) {
+                originalVentas = result.data.ventas || [];
+                originalGastos = result.data.gastos || [];
+                
+                // 1. Crear los gráficos con los totales absolutos
+                const totalVentasAbsoluto = originalVentas.reduce((sum, v) => sum + (parseFloat(v.venta_bruta) || 0), 0);
+                const totalGastosAbsoluto = originalGastos.reduce((sum, g) => sum + (parseFloat(g.monto) || 0), 0);
+                totalVentasChart = createTotalChart(ventasChartCtx, 'Ventas Totales', totalVentasAbsoluto, '#28a745');
+                totalGastosChart = createTotalChart(gastosChartCtx, 'Gastos Totales', totalGastosAbsoluto, '#dc3545');
+
+                // 2. Cargar las tablas con los últimos 10 registros
+                resetFilters();
+            } else {
+                throw new Error(result.message || 'El formato de respuesta del servidor no es válido.');
+            }
+        } catch (error) {
+            console.error('Error fatal al cargar los reportes:', error);
+            alert(`No se pudieron cargar los datos de los reportes: ${error.message}`);
+            if (summaryVentas) summaryVentas.textContent = 'Error al cargar.';
+            if (summaryGastos) summaryGastos.textContent = 'Error al cargar.';
+        } finally {
+            showLoading(false);
+        }
+    };
+
+    // --- ASIGNACIÓN DE EVENTOS ---
+    if (filterBtn) filterBtn.addEventListener('click', applyFilters);
+    if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+
+    // --- INICIALIZACIÓN ---
+    if (ventasChartCtx && gastosChartCtx && ventasTableBody && gastosTableBody) {
+        loadReportData();
+    } else {
+        console.error("Algunos elementos clave (gráficos o tablas) no se encontraron en el DOM. El script no se ejecutará.");
     }
-  }
-
-  cargarYRenderizarReportes();
 });
