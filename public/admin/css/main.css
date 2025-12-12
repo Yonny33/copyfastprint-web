@@ -1,0 +1,522 @@
+/* =============================================================================
+   1. ADMIN - VARIABLES Y ESTILOS GLOBALES
+   ============================================================================= */
+:root {
+    --admin-primary-color: #A91D3A; /* Rojo oscuro del logo */
+    --admin-accent-color: #C73852;
+    --admin-background-dark: #1F2937; /* Azul oscuro/gris */
+    --admin-background-light: #374151; /* Gris más claro para tarjetas */
+    --admin-text-primary: #F9FAFB; /* Blanco hueso */
+    --admin-text-secondary: #D1D5DB; /* Gris claro */
+    --admin-border-color: #4B5563;
+    --success-color: #10B981; /* Verde */
+    --error-color: #EF4444;   /* Rojo */
+    --warning-color: #F59E0B; /* Ámbar */
+}
+
+body.admin-page, body.login-page-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--admin-background-dark);
+    color: var(--admin-text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* =============================================================================
+   2. ADMIN - LAYOUT PRINCIPAL (GRID)
+   ============================================================================= */
+.admin-grid-container {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: 1fr;
+    min-height: 100vh;
+}
+
+/* =============================================================================
+   3. ADMIN - BARRA LATERAL
+   ============================================================================= */
+.admin-sidebar {
+    background-color: var(--admin-background-light);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0;
+    border-right: 1px solid var(--admin-border-color);
+}
+
+.sidebar-header {
+    text-align: center;
+    padding: 0 1rem 1.5rem;
+    border-bottom: 1px solid var(--admin-border-color);
+}
+
+.sidebar-header h3 {
+    font-size: 1.8rem;
+    color: var(--admin-text-primary);
+    font-weight: 700;
+}
+
+.sidebar-header span {
+    color: var(--admin-primary-color);
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    margin-top: 1.5rem;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 1.5rem;
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--admin-text-primary);
+}
+
+.sidebar-nav .active a {
+    background-color: var(--admin-primary-color);
+    color: var(--admin-text-primary);
+    border-left-color: var(--admin-accent-color);
+}
+
+.sidebar-nav i.fa-fw {
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--admin-border-color);
+}
+
+.logout-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+    padding: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.logout-btn:hover {
+    background-color: var(--error-color);
+    color: var(--admin-text-primary);
+}
+
+/* =============================================================================
+   4. ADMIN - CONTENIDO PRINCIPAL
+   ============================================================================= */
+.admin-main-content {
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+.section-heading {
+    margin-bottom: 2.5rem;
+}
+
+.section-heading h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+}
+
+.section-heading .divider {
+    width: 50px;
+    height: 3px;
+    background-color: var(--admin-primary-color);
+    margin: 0.5rem 0 1rem;
+}
+
+.section-heading p {
+    color: var(--admin-text-secondary);
+    font-size: 1.1rem;
+    max-width: 700px;
+}
+
+/* =============================================================================
+   5. ADMIN - TARJETAS DE INDICADORES (KPI)
+   ============================================================================= */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.kpi-card {
+    background-color: var(--admin-background-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--admin-border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.kpi-icon {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1.5rem;
+}
+
+/* Colores específicos para cada icono de KPI */
+.kpi-icon.ingresos { background-color: rgba(16, 185, 129, 0.2); color: #10B981; }
+.kpi-icon.gastos { background-color: rgba(239, 68, 68, 0.2); color: #EF4444; }
+.kpi-icon.clientes { background-color: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+.kpi-icon.deuda { background-color: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+.kpi-icon.inventario { background-color: rgba(139, 92, 246, 0.2); color: #8B5CF6; }
+.kpi-icon.balance { background-color: rgba(99, 102, 241, 0.2); color: #6366F1; }
+
+.kpi-info h3 {
+    font-size: 1rem;
+    color: var(--admin-text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-info p {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+}
+
+/* =============================================================================
+   6. ADMIN - GRÁFICOS Y TABLAS
+   ============================================================================= */
+.card, .card-table, .card-form {
+    background-color: var(--admin-background-light);
+    border-radius: 8px;
+    padding: 2rem;
+    border: 1px solid var(--admin-border-color);
+    margin-bottom: 2rem;
+}
+
+.card h3, .card-table h3, .card-form h3 {
+    font-size: 1.4rem;
+    color: var(--admin-text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.chart-container canvas {
+    max-height: 400px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--admin-border-color);
+}
+
+table th {
+    background-color: #374151;
+    color: var(--admin-text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+table td {
+    color: var(--admin-text-primary);
+}
+
+table tbody tr:hover {
+    background-color: #4B5563;
+}
+
+/* =============================================================================
+   7. ADMIN - FORMULARIOS
+   ============================================================================= */
+.form-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.form-grid-col-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-grid-col-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--admin-background-dark);
+    border: 1px solid var(--admin-border-color);
+    border-radius: 6px;
+    color: var(--admin-text-primary);
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--admin-primary-color);
+    box-shadow: 0 0 0 3px rgba(169, 29, 58, 0.5);
+}
+
+.btn-submit {
+    background-color: var(--admin-primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: var(--admin-accent-color);
+}
+/* =============================================================================
+   8. ADMIN - PÁGINA DE LOGIN
+   ============================================================================= */
+.login-page-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--admin-background-dark);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background-color: var(--admin-background-light);
+    border-radius: 8px;
+    border: 1px solid var(--admin-border-color);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header h2 {
+    font-size: 2rem;
+    color: var(--admin-text-primary);
+}
+
+.login-header h2 span {
+    color: var(--admin-primary-color);
+}
+
+.login-header p {
+    color: var(--admin-text-secondary);
+}
+
+#loginButton {
+    width: 100%;
+    background-color: var(--admin-primary-color);
+    color: white;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#loginButton:hover {
+    background-color: var(--admin-accent-color);
+}
+
+#loginButton:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+#login-error {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: var(--error-color);
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--error-color);
+}
+
+.back-to-home {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.back-to-home a {
+    color: var(--admin-text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.back-to-home a:hover {
+    color: var(--admin-text-primary);
+}
+
+/* =============================================================================
+   9. ADMIN - OVERLAY DE CARGA
+   ============================================================================= */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: var(--admin-text-primary);
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-left-color: var(--admin-primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =============================================================================
+   10. ADMIN - ESTILOS RESPONSIVE
+   ============================================================================= */
+
+@media (max-width: 992px) {
+    .admin-grid-container {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        grid-row: 2;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        padding: 0;
+        border-right: none;
+        border-top: 1px solid var(--admin-border-color);
+    }
+    
+    .sidebar-header, .sidebar-footer {
+        display: none;
+    }
+
+    .sidebar-nav {
+        flex-grow: 1;
+        margin: 0;
+    }
+
+    .sidebar-nav ul {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+
+    .sidebar-nav a {
+        justify-content: center;
+        padding: 1rem;
+        border-left: none;
+        border-bottom: 4px solid transparent;
+    }
+
+    .sidebar-nav .active a {
+        border-bottom-color: var(--admin-primary-color);
+        border-left-color: transparent;
+    }
+
+    .admin-main-content {
+        padding: 1.5rem;
+    }
+    
+    .form-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-grid-col-2, .form-grid-col-4 {
+        grid-template-columns: 1fr;
+    }
+    .sidebar-nav a {
+        flex-direction: column;
+        font-size: 0.8rem;
+    }
+    .sidebar-nav i.fa-fw {
+        margin-right: 0;
+        margin-bottom: 5px;
+        font-size: 1.4rem;
+    }
+}
