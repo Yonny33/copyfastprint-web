@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Si estamos dentro de la carpeta /admin/ y no hemos iniciado sesión...
     if (currentPath.includes('/admin/') && !isLoginPage && sesionActiva !== 'true') {
         // Redirigir a la página de login.
-        // Usamos una ruta relativa desde la raíz del sitio para asegurar que siempre funcione.
-        window.location.href = '/login-registro.html';
+        // Usamos una ruta absoluta para asegurar que siempre funcione.
+        window.location.href = '/admin/login-registro.html';
         return; // Detener ejecución para evitar errores.
     }
 
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 sessionStorage.removeItem('sesionActiva');
                 sessionStorage.removeItem('usuario');
                 // Al cerrar sesión, siempre redirigir al login.
-                window.location.href = '/login-registro.html';
+                window.location.href = '/admin/login-registro.html';
             });
         }
     }
