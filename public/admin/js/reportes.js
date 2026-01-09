@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.getElementById('end-date');
     const filterBtn = document.getElementById('filter-btn');
     const resetBtn = document.getElementById('reset-btn');
+    const debtToggle = document.getElementById('debt-toggle');
 
-    // Tablas y resúmenes
     const ventasTableBody = document.querySelector('#ventas-table tbody');
     const gastosTableBody = document.querySelector('#gastos-table tbody');
     const ventasTableTitle = document.getElementById('ventas-table-title');
@@ -17,7 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const summaryVentas = document.getElementById('summary-ventas');
     const summaryGastos = document.getElementById('summary-gastos');
 
-    // Contextos de los gráficos
+    const abonoModal = document.getElementById('abono-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const abonoForm = document.getElementById('abono-form');
+    const abonoDetails = document.getElementById('abono-details');
+    const abonoTransaccionIdInput = document.getElementById('abono-transaccion-id');
+    const montoAbonoInput = document.getElementById('monto-abono');
+
     const ventasChartCtx = document.getElementById('total-ventas-chart')?.getContext('2d');
     const gastosChartCtx = document.getElementById('total-gastos-chart')?.getContext('2d');
 
@@ -26,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let originalGastos = [];
     let totalVentasChart = null;
     let totalGastosChart = null;
+    let currentVentas = [];
 
     // --- FUNCIONES AUXILIARES ---
     const showLoading = (show) => {
@@ -45,69 +52,63 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- FUNCIONES DE GRÁFICOS ---
     const createTotalChart = (ctx, label, totalAmount, color) => {
         if (!ctx) return null;
-
-        // Destruir el gráfico anterior si existe para evitar solapamientos
         if (ctx.chart) {
             ctx.chart.destroy();
         }
-
         const chart = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: [label],
-                datasets: [{
-                    data: [totalAmount > 0 ? totalAmount : 1], // Se pone 1 si es 0 para que el gráfico no se rompa
-                    backgroundColor: [totalAmount > 0 ? color : '#E0E0E0'],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false },
-                    title: {
-                        display: true,
-                        text: formatCurrency(totalAmount),
-                        position: 'bottom',
-                        align: 'center',
-                        font: { size: 16, weight: 'bold' },
-                        color: '#333'
-                    }
+            data: { datasets: [{ data: [totalAmount > 0 ? totalAmount : 1], backgroundColor: [totalAmount > 0 ? color : '#E0E0E0'], borderWidth: 2 }] },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: true, 
+                cutout: '70%', 
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { enabled: false }, 
+                    title: { display: true, text: formatCurrency(totalAmount), position: 'bottom', font: { size: 16, weight: 'bold' } } 
                 }
             }
         });
-        ctx.chart = chart; // Guardar la referencia en el contexto
+        ctx.chart = chart;
         return chart;
     };
 
-    // --- FUNCIONES DE RENDERIZADO DE TABLAS ---
+    // --- FUNCIONES DE RENDERIZADO DE TABLAS (CON CORRECCIÓN) ---
     const renderVentasTable = (ventas) => {
         if (!ventasTableBody) return;
         ventasTableBody.innerHTML = '';
         let totalPeriodo = 0;
 
         if (!ventas || ventas.length === 0) {
-            ventasTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay ventas para mostrar.</td></tr>';
+            ventasTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay ventas para mostrar.</td></tr>';
         } else {
             ventas.forEach(v => {
                 totalPeriodo += parseFloat(v.venta_bruta) || 0;
                 const row = document.createElement('tr');
+                
+                let accionesHtml = '-'; // Por defecto no hay acciones
+                // CORRECCIÓN: Solo mostrar el botón si hay un ID de transacción válido
+                if (v.id_transaccion && String(v.estado_pedido).toLowerCase() === 'pendiente' && (parseFloat(v.saldo_pendiente) || 0) > 0) {
+                    accionesHtml = `<button class="btn-abono" data-id="${v.id_transaccion}" data-cliente="${v.nombre_cliente}" data-saldo="${v.saldo_pendiente}">Abonar</button>`;
+                }
+
                 row.innerHTML = `
                     <td>${v.fecha ? v.fecha.split(' ')[0] : 'N/A'}</td>
-                    <td>${v.nombre || 'Cliente General'}</td>
+                    <td>${v.nombre_cliente || 'Cliente General'}</td>
                     <td>${formatCurrency(v.venta_bruta)}</td>
                     <td><span class="status ${String(v.estado_pedido).toLowerCase()}">${v.estado_pedido || 'N/A'}</span></td>
+                    <td>${accionesHtml}</td>
                 `;
                 ventasTableBody.appendChild(row);
             });
         }
         if (summaryVentas) summaryVentas.textContent = `Total del Periodo: ${formatCurrency(totalPeriodo)}`;
+        
+        document.querySelectorAll('.btn-abono').forEach(button => {
+            button.addEventListener('click', openAbonoModal);
+        });
     };
-
+    
     const renderGastosTable = (gastos) => {
         if (!gastosTableBody) return;
         gastosTableBody.innerHTML = '';
@@ -131,48 +132,104 @@ document.addEventListener('DOMContentLoaded', function() {
         if (summaryGastos) summaryGastos.textContent = `Total del Periodo: ${formatCurrency(totalPeriodo)}`;
     };
 
-    // --- LÓGICA DE FILTRADO Y CARGA ---
-    const applyFilters = () => {
-        const startDate = startDateInput.value ? parseDate(startDateInput.value) : null;
-        const endDate = endDateInput.value ? parseDate(endDateInput.value) : null;
-        if (endDate) endDate.setHours(23, 59, 59, 999);
+    // --- LÓGICA DEL MODAL DE ABONOS ---
+    const openAbonoModal = (event) => {
+        const button = event.target;
+        const transaccionId = button.dataset.id;
+        const cliente = button.dataset.cliente;
+        const saldo = button.dataset.saldo;
 
-        if (!startDate || !endDate) {
-            alert("Por favor, selecciona una fecha de inicio y una de fin.");
+        abonoTransaccionIdInput.value = transaccionId;
+        abonoDetails.innerHTML = `<strong>Cliente:</strong> ${cliente}<br><strong>Saldo Pendiente:</strong> ${formatCurrency(saldo)}`;
+        montoAbonoInput.value = '';
+        montoAbonoInput.max = saldo;
+        abonoModal.style.display = 'flex';
+    };
+
+    const closeAbonoModal = () => {
+        abonoModal.style.display = 'none';
+    };
+
+    const handleAbonoSubmit = async (event) => {
+        event.preventDefault();
+        const id_transaccion = abonoTransaccionIdInput.value;
+        const monto_abono = parseFloat(montoAbonoInput.value);
+
+        if (!monto_abono || monto_abono <= 0) {
+            alert('Por favor, introduce un monto de abono válido.');
             return;
         }
 
-        const filteredVentas = originalVentas.filter(v => {
-            const vDate = parseDate(v.fecha);
-            return vDate && vDate >= startDate && vDate <= endDate;
-        });
+        showLoading(true);
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'gestionarAbono', id_transaccion, monto_abono })
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert('Abono registrado con éxito.');
+                closeAbonoModal();
+                loadReportData();
+            } else {
+                throw new Error(result.message || 'Error al procesar el abono.');
+            }
+        } catch (error) {
+            console.error('Error al registrar abono:', error);
+            alert(`Error: ${error.message}`);
+        } finally {
+            showLoading(false);
+        }
+    };
 
-        const filteredGastos = originalGastos.filter(g => {
-            const gDate = parseDate(g.fecha);
-            return gDate && gDate >= startDate && gDate <= endDate;
-        });
+    // --- LÓGICA DE FILTRADO Y CARGA ---
+    const applyAndRenderFilters = () => {
+        const startDate = startDateInput.value ? parseDate(startDateInput.value) : null;
+        const endDate = endDateInput.value ? parseDate(endDateInput.value) : null;
+        if (endDate) endDate.setHours(23, 59, 59, 999);
+        
+        const showOnlyDebts = debtToggle.checked;
 
-        if(ventasTableTitle) ventasTableTitle.textContent = "Ventas del Periodo";
-        if(gastosTableTitle) gastosTableTitle.textContent = "Gastos del Periodo";
-        renderVentasTable(filteredVentas);
+        let filteredVentas = originalVentas;
+        let filteredGastos = originalGastos;
+
+        if (showOnlyDebts) {
+            filteredVentas = filteredVentas.filter(v => String(v.estado_pedido).toLowerCase() === 'pendiente' && (parseFloat(v.saldo_pendiente) || 0) > 0);
+        }
+
+        if (startDate && endDate) {
+            filteredVentas = filteredVentas.filter(v => {
+                const vDate = parseDate(v.fecha);
+                return vDate && vDate >= startDate && vDate <= endDate;
+            });
+            filteredGastos = filteredGastos.filter(g => {
+                const gDate = parseDate(g.fecha);
+                return gDate && gDate >= startDate && gDate <= endDate;
+            });
+            if(ventasTableTitle) ventasTableTitle.textContent = "Ventas del Periodo";
+            if(gastosTableTitle) gastosTableTitle.textContent = "Gastos del Periodo";
+        } else {
+            const sortedVentas = [...filteredVentas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            filteredVentas = showOnlyDebts ? sortedVentas : sortedVentas.slice(0, 10);
+
+            const sortedGastos = [...originalGastos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            filteredGastos = sortedGastos.slice(0, 10);
+
+            if(ventasTableTitle) ventasTableTitle.textContent = showOnlyDebts ? "Ventas con Deuda" : "Últimas 10 Ventas";
+            if(gastosTableTitle) gastosTableTitle.textContent = "Últimos 10 Gastos";
+        }
+        
+        currentVentas = filteredVentas;
+        renderVentasTable(currentVentas);
         renderGastosTable(filteredGastos);
     };
 
-    const resetFilters = () => {
+    const resetAndRender = () => {
         if(startDateInput) startDateInput.value = '';
         if(endDateInput) endDateInput.value = '';
-
-        // Ordenar por fecha descendente para obtener los últimos
-        const sortedVentas = [...originalVentas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        const sortedGastos = [...originalGastos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-        
-        const ultimas10Ventas = sortedVentas.slice(0, 10);
-        const ultimos10Gastos = sortedGastos.slice(0, 10);
-
-        if(ventasTableTitle) ventasTableTitle.textContent = "Últimas 10 Ventas";
-        if(gastosTableTitle) gastosTableTitle.textContent = "Últimos 10 Gastos";
-        renderVentasTable(ultimas10Ventas);
-        renderGastosTable(ultimos10Gastos);
+        if(debtToggle) debtToggle.checked = false;
+        applyAndRenderFilters();
     };
 
     const loadReportData = async () => {
@@ -186,35 +243,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 originalVentas = result.data.ventas || [];
                 originalGastos = result.data.gastos || [];
                 
-                // 1. Crear los gráficos con los totales absolutos
                 const totalVentasAbsoluto = originalVentas.reduce((sum, v) => sum + (parseFloat(v.venta_bruta) || 0), 0);
                 const totalGastosAbsoluto = originalGastos.reduce((sum, g) => sum + (parseFloat(g.monto) || 0), 0);
                 totalVentasChart = createTotalChart(ventasChartCtx, 'Ventas Totales', totalVentasAbsoluto, '#28a745');
                 totalGastosChart = createTotalChart(gastosChartCtx, 'Gastos Totales', totalGastosAbsoluto, '#dc3545');
 
-                // 2. Cargar las tablas con los últimos 10 registros
-                resetFilters();
+                resetAndRender();
             } else {
                 throw new Error(result.message || 'El formato de respuesta del servidor no es válido.');
             }
         } catch (error) {
             console.error('Error fatal al cargar los reportes:', error);
             alert(`No se pudieron cargar los datos de los reportes: ${error.message}`);
-            if (summaryVentas) summaryVentas.textContent = 'Error al cargar.';
-            if (summaryGastos) summaryGastos.textContent = 'Error al cargar.';
         } finally {
             showLoading(false);
         }
     };
 
     // --- ASIGNACIÓN DE EVENTOS ---
-    if (filterBtn) filterBtn.addEventListener('click', applyFilters);
-    if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+    if (filterBtn) filterBtn.addEventListener('click', applyAndRenderFilters);
+    if (resetBtn) resetBtn.addEventListener('click', resetAndRender);
+    if (debtToggle) debtToggle.addEventListener('change', applyAndRenderFilters);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeAbonoModal);
+    if (abonoForm) abonoForm.addEventListener('submit', handleAbonoSubmit);
 
     // --- INICIALIZACIÓN ---
     if (ventasChartCtx && gastosChartCtx && ventasTableBody && gastosTableBody) {
         loadReportData();
     } else {
-        console.error("Algunos elementos clave (gráficos o tablas) no se encontraron en el DOM. El script no se ejecutará.");
+        console.error("Algunos elementos clave no se encontraron en el DOM.");
     }
 });
