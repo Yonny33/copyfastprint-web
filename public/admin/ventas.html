@@ -1,136 +1,224 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de Ventas - Admin COPYFAST&PRINT</title>
-    <meta name="description" content="Panel de administración para el registro de ventas y control de saldos.">
+    <meta
+      name="description"
+      content="Panel de administración para el registro de ventas y control de saldos."
+    />
 
     <!-- Favicons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
-    <link rel="manifest" href="/favicons/manifest.json">
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
-    <link rel="stylesheet" href="/admin/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/admin/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
     <!-- Contenedor principal del panel de administración -->
     <div class="admin-grid-container">
+      <!-- Barra lateral de navegación -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-header">
+          <h3>COPY<span>FAST&</span>PRINT</h3>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="admin.html"
+                ><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a
+              >
+            </li>
+            <li class="active">
+              <a href="ventas.html"
+                ><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a
+              >
+            </li>
+            <li>
+              <a href="gastos.html"
+                ><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a
+              >
+            </li>
+            <li>
+              <a href="clientes.html"
+                ><i class="fas fa-users fa-fw"></i> Clientes</a
+              >
+            </li>
+            <li>
+              <a href="inventario.html"
+                ><i class="fas fa-box-open fa-fw"></i> Inventario</a
+              >
+            </li>
+            <li>
+              <a href="reportes.html"
+                ><i class="fas fa-chart-line fa-fw"></i> Reportes</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <button id="btnCerrarSesion" class="logout-btn">
+            <i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión
+          </button>
+        </div>
+      </aside>
 
-        <!-- Barra lateral de navegación -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <h3>COPY<span>FAST&</span>PRINT</h3>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
-                    <li class="active"><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
-                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
-                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
-                    <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
-                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
-                </ul>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
-            </div>
-        </aside>
+      <!-- Contenido principal -->
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2>Registro de Venta</h2>
+          <div class="divider"></div>
+          <p>Añade los detalles de una nueva venta y su estado de pago.</p>
+        </div>
 
-        <!-- Contenido principal -->
-        <main class="admin-main-content">
-            <div class="section-heading">
-                <h2>Registro de Venta</h2>
-                <div class="divider"></div>
-                <p>Añade los detalles de una nueva venta y su estado de pago.</p>
-            </div>
-
-            <!-- Layout del formulario -->
-            <div class="form-layout">
-                <div class="form-container">
-                    <form id="registro-ventas-form">
-                        <div class="form-grid-col-2">
-                            <div class="form-group">
-                                <label for="fecha">Fecha de Venta *</label>
-                                <input type="date" id="fecha" name="fecha" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cliente">Cliente *</label>
-                                <select id="cliente" name="cliente" required>
-                                    <option value="">Cargando clientes...</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="producto">Producto *</label>
-                            <select id="producto" name="producto" required>
-                                <option value="">Cargando productos...</option>
-                            </select>
-                        </div>
-                        <div class="form-grid-col-4">
-                            <div class="form-group">
-                                <label for="cantidad">Cantidad *</label>
-                                <input type="number" id="cantidad" name="cantidad" value="1" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="precio_unitario">Precio Unitario *</label>
-                                <input type="number" id="precio_unitario" name="precio_unitario" min="0" step="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="venta_bruta">Venta Bruta</label>
-                                <input type="number" id="venta_bruta" name="venta_bruta" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="abono_recibido">Abono Recibido *</label>
-                                <input type="number" id="abono_recibido" name="abono_recibido" min="0" step="0.01" required>
-                            </div>
-                        </div>
-                         <div class="form-grid-col-2">
-                             <div class="form-group">
-                                <label for="saldo_pendiente">Saldo Pendiente</label>
-                                <input type="number" id="saldo_pendiente" name="saldo_pendiente" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="metodo_pago">Método de Pago *</label>
-                                <select id="metodo_pago" name="metodo_pago" required>
-                                    <option value="">Selecciona uno</option>
-                                    <option value="Efectivo">Efectivo</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                    <option value="Pago-Movil">Pago Móvil</option>
-                                    <option value="Zelle">Zelle</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Registrar Venta</button>
-                        </div>
-                    </form>
+        <!-- Layout del formulario -->
+        <div class="form-layout">
+          <div class="form-container">
+            <form id="registro-ventas-form">
+              <div class="form-grid-col-2">
+                <div class="form-group">
+                  <label for="fecha">Fecha de Venta *</label>
+                  <input type="date" id="fecha" name="fecha" required />
                 </div>
-                 <aside class="form-sidebar">
-                    <div class="info-box">
-                        <h3><i class="fas fa-calculator"></i> Cálculos Automáticos</h3>
-                        <p>La <strong>Venta Bruta</strong> y el <strong>Saldo Pendiente</strong> se calculan solos para evitar errores.</p>
-                    </div>
-                     <div class="info-box">
-                        <h3><i class="fas fa-box-open"></i> Productos</h3>
-                        <p>Selecciona un producto de la lista. El stock se descontará automáticamente al registrar la venta. Si no encuentras un producto, añádelo en la sección "Inventario".</p>
-                    </div>
-                    <div class="info-box">
-                        <h3><i class="fas fa-users"></i> Clientes</h3>
-                        <p>Si un cliente no aparece en la lista, debes añadirlo primero desde la sección "Clientes" para poder asociarle una venta.</p>
-                    </div>
-                </aside>
+                <div class="form-group">
+                  <label for="cliente">Cliente *</label>
+                  <select id="cliente" name="id_cliente" required>
+                    <option value="">Cargando clientes...</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label for="producto">Producto *</label>
+                <select id="producto" name="producto" required>
+                  <option value="">Cargando productos...</option>
+                </select>
+              </div>
+              <div class="form-grid-col-4">
+                <div class="form-group">
+                  <label for="cantidad">Cantidad *</label>
+                  <input
+                    type="number"
+                    id="cantidad"
+                    name="cantidad"
+                    value="1"
+                    min="0"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="precio_unitario">Precio Unitario *</label>
+                  <input
+                    type="number"
+                    id="precio_unitario"
+                    name="precio_unitario"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="venta_bruta">Venta Bruta</label>
+                  <input
+                    type="number"
+                    id="venta_bruta"
+                    name="venta_bruta"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="abono_recibido">Abono Recibido *</label>
+                  <input
+                    type="number"
+                    id="abono_recibido"
+                    name="abono_recibido"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-grid-col-2">
+                <div class="form-group">
+                  <label for="saldo_pendiente">Saldo Pendiente</label>
+                  <input
+                    type="number"
+                    id="saldo_pendiente"
+                    name="saldo_pendiente"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="metodo_pago">Método de Pago *</label>
+                  <select id="metodo_pago" name="metodo_pago" required>
+                    <option value="">Selecciona uno</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Pago-Movil">Pago Móvil</option>
+                    <option value="Zelle">Zelle</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                  <i class="fas fa-save"></i> Registrar Venta
+                </button>
+              </div>
+            </form>
+          </div>
+          <aside class="form-sidebar">
+            <div class="info-box">
+              <h3><i class="fas fa-calculator"></i> Cálculos Automáticos</h3>
+              <p>
+                La <strong>Venta Bruta</strong> y el
+                <strong>Saldo Pendiente</strong> se calculan solos para evitar
+                errores.
+              </p>
             </div>
-        </main>
-
+            <div class="info-box">
+              <h3><i class="fas fa-box-open"></i> Productos</h3>
+              <p>
+                Selecciona un producto de la lista. El stock se descontará
+                automáticamente al registrar la venta. Si no encuentras un
+                producto, añádelo en la sección "Inventario".
+              </p>
+            </div>
+            <div class="info-box">
+              <h3><i class="fas fa-users"></i> Clientes</h3>
+              <p>
+                Si un cliente no aparece en la lista, debes añadirlo primero
+                desde la sección "Clientes" para poder asociarle una venta.
+              </p>
+            </div>
+          </aside>
+        </div>
+      </main>
     </div>
 
     <!-- Overlay de carga -->
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="spinner"></div>
       <p>Procesando...</p>
     </div>
@@ -138,5 +226,5 @@
     <!-- Scripts. Se añade un parámetro para evitar problemas de caché. -->
     <script src="/admin/js/auth.js"></script>
     <script src="/admin/js/ventas.js?v=2.0"></script>
-</body>
+  </body>
 </html>
