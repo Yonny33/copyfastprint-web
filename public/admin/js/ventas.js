@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // <-- FUNCIÓN MODIFICADA: Envía el formulario para registrar la venta -->
+    // <-- FUNCIÓN MODIFICADA Y CORREGIDA: Envía el formulario para registrar la venta -->
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         showLoading(true);
@@ -109,9 +109,10 @@ document.addEventListener('DOMContentLoaded', function () {
         data.id_producto = selectedProduct.value;
         data.descripcion = selectedProduct.text;
 
-        // --- Información del Cliente Seleccionado ---
-        const selectedClient = clienteSelect.options[clienteSelect.selectedIndex];
-        data.id_cliente = selectedClient.value;
+        // CORRECCIÓN: La siguiente línea era redundante y causaba el error.
+        // Se ha eliminado. El 'id_cliente' ya se obtiene correctamente de FormData.
+        // const selectedClient = clienteSelect.options[clienteSelect.selectedIndex];
+        // data.id_cliente = selectedClient.value; 
 
         try {
             const response = await fetch(SCRIPT_URL, {

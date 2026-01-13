@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.createElement('tr');
                 
                 let accionesHtml = '-'; // Por defecto no hay acciones
-                // CORRECCIÓN: Solo mostrar el botón si hay un ID de transacción válido
                 if (v.id_transaccion && String(v.estado_pedido).toLowerCase() === 'pendiente' && (parseFloat(v.saldo_pendiente) || 0) > 0) {
                     accionesHtml = `<button class="btn-abono" data-id="${v.id_transaccion}" data-cliente="${v.nombre_cliente}" data-saldo="${v.saldo_pendiente}">Abonar</button>`;
                 }
@@ -169,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const result = await response.json();
             if (result.status === 'success') {
-                alert('Abono registrado con éxito.');
+                alert(result.message); // MOSTRAR MENSAJE REAL DEL SERVIDOR
                 closeAbonoModal();
                 loadReportData();
             } else {
