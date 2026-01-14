@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes - Admin COPYFAST&PRINT</title>
-    <meta name="description" content="Panel de administración para la visualización de reportes de ventas y gastos.">
+    <title>Reporte de Ventas - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la visualización de reportes de ventas.">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
@@ -19,11 +19,8 @@
     
     <!-- Flatpickr (Selector de Fechas) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    
-    <!-- Chart.js para Gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body class="admin-page">
     <div class="admin-grid-container">
@@ -46,9 +43,9 @@
         <!-- Contenido principal -->
         <main class="admin-main-content">
             <div class="section-heading">
-                <h2>Reportes Financieros</h2>
+                <h2>Reporte de Ventas</h2>
                 <div class="divider"></div>
-                <p>Análisis detallado de ventas, gastos y rendimiento general.</p>
+                <p>Análisis detallado de ventas.</p>
             </div>
 
             <!-- Contenedor de Filtros -->
@@ -58,11 +55,8 @@
                     <div class="form-group"><label for="start-date">Fecha de Inicio</label><input type="text" id="start-date" placeholder="Seleccionar fecha"></div>
                     <div class="form-group"><label for="end-date">Fecha de Fin</label><input type="text" id="end-date" placeholder="Seleccionar fecha"></div>
                     <div class="form-group toggle-group">
-                        <label for="debt-toggle" class="toggle-label">Mostrar solo deudas</label>
-                        <label class="switch">
-                            <input type="checkbox" id="debt-toggle">
-                            <span class="slider round"></span>
-                        </label>
+                         <label for="debt-toggle" class="toggle-label">Mostrar solo deudas</label>
+                        <label class="switch"><input type="checkbox" id="debt-toggle"><span class="slider round"></span></label>
                     </div>
                     <div class="form-actions filter-buttons">
                         <button id="filter-btn" class="btn-submit"><i class="fas fa-check"></i> Aplicar Filtro</button>
@@ -71,36 +65,23 @@
                 </div>
             </div>
 
-            <!-- Contenedor de Gráficos -->
-            <div class="charts-container">
-                <div class="card report-chart-card"><h3 class="chart-title"><i class="fas fa-chart-pie"></i> Desglose de Ventas</h3><canvas id="total-ventas-chart"></canvas></div>
-                <div class="card report-chart-card"><h3 class="chart-title"><i class="fas fa-chart-pie"></i> Desglose de Gastos</h3><canvas id="total-gastos-chart"></canvas></div>
-            </div>
-
-            <!-- Tablas de Reportes -->
-            <div class="report-grid-bottom">
-                <div class="card-table">
-                    <h3 id="ventas-table-title">Ventas del Periodo</h3>
-                    <div id="summary-ventas" class="report-summary"></div>
-                    <div class="table-responsive">
-                        <table id="ventas-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Cliente</th>
-                                    <th>Monto</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-table">
-                    <h3 id="gastos-table-title">Gastos del Periodo</h3>
-                    <div id="summary-gastos" class="report-summary"></div>
-                    <div class="table-responsive"><table id="gastos-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Monto</th></tr></thead><tbody></tbody></table></div>
+            <!-- Tabla de Reportes de Ventas -->
+            <div class="card-table modern-table">
+                <h3 id="ventas-table-title">Ventas del Periodo</h3>
+                <div id="summary-ventas" class="report-summary"></div>
+                <div class="table-responsive">
+                    <table id="ventas-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -108,20 +89,13 @@
 
     <!-- Overlay y Scripts -->
     <div id="loading-overlay" class="loading-overlay" style="display: none;"><div class="spinner"></div><p>Procesando...</p></div>
+    <button id="btn-go-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></button>
     <script src="/admin/js/auth.js"></script>
     <script src="/admin/js/reportes.js"></script>
 
-    <!-- Inicialización de Flatpickr -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            flatpickr("#start-date", { dateFormat: "Y-m-d" });
-            flatpickr("#end-date", { dateFormat: "Y-m-d" });
-        });
-    </script>
-
     <!-- Modal de Abono -->
     <div id="abono-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content abono-modal">
             <span class="modal-close" id="close-modal-btn">&times;</span>
             <h3>Registrar Abono</h3>
             <div id="abono-details"></div>
@@ -131,28 +105,10 @@
                     <label for="monto-abono">Monto del Abono</label>
                     <input type="number" id="monto-abono" step="0.01" required>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn-submit">Guardar Abono</button>
-                </div>
+                <div class="form-actions"><button type="submit" class="btn-submit">Guardar Abono</button></div>
             </form>
         </div>
     </div>
-
-    <!-- Estilos para el Modal y el Toggle Switch -->
-    <style>
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; position: relative; color: #333; }
-        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; }
-        #abono-details { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .toggle-group { display: flex; align-items: center; gap: 10px; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
-        .slider.round { border-radius: 28px; }
-        .slider.round:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #4CAF50; }
-        input:checked + .slider:before { transform: translateX(22px); }
-    </style>
 
 </body>
 </html>

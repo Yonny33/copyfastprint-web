@@ -1,255 +1,158 @@
+
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Inventario - COPYFAST&PRINT</title>
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content="noindex, nofollow">
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
-    <link rel="manifest" href="/favicons/manifest.json" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/favicons/manifest.json">
 
-    <link rel="stylesheet" href="/admin/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="/admin/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-  <body>
-    <div id="loading-overlay" class="loading-overlay" style="display: none">
-      <div class="spinner"></div>
-      <p>Cargando...</p>
+
+</head>
+<body>
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div><p>Cargando...</p>
     </div>
 
     <div class="admin-grid-container">
-      <aside class="admin-sidebar">
-        <div class="sidebar-header">
-          <h3>COPY<span>FAST&</span>PRINT</h3>
-        </div>
-        <nav class="sidebar-nav">
-          <ul>
-            <li>
-              <a href="admin.html"
-                ><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a
-              >
-            </li>
-            <li>
-              <a href="ventas.html"
-                ><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a
-              >
-            </li>
-            <li>
-              <a href="gastos.html"
-                ><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a
-              >
-            </li>
-            <li>
-              <a href="clientes.html"
-                ><i class="fas fa-users fa-fw"></i> Clientes</a
-              >
-            </li>
-            <li class="active">
-              <a href="inventario.html"
-                ><i class="fas fa-box-open fa-fw"></i> Inventario</a
-              >
-            </li>
-            <li>
-              <a href="reportes.html"
-                ><i class="fas fa-chart-line fa-fw"></i> Reportes</a
-              >
-            </li>
-          </ul>
-        </nav>
-        <div class="sidebar-footer">
-          <button id="btnCerrarSesion" class="logout-btn">
-            <i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión
-          </button>
-        </div>
-      </aside>
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>COPY<span>FAST&</span>PRINT</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                    <li class="active"><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
 
-      <main class="admin-main-content">
-        <div class="section-heading">
-          <h2>Gestión de Inventario</h2>
-          <div class="divider"></div>
-        </div>
+        <main class="admin-main-content">
+            <div class="section-heading">
+                <h2>Gestión de Inventario</h2>
+                <div class="divider"></div>
+            </div>
 
-        <div class="toolbar">
-          <button id="btn-add-producto" class="btn-primary">
-            <i class="fas fa-plus"></i> Añadir Nuevo Producto
-          </button>
-          <div class="search-bar">
-            <i class="fas fa-search"></i>
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Buscar por nombre, código o categoría..."
-            />
-          </div>
-        </div>
+            <div class="toolbar">
+                <button id="btn-add-producto" class="btn-primary"><i class="fas fa-plus"></i> Añadir Nuevo Producto</button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Buscar por nombre, código o categoría...">
+                </div>
+            </div>
 
-        <div class="card-table">
-          <h3><i class="fas fa-chart-bar"></i> Stock Actual de Productos</h3>
-          <div class="chart-container-medium">
-            <canvas id="stock-chart"></canvas>
-          </div>
-        </div>
+            <div class="card-table">
+                <h3><i class="fas fa-chart-bar"></i> Stock Actual de Productos</h3>
+                <div class="chart-container-medium">
+                    <canvas id="stock-chart"></canvas>
+                </div>
+            </div>
 
-        <div class="card-table">
-          <h3><i class="fas fa-list-alt"></i> Listado de Productos</h3>
-          <div class="table-responsive">
-            <table id="tabla-inventario">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Nombre</th>
-                  <th>Categoría</th>
-                  <th>Stock</th>
-                  <th>Unidad</th>
-                  <th>Stock Mín.</th>
-                  <th>Proveedor</th>
-                  <th>Fecha Ingreso</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Las filas se insertarán dinámicamente con JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </main>
+            <div class="card-table modern-table">
+                <h3><i class="fas fa-list-alt"></i> Listado de Productos</h3>
+                <div class="table-responsive">
+                    <table id="tabla-inventario">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Unidad</th>
+                                <th>Stock Mín.</th>
+                                <th>Proveedor</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se insertarán dinámicamente con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- Modal para Añadir/Editar Producto -->
-    <div id="product-modal" class="modal" style="display: none">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="form-title">Añadir Nuevo Producto</h3>
-          <span class="close-button">&times;</span>
+    <div id="product-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="form-title">Añadir Nuevo Producto</h3>
+                <span class="close-button">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="inventario-form">
+                    <input type="hidden" id="id_producto" name="id_producto">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="codigo">Código de Producto</label>
+                            <input type="text" id="codigo" name="codigo" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Producto</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoria">Categoría</label>
+                            <input type="text" id="categoria" name="categoria" class="form-control" placeholder="Ej: Papelería, Insumos, etc.">
+                        </div>
+                         <div class="form-group">
+                            <label for="proveedor">Proveedor</label>
+                            <input type="text" id="proveedor" name="proveedor" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stock_actual">Stock Actual</label>
+                            <input type="number" id="stock_actual" name="stock_actual" class="form-control" required step="any">
+                        </div>
+                        <div class="form-group">
+                            <label for="stock_minimo">Stock Mínimo de Alerta</label>
+                            <input type="number" id="stock_minimo" name="stock_minimo" class="form-control" step="any">
+                        </div>
+                    </div>
+                     <div class="form-row">
+                        <div class="form-group">
+                            <label for="unidad_medida">Unidad de Medida</label>
+                            <input type="text" id="unidad_medida" name="unidad_medida" class="form-control" placeholder="Ej: kg, L, unidad">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_ingreso">Fecha de Ingreso</label>
+                            <input type="date" id="fecha_ingreso" name="fecha_ingreso" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Guardar Producto</button>
+                        <button type="button" class="btn btn-secondary close-button">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="modal-body">
-          <form id="inventario-form">
-            <input type="hidden" id="id_producto" name="id_producto" />
-            <div class="form-row">
-              <div class="form-group">
-                <label for="codigo">Código de Producto</label>
-                <input
-                  type="text"
-                  id="codigo"
-                  name="codigo"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="nombre">Nombre del Producto</label>
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  class="form-control"
-                  required
-                />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="categoria">Categoría</label>
-                <input
-                  type="text"
-                  id="categoria"
-                  name="categoria"
-                  class="form-control"
-                  placeholder="Ej: Papelería, Insumos, etc."
-                />
-              </div>
-              <div class="form-group">
-                <label for="proveedor">Proveedor</label>
-                <input
-                  type="text"
-                  id="proveedor"
-                  name="proveedor"
-                  class="form-control"
-                />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="stock_actual">Stock Actual</label>
-                <input
-                  type="number"
-                  id="stock_actual"
-                  name="stock_actual"
-                  class="form-control"
-                  required
-                  step="any"
-                />
-              </div>
-              <div class="form-group">
-                <label for="stock_minimo">Stock Mínimo de Alerta</label>
-                <input
-                  type="number"
-                  id="stock_minimo"
-                  name="stock_minimo"
-                  class="form-control"
-                  step="any"
-                />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="unidad_medida">Unidad de Medida</label>
-                <input
-                  type="text"
-                  id="unidad_medida"
-                  name="unidad_medida"
-                  class="form-control"
-                  placeholder="Ej: kg, L, unidad"
-                />
-              </div>
-              <div class="form-group">
-                <label for="fecha_ingreso">Fecha de Ingreso</label>
-                <input
-                  type="date"
-                  id="fecha_ingreso"
-                  name="fecha_ingreso"
-                  class="form-control"
-                  required
-                />
-              </div>
-            </div>
-            <div class="form-buttons">
-              <button type="submit" class="btn btn-primary">
-                Guardar Producto
-              </button>
-              <button type="button" class="btn btn-secondary close-button">
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
+
+    <!-- Botón Ir Arriba -->
+    <button id="btn-go-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></button>
 
     <script src="/admin/js/auth.js"></script>
     <script src="/admin/js/inventario.js"></script>
-  </body>
+</body>
 </html>

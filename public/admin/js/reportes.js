@@ -9,13 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterBtn = document.getElementById('filter-btn');
     const resetBtn = document.getElementById('reset-btn');
     const debtToggle = document.getElementById('debt-toggle');
+    const goTopBtn = document.getElementById('btn-go-top');
 
     const ventasTableBody = document.querySelector('#ventas-table tbody');
-    const gastosTableBody = document.querySelector('#gastos-table tbody');
     const ventasTableTitle = document.getElementById('ventas-table-title');
-    const gastosTableTitle = document.getElementById('gastos-table-title');
     const summaryVentas = document.getElementById('summary-ventas');
-    const summaryGastos = document.getElementById('summary-gastos');
 
     const abonoModal = document.getElementById('abono-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
@@ -24,15 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const abonoTransaccionIdInput = document.getElementById('abono-transaccion-id');
     const montoAbonoInput = document.getElementById('monto-abono');
 
-    const ventasChartCtx = document.getElementById('total-ventas-chart')?.getContext('2d');
-    const gastosChartCtx = document.getElementById('total-gastos-chart')?.getContext('2d');
-
-    // --- ALMACENES DE DATOS Y GRÁFICOS ---
+    // --- ALMACÉN DE DATOS ---
     let originalVentas = [];
-    let originalGastos = [];
-    let totalVentasChart = null;
-    let totalGastosChart = null;
     let currentVentas = [];
+    
+    // --- INICIALIZACIÓN DE SELECTORES DE FECHA ---
+    flatpickr(startDateInput, { dateFormat: "Y-m-d" });
+    flatpickr(endDateInput, { dateFormat: "Y-m-d" });
 
     // --- FUNCIONES AUXILIARES ---
     const showLoading = (show) => {
@@ -49,31 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return isNaN(date.getTime()) ? null : date;
     };
 
-    // --- FUNCIONES DE GRÁFICOS ---
-    const createTotalChart = (ctx, label, totalAmount, color) => {
-        if (!ctx) return null;
-        if (ctx.chart) {
-            ctx.chart.destroy();
-        }
-        const chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: { datasets: [{ data: [totalAmount > 0 ? totalAmount : 1], backgroundColor: [totalAmount > 0 ? color : '#E0E0E0'], borderWidth: 2 }] },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: true, 
-                cutout: '70%', 
-                plugins: { 
-                    legend: { display: false }, 
-                    tooltip: { enabled: false }, 
-                    title: { display: true, text: formatCurrency(totalAmount), position: 'bottom', font: { size: 16, weight: 'bold' } } 
-                }
-            }
-        });
-        ctx.chart = chart;
-        return chart;
-    };
-
-    // --- FUNCIONES DE RENDERIZADO DE TABLAS (CON CORRECCIÓN) ---
+    // --- RENDERIZADO DE LA TABLA DE VENTAS ---
     const renderVentasTable = (ventas) => {
         if (!ventasTableBody) return;
         ventasTableBody.innerHTML = '';
@@ -86,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 totalPeriodo += parseFloat(v.venta_bruta) || 0;
                 const row = document.createElement('tr');
                 
-                let accionesHtml = '-'; // Por defecto no hay acciones
+                let accionesHtml = '-';
                 if (v.id_transaccion && String(v.estado_pedido).toLowerCase() === 'pendiente' && (parseFloat(v.saldo_pendiente) || 0) > 0) {
                     accionesHtml = `<button class="btn-abono" data-id="${v.id_transaccion}" data-cliente="${v.nombre_cliente}" data-saldo="${v.saldo_pendiente}">Abonar</button>`;
                 }
@@ -107,41 +79,14 @@ document.addEventListener('DOMContentLoaded', function() {
             button.addEventListener('click', openAbonoModal);
         });
     };
-    
-    const renderGastosTable = (gastos) => {
-        if (!gastosTableBody) return;
-        gastosTableBody.innerHTML = '';
-        let totalPeriodo = 0;
-
-        if (!gastos || gastos.length === 0) {
-            gastosTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay gastos para mostrar.</td></tr>';
-        } else {
-            gastos.forEach(g => {
-                totalPeriodo += parseFloat(g.monto) || 0;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${g.fecha ? g.fecha.split(' ')[0] : 'N/A'}</td>
-                    <td>${g.descripcion || 'N/A'}</td>
-                    <td>${g.categoria || 'N/A'}</td>
-                    <td>${formatCurrency(g.monto)}</td>
-                `;
-                gastosTableBody.appendChild(row);
-            });
-        }
-        if (summaryGastos) summaryGastos.textContent = `Total del Periodo: ${formatCurrency(totalPeriodo)}`;
-    };
 
     // --- LÓGICA DEL MODAL DE ABONOS ---
     const openAbonoModal = (event) => {
         const button = event.target;
-        const transaccionId = button.dataset.id;
-        const cliente = button.dataset.cliente;
-        const saldo = button.dataset.saldo;
-
-        abonoTransaccionIdInput.value = transaccionId;
-        abonoDetails.innerHTML = `<strong>Cliente:</strong> ${cliente}<br><strong>Saldo Pendiente:</strong> ${formatCurrency(saldo)}`;
+        abonoTransaccionIdInput.value = button.dataset.id;
+        abonoDetails.innerHTML = `<strong>Cliente:</strong> ${button.dataset.cliente}<br><strong>Saldo Pendiente:</strong> ${formatCurrency(button.dataset.saldo)}`;
         montoAbonoInput.value = '';
-        montoAbonoInput.max = saldo;
+        montoAbonoInput.max = button.dataset.saldo;
         abonoModal.style.display = 'flex';
     };
 
@@ -168,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const result = await response.json();
             if (result.status === 'success') {
-                alert(result.message); // MOSTRAR MENSAJE REAL DEL SERVIDOR
+                alert(result.message);
                 closeAbonoModal();
-                loadReportData();
+                loadReportData(); // Recargar datos
             } else {
                 throw new Error(result.message || 'Error al procesar el abono.');
             }
@@ -191,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const showOnlyDebts = debtToggle.checked;
 
         let filteredVentas = originalVentas;
-        let filteredGastos = originalGastos;
 
         if (showOnlyDebts) {
             filteredVentas = filteredVentas.filter(v => String(v.estado_pedido).toLowerCase() === 'pendiente' && (parseFloat(v.saldo_pendiente) || 0) > 0);
@@ -202,31 +146,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const vDate = parseDate(v.fecha);
                 return vDate && vDate >= startDate && vDate <= endDate;
             });
-            filteredGastos = filteredGastos.filter(g => {
-                const gDate = parseDate(g.fecha);
-                return gDate && gDate >= startDate && gDate <= endDate;
-            });
-            if(ventasTableTitle) ventasTableTitle.textContent = "Ventas del Periodo";
-            if(gastosTableTitle) gastosTableTitle.textContent = "Gastos del Periodo";
+            if(ventasTableTitle) ventasTableTitle.textContent = "Ventas del Periodo Seleccionado";
         } else {
-            const sortedVentas = [...filteredVentas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-            filteredVentas = showOnlyDebts ? sortedVentas : sortedVentas.slice(0, 10);
-
-            const sortedGastos = [...originalGastos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-            filteredGastos = sortedGastos.slice(0, 10);
-
-            if(ventasTableTitle) ventasTableTitle.textContent = showOnlyDebts ? "Ventas con Deuda" : "Últimas 10 Ventas";
-            if(gastosTableTitle) gastosTableTitle.textContent = "Últimos 10 Gastos";
+            const sortedVentas = [...filteredVentas].sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
+            filteredVentas = showOnlyDebts ? sortedVentas : sortedVentas.slice(0, 20); // Mostrar últimas 20 por defecto
+            if(ventasTableTitle) ventasTableTitle.textContent = showOnlyDebts ? "Todas las Ventas con Deuda" : "Últimas 20 Ventas Registradas";
         }
         
         currentVentas = filteredVentas;
         renderVentasTable(currentVentas);
-        renderGastosTable(filteredGastos);
     };
 
     const resetAndRender = () => {
-        if(startDateInput) startDateInput.value = '';
-        if(endDateInput) endDateInput.value = '';
+        if(startDateInput) startDateInput._flatpickr.clear();
+        if(endDateInput) endDateInput._flatpickr.clear();
         if(debtToggle) debtToggle.checked = false;
         applyAndRenderFilters();
     };
@@ -238,26 +171,34 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
             
             const result = await response.json();
-            if (result.status === 'success' && result.data) {
+            if (result.status === 'success' && result.data && result.data.ventas) {
                 originalVentas = result.data.ventas || [];
-                originalGastos = result.data.gastos || [];
-                
-                const totalVentasAbsoluto = originalVentas.reduce((sum, v) => sum + (parseFloat(v.venta_bruta) || 0), 0);
-                const totalGastosAbsoluto = originalGastos.reduce((sum, g) => sum + (parseFloat(g.monto) || 0), 0);
-                totalVentasChart = createTotalChart(ventasChartCtx, 'Ventas Totales', totalVentasAbsoluto, '#28a745');
-                totalGastosChart = createTotalChart(gastosChartCtx, 'Gastos Totales', totalGastosAbsoluto, '#dc3545');
-
-                resetAndRender();
+                resetAndRender(); // Aplicar filtros iniciales (mostrar últimas ventas)
             } else {
-                throw new Error(result.message || 'El formato de respuesta del servidor no es válido.');
+                throw new Error(result.message || 'La respuesta del servidor no contiene datos de ventas.');
             }
         } catch (error) {
             console.error('Error fatal al cargar los reportes:', error);
             alert(`No se pudieron cargar los datos de los reportes: ${error.message}`);
+            if(ventasTableBody) ventasTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Error al cargar datos.</td></tr>';
         } finally {
             showLoading(false);
         }
     };
+
+    // --- LÓGICA DEL BOTÓN IR ARRIBA ---
+    if(goTopBtn) {
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                goTopBtn.style.display = "block";
+            } else {
+                goTopBtn.style.display = "none";
+            }
+        };
+        goTopBtn.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    }
 
     // --- ASIGNACIÓN DE EVENTOS ---
     if (filterBtn) filterBtn.addEventListener('click', applyAndRenderFilters);
@@ -267,9 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (abonoForm) abonoForm.addEventListener('submit', handleAbonoSubmit);
 
     // --- INICIALIZACIÓN ---
-    if (ventasChartCtx && gastosChartCtx && ventasTableBody && gastosTableBody) {
+    if (ventasTableBody) {
         loadReportData();
     } else {
-        console.error("Algunos elementos clave no se encontraron en el DOM.");
+        console.error("El cuerpo de la tabla de ventas no se encontró en el DOM.");
     }
 });

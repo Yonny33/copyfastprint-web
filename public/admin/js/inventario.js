@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsmEVpWCCNBW0N-52h2eHx42YJ9qj7cOT2ktyyQpBY5qgGgCq_wAYd2oW_R7R0j0vV/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec';
 
+    // --- Elementos del DOM ---
     const loadingOverlay = document.getElementById('loading-overlay');
     const btnAddProducto = document.getElementById('btn-add-producto');
     const productModal = document.getElementById('product-modal');
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tablaInventarioBody = document.querySelector('#tabla-inventario tbody');
     const searchInput = document.getElementById('search-input');
     const stockChartCanvas = document.getElementById('stock-chart');
+    const goTopBtn = document.getElementById('btn-go-top'); // <-- Botón Ir Arriba
 
     let allProducts = [];
     let stockChart = null;
@@ -35,11 +37,24 @@ document.addEventListener('DOMContentLoaded', function() {
     inventarioForm.addEventListener('submit', handleFormSubmit);
     searchInput.addEventListener('input', handleSearch);
 
+    // --- LÓGICA DEL BOTÓN IR ARRIBA ---
+    if(goTopBtn) {
+        window.onscroll = function() {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                goTopBtn.style.display = "block";
+            } else {
+                goTopBtn.style.display = "none";
+            }
+        };
+        goTopBtn.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    }
+
     // --- FUNCIONES PRINCIPALES ---
 
     function fetchInventoryData() {
         showLoading(true);
-        // CORRECCIÓN: Se usa 'getInventory' en lugar de 'getInventario' para coincidir con el backend.
         fetch(`${SCRIPT_URL}?action=getInventory`)
             .then(response => {
                 if (!response.ok) {
@@ -229,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const field = inventarioForm.elements[key];
                 if (field) {
                     if (key === 'fecha_ingreso' && product[key]) {
-                        // Asegurarse que la fecha es un objeto Date válido antes de llamar a toISOString
                         const date = new Date(product[key]);
                         if (!isNaN(date)) {
                            field.value = date.toISOString().split('T')[0];
@@ -239,7 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-             // Asegurarse de que el id_producto se establece en el campo oculto
             if (inventarioForm.elements['id_producto']) {
                 inventarioForm.elements['id_producto'].value = product.id_producto || '';
             }
