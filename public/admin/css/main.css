@@ -42,9 +42,7 @@ body.admin-page, body.login-page-body {
 .sidebar-nav a:hover { background-color: var(--background-card); color: var(--text-primary); }
 .sidebar-nav .active a { background-color: var(--primary-color); color: var(--text-primary); border-left-color: #ff4d4d; }
 .sidebar-nav i.fa-fw { margin-right: 12px; font-size: 1.1rem; }
-.sidebar-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); }
-.logout-btn { width: 100%; background: transparent; border: 1px solid var(--error-color); color: var(--error-color); padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
-.logout-btn:hover { background-color: var(--error-color); color: var(--text-primary); }
+.sidebar-footer { display: none; } /* OCULTADO: El botón ahora es flotante */
 
 /* =============================================================================
    4. ADMIN - CONTENIDO PRINCIPAL
@@ -172,10 +170,6 @@ td.actions { text-align: center; }
    14. ADMIN - COMPONENTES REUTILIZABLES
    ============================================================================= */
 
-/* --- Botón Ir Arriba --- */
-#btn-go-top { display: none; position: fixed; bottom: 25px; right: 25px; z-index: 100; border: none; outline: none; background-color: var(--primary-color); color: white; cursor: pointer; padding: 12px 16px; border-radius: 50%; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: background-color 0.3s, transform 0.3s; }
-#btn-go-top:hover { background-color: #6d0000; transform: translateY(-3px); }
-
 /* --- Estilo unificado para tablas modernas (Inventario, Reportes) --- */
 .card-table.modern-table { padding: 1.5rem; }
 .modern-table table { border-collapse: separate; border-spacing: 0 6px; }
@@ -202,3 +196,20 @@ td.actions { text-align: center; }
 .slider.round:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
 input:checked + .slider { background-color: var(--success-color); }
 input:checked + .slider:before { transform: translateX(22px); }
+
+/* =============================================================================
+   15. ADMIN - BOTONES FLOTANTES
+   ============================================================================= */
+.floating-buttons-container { position: fixed; bottom: 25px; right: 25px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+
+.btn-flotante { border: none; outline: none; cursor: pointer; border-radius: 50%; width: 50px; height: 50px; font-size: 18px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: transform 0.3s, background-color 0.3s; }
+
+.btn-flotante:hover { transform: translateY(-3px); }
+
+.btn-flotante-top { background-color: var(--primary-color); display: none; /* Gestionado por JS */ }
+
+.btn-flotante-top:hover { background-color: #6d0000; }
+
+.btn-flotante-logout { background-color: var(--error-color); }
+
+.btn-flotante-logout:hover { background-color: #c53030; }

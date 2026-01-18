@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterBtn = document.getElementById('filter-btn');
     const resetBtn = document.getElementById('reset-btn');
     const debtToggle = document.getElementById('debt-toggle');
-    const goTopBtn = document.getElementById('btn-go-top');
 
     const ventasTableBody = document.querySelector('#ventas-table tbody');
     const ventasTableTitle = document.getElementById('ventas-table-title');
@@ -185,20 +184,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading(false);
         }
     };
-
-    // --- LÓGICA DEL BOTÓN IR ARRIBA ---
-    if(goTopBtn) {
-        window.onscroll = function() {
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                goTopBtn.style.display = "block";
-            } else {
-                goTopBtn.style.display = "none";
-            }
-        };
-        goTopBtn.addEventListener('click', () => {
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        });
-    }
 
     // --- ASIGNACIÓN DE EVENTOS ---
     if (filterBtn) filterBtn.addEventListener('click', applyAndRenderFilters);

@@ -4,38 +4,69 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
     const isLoginPage = currentPath.includes('login-registro.html');
 
-    // --- PROTECCIÓN DE PÁGINAS DE ADMINISTRACIÓN ---
-    // Si estamos dentro de la carpeta /admin/ y no hemos iniciado sesión...
-    if (currentPath.includes('/admin/') && !isLoginPage && sesionActiva !== 'true') {
-        // Redirigir a la página de login.
-        // Usamos una ruta absoluta para asegurar que siempre funcione.
+    const logout = () => {
+        sessionStorage.removeItem('sesionActiva');
+        sessionStorage.removeItem('usuario');
         window.location.href = '/admin/login-registro.html';
-        return; // Detener ejecución para evitar errores.
-    }
+    };
 
-    // Si no estamos en una página de admin, no hacemos nada de protección.
-
-    // --- CÓDIGO QUE SOLO SE EJECUTA SI LA SESIÓN ESTÁ ACTIVA (en cualquier página) ---
-    // Esto es útil para mostrar el nombre de usuario o el botón de cerrar sesión
-    // si el usuario navega a una página pública mientras tiene la sesión activa.
-
-    if (sesionActiva === 'true') {
-        // Configurar el nombre de usuario en la interfaz (si aplica)
-        const usernameDisplay = document.getElementById('username-display');
-        if (usernameDisplay && usuario) {
-            usernameDisplay.textContent = usuario;
+    if (currentPath.includes('/admin/') && !isLoginPage) {
+        if (sesionActiva !== 'true') {
+            window.location.href = '/admin/login-registro.html';
+            return;
         }
 
-        // Configurar el botón de cerrar sesión
-        const logoutButton = document.getElementById('btnCerrarSesion');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                sessionStorage.removeItem('sesionActiva');
-                sessionStorage.removeItem('usuario');
-                // Al cerrar sesión, siempre redirigir al login.
-                window.location.href = '/admin/login-registro.html';
+        const body = document.body;
+        const floatingButtonsContainer = document.createElement('div');
+        floatingButtonsContainer.className = 'floating-buttons-container';
+        floatingButtonsContainer.innerHTML = `
+            <button id="btn-logout-floating" class="btn-flotante btn-flotante-logout" title="Cerrar Sesión">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <button id="btn-go-top" class="btn-flotante btn-flotante-top" title="Ir arriba">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        `;
+        body.appendChild(floatingButtonsContainer);
+
+        // --- LÓGICA UNIVERSAL PARA EL BOTÓN "IR ARRIBA" ---
+        const goTopBtn = document.getElementById('btn-go-top');
+        const mainContent = document.querySelector('.admin-main-content');
+
+        if (goTopBtn) {
+            const handleScroll = () => {
+                let show = (window.scrollY > 100) || (mainContent && mainContent.scrollTop > 100);
+                goTopBtn.style.display = show ? "flex" : "none";
+            };
+
+            window.addEventListener('scroll', handleScroll);
+            if (mainContent) {
+                mainContent.addEventListener('scroll', handleScroll);
+            }
+
+            goTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (mainContent) {
+                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             });
         }
+
+        const logoutFloatingBtn = document.getElementById('btn-logout-floating');
+        if (logoutFloatingBtn) {
+            logoutFloatingBtn.addEventListener('click', logout);
+        }
+
+        const originalLogoutButton = document.getElementById('btnCerrarSesion');
+        if (originalLogoutButton) {
+            originalLogoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+        }
+    }
+
+    if (isLoginPage && sesionActiva === 'true') {
+        window.location.href = '/admin/admin.html';
     }
 });

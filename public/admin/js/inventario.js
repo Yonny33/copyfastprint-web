@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const tablaInventarioBody = document.querySelector('#tabla-inventario tbody');
     const searchInput = document.getElementById('search-input');
     const stockChartCanvas = document.getElementById('stock-chart');
-    const goTopBtn = document.getElementById('btn-go-top'); // <-- Botón Ir Arriba
 
     let allProducts = [];
     let stockChart = null;
@@ -36,20 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     inventarioForm.addEventListener('submit', handleFormSubmit);
     searchInput.addEventListener('input', handleSearch);
-
-    // --- LÓGICA DEL BOTÓN IR ARRIBA ---
-    if(goTopBtn) {
-        window.onscroll = function() {
-            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-                goTopBtn.style.display = "block";
-            } else {
-                goTopBtn.style.display = "none";
-            }
-        };
-        goTopBtn.addEventListener('click', () => {
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        });
-    }
 
     // --- FUNCIONES PRINCIPALES ---
 
