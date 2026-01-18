@@ -54,20 +54,33 @@ body.admin-page, body.login-page-body {
 .section-heading p { color: var(--text-secondary); font-size: 1.1rem; }
 
 /* =============================================================================
-   5. ADMIN - TARJETAS KPI
+   5. ADMIN - TARJETAS KPI (MODIFICADO)
    ============================================================================= */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
-.kpi-card { background-color: var(--background-card); border-radius: 8px; padding: 1.5rem; display: flex; align-items: center; border: 1px solid var(--border-color); transition: all 0.2s ease; }
+.kpi-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); /* MODIFICADO: Rejilla 3x3 */
+    gap: 1.5rem; 
+    margin-bottom: 2.5rem; 
+}
+.kpi-card { 
+    background-color: var(--background-card); 
+    border-radius: 8px; 
+    padding: 1.25rem; /* MODIFICADO: Menos padding vertical para hacerla más compacta */
+    display: flex; 
+    align-items: center; 
+    border: 1px solid var(--border-color); 
+    transition: all 0.2s ease; 
+}
 .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 0 25px -5px var(--accent-glow); }
-.kpi-icon { font-size: 2rem; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0; background-color: rgba(255, 255, 255, 0.05); }
+.kpi-icon { font-size: 1.8rem; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.25rem; flex-shrink: 0; background-color: rgba(255, 255, 255, 0.05); }
 .kpi-icon.ingresos { color: var(--success-color); }
 .kpi-icon.gastos { color: var(--error-color); }
 .kpi-icon.clientes { color: #3B82F6; }
 .kpi-icon.deuda { color: var(--warning-color); }
 .kpi-icon.inventario { color: #8B5CF6; }
 .kpi-icon.balance { color: #6366F1; }
-.kpi-info h3 { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 0.25rem; text-transform: uppercase; }
-.kpi-info p { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
+.kpi-info h3 { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 0.2rem; text-transform: uppercase; }
+.kpi-info p { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); }
 
 /* =============================================================================
    6. ADMIN - GRÁFICOS Y TABLAS
@@ -221,7 +234,8 @@ td.actions { text-align: center; }
 @media (max-width: 992px) { .admin-grid-container { grid-template-columns: 1fr; } .admin-sidebar { display: none; } .filter-controls { grid-template-columns: 1fr; } .filter-buttons { justify-self: stretch; display: flex; flex-direction: column; gap: 1rem; } .toolbar { flex-direction: column; align-items: stretch; gap: 1.5rem; } .search-bar { width: 100%; } }
 @media (max-width: 768px) { 
     .admin-main-content { padding: 1.5rem; } 
-    .kpi-grid, .form-grid, .form-row { grid-template-columns: 1fr; } 
+    .kpi-grid { grid-template-columns: 1fr; } /* MODIFICADO: 1 columna en móvil */
+    .form-grid, .form-row { grid-template-columns: 1fr; } 
     .form-row { margin-bottom: 0; } 
     .form-row .form-group { margin-bottom: 1.5rem; } 
     .modal-content { margin: 5% auto; } 

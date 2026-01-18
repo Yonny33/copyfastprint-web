@@ -22,8 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const element = document.getElementById(id);
         if (element) element.textContent = text;
     };
-    const formatCurrency = (value) => `$${parseFloat(value || 0).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-    const formatNumber = (value) => (value || 0).toLocaleString('es-CO');
+    // MODIFICADO: Formato de moneda para Bolívares (Bs.)
+    const formatCurrency = (value) => `Bs. ${parseFloat(value || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatNumber = (value) => (value || 0).toLocaleString('de-DE');
     const showLoading = (show) => {
         if(loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none';
     }
@@ -38,12 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
         safeSetText("kpi-alertas-inventario", formatNumber(kpis.alertasInventario));
         safeSetText("kpi-balance-general", formatCurrency(kpis.balanceGeneral));
         safeSetText("kpi-items-stock", formatNumber(kpis.totalItemsStock));
+        safeSetText("kpi-saldo-pendiente", formatCurrency(kpis.totalSaldoPendiente)); // Nuevo KPI
+
         const balanceNetoEl = document.getElementById("kpi-balance-neto");
         if(balanceNetoEl) balanceNetoEl.style.color = (kpis.balanceNeto < 0) ? 'var(--error-color)' : 'var(--success-color)';
         const balanceGeneralEl = document.getElementById("kpi-balance-general");
         if(balanceGeneralEl) balanceGeneralEl.style.color = (kpis.balanceGeneral < 0) ? 'var(--error-color)' : 'var(--success-color)';
     };
 
+    // MODIFICADO: Gráfico con formato de moneda actualizado
     const renderChart = (chartData = { labels: [], ingresos: [], gastos: [] }) => {
         const canvas = document.getElementById('ingresos-gastos-chart');
         if (!canvas) return;
@@ -59,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true, ticks: { color: 'var(--text-secondary)', callback: (v) => '$' + v.toLocaleString('es-CO') } }, x: { ticks: { color: 'var(--text-secondary)', autoSkip: true, maxTicksLimit: 20 } } },
+                scales: { y: { beginAtZero: true, ticks: { color: 'var(--text-secondary)', callback: (v) => formatCurrency(v) } }, x: { ticks: { color: 'var(--text-secondary)', autoSkip: true, maxTicksLimit: 20 } } },
                 plugins: { legend: { position: 'top', labels: { color: 'var(--text-primary)' } } }
             }
         });
@@ -79,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             columns.forEach(col => {
                 const td = document.createElement('td');
                 let value = item[col.key];
-                if (col.format === 'currency') value = formatCurrency(item[col.moneyKey]); // Usar la clave de monto correcta
+                if (col.format === 'currency') value = formatCurrency(item[col.moneyKey]);
                 else if (col.format === 'date') {
                     const date = value ? new Date(value + 'T00:00:00') : null;
                     value = date && !isNaN(date) ? date.toLocaleDateString('es-CO', { timeZone: 'UTC' }) : '-';
@@ -96,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tbody.appendChild(tr);
         });
         
-        // Delegación de eventos en el cuerpo de la tabla
         tbody.addEventListener('click', (event) => {
             const button = event.target.closest('.btn-edit');
             if (button) {
@@ -116,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openEditModal = (record, type) => {
-        editForm.innerHTML = ''; // Limpiar formulario anterior
+        editForm.innerHTML = '';
         editFormTitle.textContent = `Editar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
         buildEditForm(record, type);
         editModal.style.display = 'block';
@@ -195,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
             editForm.appendChild(formGroup);
         });
 
-        // Botones de acción del formulario
         const formActions = document.createElement('div');
         formActions.className = 'form-buttons';
         formActions.innerHTML = `
@@ -230,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.status === 'success') {
                 alert(result.message);
                 closeModal();
-                loadDashboardData(); // Recargar datos
+                loadDashboardData();
             } else {
                 throw new Error(result.message || 'Error al guardar.');
             }
@@ -273,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error(error.message);
-            // Mostrar error en UI
         } finally {
            showLoading(false);
         }
