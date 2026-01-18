@@ -1,197 +1,286 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Asegura que la autenticación se verifique al cargar la página.
-  if (typeof setupAuth === "function") {
-    setupAuth();
-  }
-
-  const GOOGLE_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
-  const loadingOverlay = document.getElementById("loading-overlay");
-  let ingresosGastosChart = null;
-
-  // --- HELPERS DE SEGURIDAD Y FORMATO ---
-  const safeSetText = (id, text) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.textContent = text;
-    } else {
-      console.warn(`Elemento con id '${id}' no encontrado.`);
-    }
-  };
-
-  const formatCurrency = (value) =>
-    `$${parseFloat(value || 0).toLocaleString("es-CO", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })}`;
-  const formatNumber = (value) => (value || 0).toLocaleString("es-CO");
-
-  // --- FUNCIONES DE RENDERIZADO ---
-  const renderKpis = (kpis = {}) => {
-    safeSetText("kpi-ingresos-mes", formatCurrency(kpis.ingresosMes));
-    safeSetText("kpi-gastos-mes", formatCurrency(kpis.gastosMes));
-    safeSetText("kpi-balance-neto", formatCurrency(kpis.balanceNeto));
-    safeSetText("kpi-clientes-nuevos", formatNumber(kpis.clientesNuevos));
-    safeSetText("kpi-clientes-deudas", formatNumber(kpis.clientesConDeuda));
-    safeSetText("kpi-alertas-inventario", formatNumber(kpis.alertasInventario));
-    safeSetText("kpi-balance-general", formatCurrency(kpis.balanceGeneral));
-    safeSetText("kpi-items-stock", formatNumber(kpis.totalItemsStock));
-
-    const balanceNetoElement = document.getElementById("kpi-balance-neto");
-    if (balanceNetoElement) {
-      balanceNetoElement.style.color =
-        kpis.balanceNeto < 0 ? "var(--error-color)" : "var(--success-color)";
+document.addEventListener('DOMContentLoaded', () => {
+    // Autenticación
+    if (typeof setupAuth === 'function') {
+        setupAuth();
     }
 
-    const balanceGeneralElement = document.getElementById(
-      "kpi-balance-general"
-    );
-    if (balanceGeneralElement) {
-      balanceGeneralElement.style.color =
-        kpis.balanceGeneral < 0 ? "var(--error-color)" : "var(--success-color)";
+    // --- ELEMENTOS DEL DOM ---
+    const loadingOverlay = document.getElementById("loading-overlay");
+    const editModal = document.getElementById("edit-modal");
+    const editForm = document.getElementById("edit-form");
+    const editFormTitle = document.getElementById("edit-form-title");
+    const closeModalButtons = document.querySelectorAll(".close-button");
+
+    // --- ESTADO Y CONFIGURACIÓN ---
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+    let ingresosGastosChart = null;
+    let recentVentas = [];
+    let recentGastos = [];
+
+    // --- HELPERS ---
+    const safeSetText = (id, text) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = text;
+    };
+    const formatCurrency = (value) => `$${parseFloat(value || 0).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    const formatNumber = (value) => (value || 0).toLocaleString('es-CO');
+    const showLoading = (show) => {
+        if(loadingOverlay) loadingOverlay.style.display = show ? 'flex' : 'none';
     }
-  };
 
-  // --- FUNCIÓN DE GRÁFICO CON CORRECCIÓN DEFINITIVA ---
-  const renderChart = (
-    chartData = { labels: [], ingresos: [], gastos: [] }
-  ) => {
-    const canvas = document.getElementById("ingresos-gastos-chart");
-    if (!canvas) return console.warn("Canvas para el gráfico no encontrado.");
-    const ctx = canvas.getContext("2d");
+    // --- FUNCIONES DE RENDERIZADO ---
+    const renderKpis = (kpis = {}) => {
+        safeSetText("kpi-ingresos-mes", formatCurrency(kpis.ingresosMes));
+        safeSetText("kpi-gastos-mes", formatCurrency(kpis.gastosMes));
+        safeSetText("kpi-balance-neto", formatCurrency(kpis.balanceNeto));
+        safeSetText("kpi-clientes-nuevos", formatNumber(kpis.clientesNuevos));
+        safeSetText("kpi-clientes-deudas", formatNumber(kpis.clientesConDeuda));
+        safeSetText("kpi-alertas-inventario", formatNumber(kpis.alertasInventario));
+        safeSetText("kpi-balance-general", formatCurrency(kpis.balanceGeneral));
+        safeSetText("kpi-items-stock", formatNumber(kpis.totalItemsStock));
+        const balanceNetoEl = document.getElementById("kpi-balance-neto");
+        if(balanceNetoEl) balanceNetoEl.style.color = (kpis.balanceNeto < 0) ? 'var(--error-color)' : 'var(--success-color)';
+        const balanceGeneralEl = document.getElementById("kpi-balance-general");
+        if(balanceGeneralEl) balanceGeneralEl.style.color = (kpis.balanceGeneral < 0) ? 'var(--error-color)' : 'var(--success-color)';
+    };
 
-    if (ingresosGastosChart) ingresosGastosChart.destroy();
-
-    ingresosGastosChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: chartData.labels,
-        datasets: [
-          {
-            label: "Ingresos",
-            data: chartData.ingresos,
-            backgroundColor: "rgba(75, 192, 192, 0.7)",
-          },
-          {
-            label: "Gastos",
-            data: chartData.gastos,
-            backgroundColor: "rgba(255, 99, 132, 0.7)",
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false, // CLAVE: Permite que el CSS controle el tamaño
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: "var(--text-secondary)",
-              callback: (value) => "$" + value.toLocaleString("es-CO"),
+    const renderChart = (chartData = { labels: [], ingresos: [], gastos: [] }) => {
+        const canvas = document.getElementById('ingresos-gastos-chart');
+        if (!canvas) return;
+        if (ingresosGastosChart) ingresosGastosChart.destroy();
+        ingresosGastosChart = new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    { label: 'Ingresos', data: chartData.ingresos, backgroundColor: 'rgba(75, 192, 192, 0.7)' },
+                    { label: 'Gastos', data: chartData.gastos, backgroundColor: 'rgba(255, 99, 132, 0.7)' }
+                ]
             },
-          },
-          x: {
-            ticks: {
-              color: "var(--text-secondary)",
-              autoSkip: true,
-              maxTicksLimit: 20,
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            position: "top",
-            labels: {
-              color: "var(--text-primary)",
-            },
-          },
-        },
-      },
-    });
-  };
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { color: 'var(--text-secondary)', callback: (v) => '$' + v.toLocaleString('es-CO') } }, x: { ticks: { color: 'var(--text-secondary)', autoSkip: true, maxTicksLimit: 20 } } },
+                plugins: { legend: { position: 'top', labels: { color: 'var(--text-primary)' } } }
+            }
+        });
+    };
 
-  const renderTable = (tableId, data, columns) => {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    if (!tbody)
-      return console.warn(`Cuerpo de tabla para #${tableId} no encontrado.`);
-
-    tbody.innerHTML = "";
-    if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${columns.length}" style="text-align: center;">No hay datos.</td></tr>`;
-      return;
-    }
-
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-      columns.forEach((col) => {
-        const td = document.createElement("td");
-        let value = item[col.key];
-        if (col.format === "currency") value = formatCurrency(value);
-        else if (col.format === "date") {
-          const date = value ? new Date(value + "T00:00:00") : null;
-          value =
-            date && !isNaN(date)
-              ? date.toLocaleDateString("es-CO", { timeZone: "UTC" })
-              : "-";
+    const renderTable = (tableId, data, columns, type) => {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${columns.length + 1}" style="text-align: center;">No hay datos recientes.</td></tr>`;
+            return;
         }
-        td.textContent = value || "-";
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-  };
 
-  const showError = (message) => {
-    console.error(message);
-    const kpiIds = [
-      "kpi-ingresos-mes",
-      "kpi-gastos-mes",
-      "kpi-balance-neto",
-      "kpi-clientes-nuevos",
-      "kpi-clientes-deudas",
-      "kpi-alertas-inventario",
-      "kpi-balance-general",
-      "kpi-items-stock",
-    ];
-    kpiIds.forEach((id) => safeSetText(id, "Error"));
-  };
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            columns.forEach(col => {
+                const td = document.createElement('td');
+                let value = item[col.key];
+                if (col.format === 'currency') value = formatCurrency(item[col.moneyKey]); // Usar la clave de monto correcta
+                else if (col.format === 'date') {
+                    const date = value ? new Date(value + 'T00:00:00') : null;
+                    value = date && !isNaN(date) ? date.toLocaleDateString('es-CO', { timeZone: 'UTC' }) : '-';
+                }
+                td.textContent = value || '-';
+                tr.appendChild(td);
+            });
 
-  // --- FUNCIÓN PRINCIPAL DE CARGA ---
-  const loadDashboardData = async () => {
-    if (loadingOverlay) loadingOverlay.style.display = "flex";
-    try {
-      const response = await fetch(
-        `${GOOGLE_SCRIPT_URL}?action=getEnhancedDashboardData`
-      );
-      if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+            const idKey = type === 'venta' ? 'id_transaccion' : 'id_gasto';
+            const actionsTd = document.createElement('td');
+            actionsTd.className = 'actions';
+            actionsTd.innerHTML = `<button class="btn-edit" data-id="${item[idKey]}" data-type="${type}"><i class="fas fa-edit"></i></button>`;
+            tr.appendChild(actionsTd);
+            tbody.appendChild(tr);
+        });
+        
+        // Delegación de eventos en el cuerpo de la tabla
+        tbody.addEventListener('click', (event) => {
+            const button = event.target.closest('.btn-edit');
+            if (button) {
+                handleEditClick(button.dataset.id, button.dataset.type);
+            }
+        });
+    };
 
-      const result = await response.json();
+    // --- LÓGICA DE EDICIÓN ---
+    const handleEditClick = (id, type) => {
+        const sourceData = type === 'venta' ? recentVentas : recentGastos;
+        const idKey = type === 'venta' ? 'id_transaccion' : 'id_gasto';
+        const record = sourceData.find(item => String(item[idKey]) === String(id));
+        if (record) {
+            openEditModal(record, type);
+        }
+    };
 
-      if (result.status === "success" && result.data) {
-        const { kpis, chartData, ultimasVentas, ultimosGastos } = result.data;
-        renderKpis(kpis);
-        renderChart(chartData);
-        renderTable("tabla-ultimas-ventas", ultimasVentas, [
-          { key: "fecha", format: "date" },
-          { key: "nombre", format: "text" },
-          { key: "monto", format: "currency" },
-        ]);
-        renderTable("tabla-ultimos-gastos", ultimosGastos, [
-          { key: "fecha", format: "date" },
-          { key: "descripcion", format: "text" },
-          { key: "monto", format: "currency" },
-        ]);
-      } else {
-        throw new Error(
-          result.message || "La API no devolvió el formato esperado."
-        );
-      }
-    } catch (error) {
-      showError(error.message);
-    } finally {
-      if (loadingOverlay) loadingOverlay.style.display = "none";
+    const openEditModal = (record, type) => {
+        editForm.innerHTML = ''; // Limpiar formulario anterior
+        editFormTitle.textContent = `Editar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        buildEditForm(record, type);
+        editModal.style.display = 'block';
+    };
+
+    const closeModal = () => {
+        if(editModal) editModal.style.display = 'none';
     }
-  };
 
-  loadDashboardData();
+    const buildEditForm = (record, type) => {
+        let fields = [];
+        if (type === 'venta') {
+            fields = [
+                { name: 'id_transaccion', type: 'hidden' },
+                { label: 'Fecha', name: 'fecha', type: 'date' },
+                { label: 'Nombre Cliente', name: 'nombre_cliente', type: 'text' },
+                { label: 'Descripción', name: 'descripcion_producto', type: 'text' },
+                { label: 'Cantidad', name: 'cantidad', type: 'number' },
+                { label: 'Precio Unitario', name: 'precio_unitario', type: 'number' },
+                { label: 'Venta Bruta', name: 'venta_bruta', type: 'number' },
+                { label: 'Abono Recibido', name: 'abono_recibido', type: 'number' },
+                { label: 'Saldo Pendiente', name: 'saldo_pendiente', type: 'number' },
+                { label: 'Método de Pago', name: 'metodo_pago', type: 'select', options: ['Efectivo', 'Transferencia', 'Tarjeta', 'Otro'] }
+            ];
+        } else { // Gasto
+            fields = [
+                { name: 'id_gasto', type: 'hidden' },
+                { label: 'Fecha', name: 'fecha', type: 'date' },
+                { label: 'Descripción', name: 'descripcion', type: 'text' },
+                { label: 'Monto', name: 'monto', type: 'number' },
+                { label: 'Método de Pago', name: 'metodo_pago', type: 'select', options: ['Efectivo', 'Transferencia', 'Tarjeta', 'Otro'] },
+                { label: 'Categoría', name: 'categoria', type: 'text' },
+                 { label: 'Proveedor', name: 'proveedor', type: 'text' }
+            ];
+        }
+
+        fields.forEach(field => {
+            if (field.type === 'hidden') {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                input.value = record[field.name] || '';
+                editForm.appendChild(input);
+                return;
+            }
+
+            const formGroup = document.createElement('div');
+            formGroup.className = 'form-group';
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            formGroup.appendChild(label);
+
+            if (field.type === 'select') {
+                const select = document.createElement('select');
+                select.name = field.name;
+                field.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (record[field.name] === opt) option.selected = true;
+                    select.appendChild(option);
+                });
+                formGroup.appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = field.type;
+                input.name = field.name;
+                if(field.type === 'date' && record[field.name]){
+                     const date = new Date(record[field.name]);
+                     if (!isNaN(date)) input.value = date.toISOString().split('T')[0];
+                } else {
+                    input.value = record[field.name] || '';
+                }
+                formGroup.appendChild(input);
+            }
+            editForm.appendChild(formGroup);
+        });
+
+        // Botones de acción del formulario
+        const formActions = document.createElement('div');
+        formActions.className = 'form-buttons';
+        formActions.innerHTML = `
+            <button type="button" class="btn-cancel">Cancelar</button>
+            <button type="submit" class="btn-submit">Guardar Cambios</button>
+        `;
+        editForm.appendChild(formActions);
+        formActions.querySelector('.btn-cancel').addEventListener('click', closeModal);
+    }
+
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(editForm);
+        const recordData = Object.fromEntries(formData.entries());
+        
+        const type = recordData.id_transaccion ? 'venta' : 'gasto';
+        const action = type === 'venta' ? 'saveVenta' : 'saveGasto';
+        
+        await saveRecord(action, recordData);
+    };
+
+    const saveRecord = async (action, data) => {
+        showLoading(true);
+        try {
+            const payload = { action, data };
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.status === 'success') {
+                alert(result.message);
+                closeModal();
+                loadDashboardData(); // Recargar datos
+            } else {
+                throw new Error(result.message || 'Error al guardar.');
+            }
+        } catch (error) {
+            console.error('Error en saveRecord:', error);
+            alert('Error al guardar: ' + error.message);
+        } finally {
+            showLoading(false);
+        }
+    };
+
+    // --- FUNCIÓN PRINCIPAL DE CARGA ---
+    const loadDashboardData = async () => {
+        showLoading(true);
+        try {
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getEnhancedDashboardData`);
+            if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+            
+            const result = await response.json();
+
+            if (result.status === "success" && result.data) {
+                const { kpis, chartData, ultimasVentas, ultimosGastos } = result.data;
+                recentVentas = ultimasVentas || [];
+                recentGastos = ultimosGastos || [];
+
+                renderKpis(kpis);
+                renderChart(chartData);
+                renderTable('tabla-ultimas-ventas', recentVentas, [
+                    { key: 'fecha', format: 'date' },
+                    { key: 'nombre_cliente', format: 'text' },
+                    { key: 'venta_bruta', format: 'currency', moneyKey: 'venta_bruta' }
+                ], 'venta');
+                renderTable('tabla-ultimos-gastos', recentGastos, [
+                    { key: 'fecha', format: 'date' },
+                    { key: 'descripcion', format: 'text' },
+                    { key: 'monto', format: 'currency', moneyKey: 'monto' }
+                ], 'gasto');
+            } else {
+                throw new Error(result.message || "La API no devolvió el formato esperado.");
+            }
+        } catch (error) {
+            console.error(error.message);
+            // Mostrar error en UI
+        } finally {
+           showLoading(false);
+        }
+    };
+
+    // --- INICIALIZACIÓN ---
+    loadDashboardData();
+    closeModalButtons.forEach(btn => btn.addEventListener('click', closeModal));
+    editForm.addEventListener('submit', handleFormSubmit);
 });
