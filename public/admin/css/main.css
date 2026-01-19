@@ -58,29 +58,50 @@ body.admin-page, body.login-page-body {
    ============================================================================= */
 .kpi-grid { 
     display: grid; 
-    grid-template-columns: repeat(3, 1fr); /* MODIFICADO: Rejilla 3x3 */
-    gap: 1.5rem; 
+    grid-template-columns: repeat(3, 1fr); /* Rejilla 3x3 */
+    gap: 1.25rem; /* Espaciado reducido */
     margin-bottom: 2.5rem; 
 }
 .kpi-card { 
     background-color: var(--background-card); 
     border-radius: 8px; 
-    padding: 1.25rem; /* MODIFICADO: Menos padding vertical para hacerla más compacta */
+    padding: 1rem; /* Padding reducido para menor altura */
     display: flex; 
     align-items: center; 
     border: 1px solid var(--border-color); 
     transition: all 0.2s ease; 
 }
-.kpi-card:hover { transform: translateY(-5px); box-shadow: 0 0 25px -5px var(--accent-glow); }
-.kpi-icon { font-size: 1.8rem; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.25rem; flex-shrink: 0; background-color: rgba(255, 255, 255, 0.05); }
+.kpi-card:hover { transform: translateY(-4px); box-shadow: 0 0 20px -5px var(--accent-glow); }
+.kpi-icon { 
+    font-size: 1.6rem; /* Icono más pequeño */
+    width: 48px; /* Contenedor de icono más pequeño */
+    height: 48px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    margin-right: 1rem; /* Margen reducido */
+    flex-shrink: 0; 
+    background-color: rgba(255, 255, 255, 0.05); 
+}
 .kpi-icon.ingresos { color: var(--success-color); }
 .kpi-icon.gastos { color: var(--error-color); }
 .kpi-icon.clientes { color: #3B82F6; }
 .kpi-icon.deuda { color: var(--warning-color); }
 .kpi-icon.inventario { color: #8B5CF6; }
 .kpi-icon.balance { color: #6366F1; }
-.kpi-info h3 { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 0.2rem; text-transform: uppercase; }
-.kpi-info p { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); }
+.kpi-info h3 { 
+    font-size: 0.8rem; /* Título más pequeño */
+    color: var(--text-secondary); 
+    font-weight: 500; 
+    margin-bottom: 0.1rem; /* Espacio reducido */
+    text-transform: uppercase; 
+}
+.kpi-info p { 
+    font-size: 1.4rem; /* Valor numérico más pequeño */
+    font-weight: 700; 
+    color: var(--text-primary); 
+}
 
 /* =============================================================================
    6. ADMIN - GRÁFICOS Y TABLAS
