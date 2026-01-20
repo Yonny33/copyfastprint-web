@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <!-- Google Tag Manager -->
@@ -6,8 +6,8 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Gastos - Admin COPYFAST&PRINT</title>
-    <meta name="description" content="Panel de administración para el registro de gastos operativos.">
+    <title>Gastos - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para el registro y consulta de gastos operativos.">
     
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
@@ -48,10 +48,11 @@
 
         <!-- Contenido principal -->
         <main class="admin-main-content">
+            <!-- ENCABEZADO DE SECCIÓN CORREGIDO -->
             <div class="section-heading">
-                <h2>Registro de Gasto</h2>
+                <h2>Gastos</h2>
                 <div class="divider"></div>
-                <p>Añade los detalles de un nuevo gasto operativo o de compra.</p>
+                <p>Gestiona, registra y consulta el historial de gastos operativos.</p>
             </div>
 
             <!-- Formulario y columna de información -->
@@ -60,6 +61,9 @@
                 <!-- Columna del formulario -->
                 <div class="form-container">
                     <form id="registro-gastos-form">
+                        <div class="form-group full-width">
+                            <h3 class="form-section-title">Registrar Nuevo Gasto</h3>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="fecha">Fecha del Gasto *</label>
@@ -142,8 +146,6 @@
     <script src="/admin/js/registro-gastos.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Llama a la función de autenticación global.
-            // Esta función se encarga de verificar la sesión y configurar el botón de cierre de sesión.
             setupAuth();
         });
     </script>
