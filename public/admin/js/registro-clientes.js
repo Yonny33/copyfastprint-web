@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const usuario = sessionStorage.getItem("usuario");
     if (!usuario) {
       alert("Error: Sesión no válida. Por favor, inicie sesión de nuevo.");
-      window.location.href = "login.html";
+      window.location.href = "login-registro.html";
       return;
     }
 
