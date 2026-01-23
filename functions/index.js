@@ -256,4 +256,13 @@ app.get("/api/dashboard", async (req, res) => {
 
 // --- Exportar la API de Express como una Cloud Function ---
 // Cada vez que se llame a esta función HTTPS, se ejecutará nuestra app de Express.
-exports.api = onRequest({ region: "us-central1" }, app);
+exports.api = onRequest(
+  {
+    region: "us-central1",
+    maxInstances: 10, // Límite de seguridad: Máximo 10 copias simultáneas (evita facturas gigantes por errores)
+    memory: "256MiB", // Memoria mínima: Suficiente para tu API y la más barata
+    timeoutSeconds: 60, // Si tarda más de 60s, se corta (evita procesos colgados cobrando tiempo)
+    concurrency: 80, // Cloud Functions v2 permite recibir hasta 80 peticiones por instancia
+  },
+  app,
+);
