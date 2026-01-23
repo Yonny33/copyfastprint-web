@@ -85,6 +85,63 @@ app.get("/api/inventario", async (req, res) => {
   }
 });
 
+// Endpoint para AÑADIR un nuevo producto al inventario
+app.post("/api/inventario", async (req, res) => {
+  try {
+    const productoData = req.body;
+    // Eliminar id_producto del cuerpo si viene vacío para que Firestore genere uno
+    delete productoData.id_producto;
+
+    const docRef = await db.collection("inventario").add(productoData);
+    res.status(201).json({
+      status: "success",
+      message: "Producto añadido con éxito",
+      id: docRef.id,
+    });
+  } catch (error) {
+    console.error("Error al añadir producto:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al añadir producto." });
+  }
+});
+
+// Endpoint para ACTUALIZAR un producto existente
+app.put("/api/inventario/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    // No queremos guardar el ID dentro del documento como un campo duplicado
+    delete data.id_producto;
+
+    await db.collection("inventario").doc(id).update(data);
+    res
+      .status(200)
+      .json({ status: "success", message: "Producto actualizado con éxito" });
+  } catch (error) {
+    console.error("Error al actualizar producto:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al actualizar producto." });
+  }
+});
+
+// Endpoint para ELIMINAR un producto
+app.delete("/api/inventario/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.collection("inventario").doc(id).delete();
+    res
+      .status(200)
+      .json({ status: "success", message: "Producto eliminado con éxito" });
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al eliminar producto." });
+  }
+});
+
 // Endpoint para AÑADIR una nueva venta
 app.post("/api/ventas", async (req, res) => {
   try {
