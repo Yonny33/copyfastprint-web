@@ -3,8 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!form) return;
 
   const loadingOverlay = document.getElementById("loading-overlay");
-  const SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+  const API_URL = "/api";
 
   const showLoading = () => (loadingOverlay.style.display = "flex");
   const hideLoading = () => (loadingOverlay.style.display = "none");
@@ -12,34 +11,36 @@ document.addEventListener("DOMContentLoaded", function () {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    const usuario = sessionStorage.getItem("usuario");
-    if (!usuario) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
       alert("Error: Sesión no válida. Por favor, inicie sesión de nuevo.");
       window.location.href = "login-registro.html";
       return;
     }
+    const usuario = user.email;
 
     showLoading();
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // SOLUCIÓN DEFINITIVA: La acción debe coincidir con el nombre de la función en Apps Script.
     const payload = {
-      action: "saveClient",
       usuario: usuario, // El backend podría usarlo para logs o auditoría.
       ...data,
     };
 
     try {
-      const response = await fetch(SCRIPT_URL, {
+      const response = await fetch(`${API_URL}/clientes`, {
         method: "POST",
-        redirect: "follow",
         headers: {
-          "Content-Type": "text/plain;charset=utf-8",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+      }
 
       const result = await response.json();
 

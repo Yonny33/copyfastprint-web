@@ -39,8 +39,8 @@
         <form id="loginForm">
             <p style="text-align: center; color: var(--text-secondary); margin-top: -1rem; margin-bottom: 2rem;">Acceso de Administrador</p>
             <div class="form-group">
-                <label for="username"><i class="fas fa-user"></i> Usuario</label>
-                <input type="text" id="username" name="username" required autocomplete="username">
+                <label for="username"><i class="fas fa-user"></i> Correo Electrónico</label>
+                <input type="email" id="username" name="username" required autocomplete="username">
             </div>
             <div class="form-group">
                 <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
@@ -51,6 +51,14 @@
         </form>
     </div>
 
+    <!-- Scripts de Firebase (¡AÑADIDOS!) -->
+    <!-- Estos deben cargarse ANTES que login.js y auth.js -->
+    <script src="/__/firebase/8.10.1/firebase-app.js"></script>
+    <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
+    <script src="/__/firebase/init.js"></script>
+
+    <!-- Scripts de tu aplicación -->
     <script src="/admin/js/login.js"></script>
+    <script src="/admin/js/auth.js"></script>
 </body>
 </html>

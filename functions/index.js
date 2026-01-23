@@ -1,40 +1,184 @@
-const functions = require("firebase-functions");
-const logger = require("firebase-functions/logger");
-const axios = require("axios");
-const cors = require("cors")({ origin: true });
+const { onRequest } = require("firebase-functions/v2/https");
+const admin = require("firebase-admin");
+const express = require("express");
+const cors = require("cors");
 
-// Tu clave de API de exchangerate-api.com
-const API_KEY = process.env.EXCHANGERATE_KEY;
-const API_URL = `https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`;
+// Inicializar Firebase Admin SDK para que las funciones puedan acceder a los servicios de Firebase
+admin.initializeApp();
+const db = admin.firestore();
 
-/**
- * Obtiene las tasas de cambio más recientes desde una API externa.
- * Esta función actúa como un proxy seguro para no exponer la API Key en el frontend.
- */
-exports.getExchangeRates = functions.https.onRequest((request, response) => {
-  // Usa el middleware de CORS para permitir peticiones desde tu web.
-  cors(request, response, async () => {
-    logger.info("Iniciando petición para obtener tasas de cambio...");
+const app = express();
 
-    try {
-      const apiResponse = await axios.get(API_URL);
+// Middlewares
+app.use(cors({ origin: true })); // Permite peticiones desde tu frontend
+app.use(express.json()); // Permite al servidor entender JSON en las peticiones
 
-      // Si la API externa responde con éxito...
-      if (apiResponse.data && apiResponse.data.result === "success") {
-        logger.info("Tasas obtenidas con éxito de la API externa.");
-        // Enviamos de vuelta solo el objeto con las tasas de conversión.
-        response.status(200).json(apiResponse.data.conversion_rates);
-      } else {
-        // Si la API externa devuelve un error conocido.
-        logger.error("La API externa devolvió un error:", apiResponse.data);
-        response
-          .status(500)
-          .send("Error al obtener las tasas de la API externa.");
-      }
-    } catch (error) {
-      // Si hay un error de red o en nuestra función.
-      logger.error("Error crítico al llamar a la API de cambio:", error);
-      response.status(500).send("Error interno del servidor.");
-    }
-  });
+// --- RUTAS DE LA API REALES ---
+
+// Endpoint para OBTENER clientes (para el select de ventas)
+app.get("/api/clientes", async (req, res) => {
+  try {
+    const snapshot = await db.collection("clientes").get();
+    const clientes = snapshot.docs.map((doc) => ({
+      id_cliente: doc.id,
+      ...doc.data(),
+    }));
+    res.status(200).json({ status: "success", data: clientes });
+  } catch (error) {
+    console.error("Error al obtener clientes:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al obtener clientes." });
+  }
 });
+
+// Endpoint para AÑADIR un nuevo cliente
+app.post("/api/clientes", async (req, res) => {
+  try {
+    const clienteData = req.body;
+    const docRef = await db.collection("clientes").add(clienteData);
+    res.status(201).json({
+      status: "success",
+      message: "Cliente añadido con éxito",
+      id: docRef.id,
+    });
+  } catch (error) {
+    console.error("Error al añadir cliente:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al añadir cliente." });
+  }
+});
+
+// Endpoint para OBTENER inventario (para el select de productos)
+app.get("/api/inventario", async (req, res) => {
+  try {
+    const snapshot = await db.collection("inventario").get();
+    const productos = snapshot.docs.map((doc) => ({
+      id_producto: doc.id,
+      ...doc.data(),
+    }));
+    res.status(200).json({ status: "success", data: productos });
+  } catch (error) {
+    console.error("Error al obtener inventario:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al obtener inventario." });
+  }
+});
+
+// Endpoint para AÑADIR una nueva venta
+app.post("/api/ventas", async (req, res) => {
+  try {
+    const ventaData = req.body;
+    // Validar datos aquí si es necesario
+    const docRef = await db.collection("ventas").add(ventaData);
+    res.status(201).json({
+      status: "success",
+      message: "Venta añadida con éxito",
+      id: docRef.id,
+    });
+  } catch (error) {
+    console.error("Error al añadir venta:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al añadir la venta." });
+  }
+});
+
+// Endpoint para AÑADIR un nuevo gasto
+app.post("/api/gastos", async (req, res) => {
+  try {
+    const gastoData = req.body;
+    // Validar datos aquí si es necesario
+    const docRef = await db.collection("gastos").add(gastoData);
+    res.status(201).json({
+      status: "success",
+      message: "Gasto añadido con éxito",
+      id: docRef.id,
+    });
+  } catch (error) {
+    console.error("Error al añadir gasto:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al añadir el gasto." });
+  }
+});
+
+// Endpoint para OBTENER los datos del dashboard (KPIs, gráficos, etc.)
+app.get("/api/dashboard", async (req, res) => {
+  try {
+    const ventasSnapshot = await db.collection("ventas").get();
+    const gastosSnapshot = await db.collection("gastos").get();
+
+    const ultimasVentas = ventasSnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+      .slice(0, 10);
+    const ultimosGastos = gastosSnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+      .slice(0, 10);
+
+    // Lógica de KPIs (esto es un cálculo real basado en los datos de Firestore)
+    const ahora = new Date();
+    const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+
+    let ingresosMes = 0;
+    ventasSnapshot.docs.forEach((doc) => {
+      const venta = doc.data();
+      const fechaVenta = new Date(venta.fecha);
+      if (fechaVenta >= primerDiaMes) {
+        ingresosMes += parseFloat(venta.venta_bruta || 0);
+      }
+    });
+
+    let gastosMes = 0;
+    gastosSnapshot.docs.forEach((doc) => {
+      const gasto = doc.data();
+      const fechaGasto = new Date(gasto.fecha);
+      if (fechaGasto >= primerDiaMes) {
+        gastosMes += parseFloat(gasto.monto || 0);
+      }
+    });
+
+    const balanceNeto = ingresosMes - gastosMes;
+
+    // Puedes añadir más cálculos de KPIs aquí (balanceGeneral, clientesNuevos, etc.)
+    // Por ahora, nos centramos en los KPIs principales.
+
+    const response = {
+      status: "success",
+      data: {
+        kpis: {
+          ingresosMes: ingresosMes,
+          gastosMes: gastosMes,
+          balanceNeto: balanceNeto,
+          // Rellenar otros KPIs con lógica real
+          clientesNuevos: 0,
+          clientesConDeuda: 0,
+          alertasInventario: 0,
+          balanceGeneral: 0,
+          totalItemsStock: 0,
+          totalSaldoPendiente: 0,
+        },
+        chartData: {
+          /* Lógica para datos de gráfico se puede añadir aquí */
+        },
+        ultimasVentas: ultimasVentas,
+        ultimosGastos: ultimosGastos,
+      },
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error al obtener datos del dashboard:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error interno del servidor." });
+  }
+});
+
+// --- Exportar la API de Express como una Cloud Function ---
+// Cada vez que se llame a esta función HTTPS, se ejecutará nuestra app de Express.
+exports.api = onRequest({ region: "us-central1" }, app);

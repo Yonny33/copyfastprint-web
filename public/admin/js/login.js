@@ -1,70 +1,75 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-    if (sessionStorage.getItem("sesionActiva") === "true") {
-        window.location.href = "admin.html";
-        return;
-    }
+    //
+    // --- IMPORTANTE ---
+    // Asegúrate de que tu archivo HTML (login-registro.html) incluye los SDK de Firebase
+    // y el objeto de configuración de Firebase (firebaseConfig) antes de que se cargue este script.
+    //
+    // Ejemplo:
+    // <script src="/__/firebase/8.x.x/firebase-app.js"></script>
+    // <script src="/__/firebase/8.x.x/firebase-auth.js"></script>
+    // <script src="/__/firebase/init.js"></script>
+    //
 
+    // Si un usuario ya está logueado, Firebase lo redirigirá automáticamente
+    // (manejaremos esa lógica en auth.js)
+    
     const loginForm = document.getElementById("loginForm");
     const loginButton = document.getElementById("loginButton");
     const loginError = document.getElementById("login-error");
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRB-KdZegxFuQjJ6K9DziWaooVXYTNCTyc158hsb-4Ts6TK2b6SXBkFXZZuegCxXJZ/exec";
+    // Reemplaza "username" por "email" si tu campo de formulario es para el correo electrónico
+    const emailInput = document.getElementById("username"); 
+    const passwordInput = document.getElementById("password");
 
-    loginForm.addEventListener("submit", async (e) => {
+    loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
         loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
         loginButton.disabled = true;
         loginError.style.display = "none";
 
-        const usernameValue = document.getElementById("username").value.trim();
-        const passwordValue = document.getElementById("password").value.trim();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
 
-        if (!usernameValue || !passwordValue) {
-            loginError.textContent = "Por favor, ingresa tu usuario y contraseña.";
+        if (!email || !password) {
+            loginError.textContent = "Por favor, ingresa tu correo y contraseña.";
             loginError.style.display = "block";
             loginButton.innerHTML = 'Entrar';
             loginButton.disabled = false;
             return;
         }
 
-        // --- CORRECCIÓN FINAL: Alineado con el script de Google ---
-        const payload = {
-            action: "loginUser",
-            username: usernameValue,
-            password: passwordValue
-        };
-
-        try {
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                redirect: "follow",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-            
-            console.log("Respuesta completa del servidor:", result);
-
-            if (result.status === "success") {
-                sessionStorage.setItem("sesionActiva", "true");
-                if (result.user) {
-                    sessionStorage.setItem("usuario", result.user);
-                }
+        // --- Lógica de Autenticación con Firebase ---
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // ¡Autenticación exitosa!
+                // Firebase ahora manejará la sesión.
+                // Redirigimos al panel de administración.
                 window.location.href = "admin.html";
-            } else {
-                throw new Error(result.message || "Usuario o contraseña incorrectos.");
-            }
-        } catch (error) {
-            console.error("Error detallado en el proceso de login:", error);
-            
-            loginError.textContent = error.message;
-            loginError.style.display = "block";
-            loginButton.innerHTML = 'Entrar';
-            loginButton.disabled = false;
-        }
+            })
+            .catch((error) => {
+                // Manejo de errores de Firebase
+                let errorMessage = "Ocurrió un error. Inténtalo de nuevo.";
+                switch (error.code) {
+                    case "auth/user-not-found":
+                        errorMessage = "No se encontró ningún usuario con ese correo.";
+                        break;
+                    case "auth/wrong-password":
+                        errorMessage = "La contraseña es incorrecta.";
+                        break;
+                    case "auth/invalid-email":
+                        errorMessage = "El formato del correo electrónico no es válido.";
+                        break;
+                    default:
+                        errorMessage = "Usuario o contraseña incorrectos.";
+                        break;
+                }
+                
+                console.error("Error de autenticación de Firebase:", error);
+                loginError.textContent = errorMessage;
+                loginError.style.display = "block";
+                loginButton.innerHTML = 'Entrar';
+                loginButton.disabled = false;
+            });
     });
 });
