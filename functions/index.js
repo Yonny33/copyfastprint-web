@@ -35,18 +35,36 @@ app.get("/api/clientes", async (req, res) => {
 // Endpoint para AÑADIR un nuevo cliente
 app.post("/api/clientes", async (req, res) => {
   try {
+    // LOGGING: Ver qué datos llegan para depurar
+    console.log(
+      "Petición recibida en /api/clientes. Body:",
+      JSON.stringify(req.body),
+    );
+
     const clienteData = req.body;
+
+    if (!clienteData || Object.keys(clienteData).length === 0) {
+      console.error("Error: El cuerpo de la petición está vacío.");
+      return res
+        .status(400)
+        .json({ status: "error", message: "No se enviaron datos válidos." });
+    }
+
     const docRef = await db.collection("clientes").add(clienteData);
+    console.log("Cliente creado exitosamente con ID:", docRef.id);
+
     res.status(201).json({
       status: "success",
       message: "Cliente añadido con éxito",
       id: docRef.id,
     });
   } catch (error) {
-    console.error("Error al añadir cliente:", error);
-    res
-      .status(500)
-      .json({ status: "error", message: "Error al añadir cliente." });
+    // LOGGING: Imprimir el error real para verlo en los logs de Firebase
+    console.error("ERROR CRÍTICO al guardar cliente en Firestore:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Error interno del servidor: " + error.message,
+    });
   }
 });
 

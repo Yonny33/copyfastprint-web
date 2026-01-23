@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
       ...data,
     };
 
+    console.log("Enviando datos al servidor:", payload); // Depuración
+
     try {
       const response = await fetch(`${API_URL}/clientes`, {
         method: "POST",
