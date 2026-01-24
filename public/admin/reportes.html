@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -97,44 +97,27 @@
           <p>Análisis detallado de ventas.</p>
         </div>
 
-        <!-- Contenedor de Filtros -->
-        <div class="card-form report-filters">
-          <h3><i class="fas fa-filter"></i> Filtrar Reportes</h3>
-          <div class="filter-controls">
-            <div class="form-group">
-              <label for="start-date">Fecha de Inicio</label
-              ><input
-                type="text"
-                id="start-date"
-                placeholder="Seleccionar fecha"
-              />
-            </div>
-            <div class="form-group">
-              <label for="end-date">Fecha de Fin</label
-              ><input
-                type="text"
-                id="end-date"
-                placeholder="Seleccionar fecha"
-              />
-            </div>
-            <div class="form-group toggle-group">
-              <label for="debt-toggle" class="toggle-label"
-                >Mostrar solo deudas</label
-              >
-              <label class="switch"
-                ><input type="checkbox" id="debt-toggle" /><span
-                  class="slider round"
-                ></span
-              ></label>
-            </div>
-            <div class="form-actions filter-buttons">
-              <button id="filter-btn" class="btn-submit">
-                <i class="fas fa-check"></i> Aplicar Filtro
-              </button>
-              <button id="reset-btn" class="btn-cancel">
-                <i class="fas fa-times"></i> Limpiar
-              </button>
-            </div>
+        <!-- Contenedor de Buscador (Reemplaza a los filtros antiguos) -->
+        <div class="card-form">
+          <h3><i class="fas fa-search"></i> Buscar Deudor</h3>
+          <div class="form-group" style="max-width: 400px">
+            <label
+              for="cedula-search"
+              style="font-weight: bold; margin-bottom: 8px; display: block"
+              >Ingrese Cédula o RIF:</label
+            >
+            <input
+              type="text"
+              id="cedula-search"
+              placeholder="Ej: V-12345678"
+              style="
+                width: 100%;
+                padding: 10px;
+                font-size: 1rem;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+              "
+            />
           </div>
         </div>
 
@@ -148,7 +131,8 @@
                 <tr>
                   <th>Fecha</th>
                   <th>Cliente</th>
-                  <th>Monto</th>
+                  <th>Cédula</th>
+                  <th>Saldo Pendiente</th>
                   <th>Estado</th>
                   <th>Acciones</th>
                 </tr>

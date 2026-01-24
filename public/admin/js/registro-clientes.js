@@ -24,6 +24,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
+    // --- VALIDACIÓN Y FORMATO DE CÉDULA ---
+    // Buscamos el campo cédula o rif (ajusta el nombre según tu HTML: name="cedula" o name="rif")
+    let cedulaKey = Object.keys(data).find(
+      (key) =>
+        key.toLowerCase().includes("cedula") ||
+        key.toLowerCase().includes("rif"),
+    );
+
+    if (cedulaKey && data[cedulaKey]) {
+      let valorCedula = data[cedulaKey].trim().toUpperCase();
+
+      // Si el usuario escribió solo números (ej: 123456), agregamos V- por defecto
+      if (/^\d+$/.test(valorCedula)) {
+        valorCedula = `V-${valorCedula}`;
+      }
+      // Si no empieza con V-, E- o J-, mostramos error
+      else if (!/^[VEJ]-/.test(valorCedula)) {
+        alert(
+          "La Cédula/RIF debe comenzar con V-, E- o J- (Ejemplo: V-12345678)",
+        );
+        hideLoading();
+        return; // Detenemos el envío
+      }
+      data[cedulaKey] = valorCedula; // Actualizamos el dato formateado
+    }
+
     const payload = {
       usuario: usuario, // El backend podría usarlo para logs o auditoría.
       ...data,
@@ -40,11 +66,14 @@ document.addEventListener("DOMContentLoaded", function () {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-      }
+      const result = await response.json().catch(() => null);
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          (result && result.message) ||
+            `Error del servidor: ${response.status} ${response.statusText}`,
+        );
+      }
 
       if (result.status === "success") {
         alert(result.message || "¡Cliente registrado con éxito!");
