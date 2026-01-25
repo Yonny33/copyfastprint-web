@@ -26,6 +26,19 @@ body.login-page-body {
   line-height: 1.6;
 }
 
+/* --- MEJORA MODERNA: Scrollbar Personalizado --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 4px;
+}
+
 /* =============================================================================
    2. ADMIN - LAYOUT PRINCIPAL
    ============================================================================= */
@@ -100,7 +113,7 @@ body.login-page-body {
 .admin-main-content {
   padding: 2.5rem;
   overflow-y: auto;
-  background-color: #000;
+  background-color: var(--background-dark);
 }
 .section-heading {
   margin-bottom: 2.5rem;
@@ -138,11 +151,15 @@ body.login-page-body {
   display: flex;
   align-items: center;
   border: 1px solid var(--border-color);
-  transition: all 0.2s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s;
 }
 .kpi-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 20px -5px var(--accent-glow);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  border-color: var(--primary-color);
 }
 .kpi-icon {
   font-size: 1.6rem; /* Icono más pequeño */
@@ -274,14 +291,16 @@ tbody tr:hover {
 }
 .btn-primary,
 .btn-submit {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color), #600000);
   color: white;
   border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 .btn-primary:hover,
 .btn-submit:hover {
-  background-color: #6d0000;
+  background: linear-gradient(135deg, #a00000, #700000);
   transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(139, 0, 0, 0.4);
 }
 .btn-secondary {
   background-color: var(--cancel-color);
@@ -647,9 +666,47 @@ td.actions {
 @media (max-width: 992px) {
   .admin-grid-container {
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
   }
   .admin-sidebar {
-    display: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0.5rem;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox: Ocultar scrollbar pero permitir scroll */
+  }
+  .admin-sidebar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari: Ocultar scrollbar */
+  }
+  .sidebar-header {
+    padding: 0 1rem;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  .sidebar-header h3 {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+  .sidebar-nav {
+    margin-top: 0;
+  }
+  .sidebar-nav ul {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  }
+  .sidebar-nav a {
+    padding: 0.5rem 0.8rem;
+    border-left: none;
+    border-radius: 4px;
+  }
+  .sidebar-nav .active a {
+    border-left: none;
+    background-color: var(--primary-color);
   }
   .filter-controls {
     grid-template-columns: 1fr;
@@ -672,6 +729,9 @@ td.actions {
 @media (max-width: 768px) {
   .admin-main-content {
     padding: 1.5rem;
+  }
+  .sidebar-header {
+    display: none;
   }
   .kpi-grid {
     grid-template-columns: 1fr;
@@ -739,7 +799,12 @@ td.actions {
 }
 .modern-table thead th {
   border: none;
-  background: transparent;
+  background: var(
+    --background-card
+  ); /* Fondo sólido para que no se vea el texto al hacer scroll */
+  position: sticky; /* Cabecera fija moderna */
+  top: 0;
+  z-index: 5;
 }
 .modern-table tbody tr {
   background-color: #ffffff;

@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const stockChartCanvas = document.getElementById("stock-chart");
 
   let allProducts = [];
-  let stockChart = null;
+  let stockChart = null; 
 
   // --- HELPERS DE FORMATO ---
   const formatDateForDisplay = (dateString) => {

@@ -128,10 +128,18 @@ document.addEventListener("DOMContentLoaded", function () {
     data.id_producto = selectedProduct.value;
     data.descripcion = selectedProduct.text;
 
-    // CORRECCIÓN: La siguiente línea era redundante y causaba el error.
-    // Se ha eliminado. El 'id_cliente' ya se obtiene correctamente de FormData.
-    // const selectedClient = clienteSelect.options[clienteSelect.selectedIndex];
-    // data.id_cliente = selectedClient.value;
+    // --- Información del Cliente ---
+    // IMPORTANTE: Forzamos la asignación de id_cliente para asegurar que llegue al backend
+    const selectedClient = clienteSelect.options[clienteSelect.selectedIndex];
+    if (selectedClient && selectedClient.value) {
+      data.id_cliente = selectedClient.value;
+      data.nombre_cliente = selectedClient.text; // Enviamos el nombre también por seguridad
+    }
+
+    // --- Estado del Pedido ---
+    // Calculamos explícitamente el estado para que se guarde correctamente en la BD
+    const saldo = parseFloat(data.saldo_pendiente) || 0;
+    data.estado_pedido = saldo > 0.01 ? "Pendiente" : "Pagado";
 
     try {
       const response = await fetch(`${API_URL}/ventas`, {

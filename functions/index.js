@@ -58,12 +58,10 @@ app.post("/api/clientes", async (req, res) => {
         .get();
 
       if (!existingClient.empty) {
-        return res
-          .status(409)
-          .json({
-            status: "error",
-            message: `El cliente con Cédula/RIF ${clienteData.cedula} ya está registrado.`,
-          });
+        return res.status(409).json({
+          status: "error",
+          message: `El cliente con Cédula/RIF ${clienteData.cedula} ya está registrado.`,
+        });
       }
     }
 
@@ -199,18 +197,109 @@ app.get("/api/ventas", async (req, res) => {
 app.post("/api/ventas", async (req, res) => {
   try {
     const ventaData = req.body;
-    // Validar datos aquí si es necesario
-    const docRef = await db.collection("ventas").add(ventaData);
+
+    // Si no hay ID de producto (ej. venta manual sin item), guardamos normal
+    if (!ventaData.id_producto) {
+      const docRef = await db.collection("ventas").add(ventaData);
+      return res.status(201).json({
+        status: "success",
+        message: "Venta añadida con éxito",
+        id: docRef.id,
+      });
+    }
+
+    const idProducto = ventaData.id_producto;
+    const cantidad = parseFloat(ventaData.cantidad) || 0;
+    const saldoPendienteInput = parseFloat(ventaData.saldo_pendiente) || 0;
+    const idCliente = ventaData.id_cliente;
+
+    // Asegurar que el estado del pedido esté definido antes de procesar
+    if (!ventaData.estado_pedido) {
+      ventaData.estado_pedido = saldoPendienteInput > 0.01 ? "Pendiente" : "Pagado";
+    }
+
+    // Transacción: Descontar stock y registrar venta simultáneamente
+    let ventaId; // Variable para capturar el ID generado
+    await db.runTransaction(async (t) => {
+      // --- FASE 1: LECTURAS (READS) ---
+      // Primero leemos TODO lo necesario antes de escribir nada.
+
+      // 1. Leer Producto
+      const productoRef = db.collection("inventario").doc(idProducto);
+      const productoDoc = await t.get(productoRef);
+
+      // 2. Leer Deuda Existente (si aplica)
+      let querySnapshot = null;
+      if (saldoPendienteInput > 0 && idCliente) {
+        const query = db
+          .collection("ventas")
+          .where("id_cliente", "==", idCliente)
+          .where("estado_pedido", "==", "Pendiente")
+          .limit(1);
+        querySnapshot = await t.get(query);
+      }
+
+      // --- FASE 2: LÓGICA Y CÁLCULOS ---
+      if (!productoDoc.exists) {
+        throw new Error("El producto no existe en el inventario.");
+      }
+
+      const stockActual = parseFloat(productoDoc.data().stock_actual || 0);
+      const nuevoStock = stockActual - cantidad;
+
+      let existingDoc = null;
+      if (querySnapshot && !querySnapshot.empty) {
+        existingDoc = querySnapshot.docs[0];
+      }
+
+      // --- FASE 3: ESCRITURAS (WRITES) ---
+      // Ahora sí, aplicamos todos los cambios.
+
+      // 1. Actualizar Stock
+      t.update(productoRef, { stock_actual: nuevoStock });
+
+      // 2. Actualizar o Crear Venta
+      if (existingDoc) {
+        // --- CASO A: CLIENTE YA TIENE DEUDA -> SUMAR A LA EXISTENTE ---
+        const oldData = existingDoc.data();
+        const nuevoSaldo =
+          (parseFloat(oldData.saldo_pendiente) || 0) + saldoPendienteInput;
+        const nuevaVentaBruta =
+          (parseFloat(oldData.venta_bruta) || 0) +
+          (parseFloat(ventaData.venta_bruta) || 0);
+        const nuevoAbono =
+          (parseFloat(oldData.abono_recibido) || 0) +
+          (parseFloat(ventaData.abono_recibido) || 0);
+        // Concatenamos la descripción para saber qué productos conforman la deuda total
+        const nuevaDescripcion = `${oldData.descripcion || "Deuda previa"} + ${ventaData.descripcion || "Item"}`;
+
+        t.update(existingDoc.ref, {
+          saldo_pendiente: nuevoSaldo,
+          venta_bruta: nuevaVentaBruta,
+          abono_recibido: nuevoAbono,
+          descripcion: nuevaDescripcion,
+          fecha: ventaData.fecha, // Actualizamos la fecha a la última interacción
+        });
+        ventaId = existingDoc.id; // Mantenemos el mismo ID único del cliente
+      } else {
+        // --- CASO B: VENTA NUEVA (Contado o Primera deuda) ---
+        const nuevaVentaRef = db.collection("ventas").doc();
+        ventaId = nuevaVentaRef.id;
+        t.set(nuevaVentaRef, ventaData);
+      }
+    });
+
     res.status(201).json({
       status: "success",
-      message: "Venta añadida con éxito",
-      id: docRef.id,
+      message: "Venta registrada y stock descontado",
+      id: ventaId, // Devolvemos el ID al frontend
     });
   } catch (error) {
     console.error("Error al añadir venta:", error);
-    res
-      .status(500)
-      .json({ status: "error", message: "Error al añadir la venta." });
+    res.status(500).json({
+      status: "error",
+      message: "Error al añadir la venta: " + error.message,
+    });
   }
 });
 

@@ -24,6 +24,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
+    // --- NUEVO: COMBINAR TIPO Y NÚMERO (Si se usa el select) ---
+    if (data.tipo_documento) {
+      // Buscamos el campo que contiene el número (cedula, rif, etc.)
+      const numeroKey = Object.keys(data).find(
+        (key) =>
+          key !== "tipo_documento" &&
+          (key.toLowerCase().includes("cedula") ||
+            key.toLowerCase().includes("rif")),
+      );
+      if (numeroKey && data[numeroKey]) {
+        data[numeroKey] = `${data.tipo_documento}-${data[numeroKey]}`;
+        delete data.tipo_documento; // No enviamos el campo auxiliar al backend
+      }
+    }
+
     // --- VALIDACIÓN Y FORMATO DE CÉDULA ---
     // Buscamos el campo cédula o rif (ajusta el nombre según tu HTML: name="cedula" o name="rif")
     let cedulaKey = Object.keys(data).find(
@@ -39,10 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
       if (/^\d+$/.test(valorCedula)) {
         valorCedula = `V-${valorCedula}`;
       }
-      // Si no empieza con V-, E- o J-, mostramos error
-      else if (!/^[VEJ]-/.test(valorCedula)) {
+      // Si no empieza con V-, E-, J- o P-, mostramos error
+      else if (!/^[VEJP]-/.test(valorCedula)) {
         alert(
-          "La Cédula/RIF debe comenzar con V-, E- o J- (Ejemplo: V-12345678)",
+          "La Cédula/RIF debe comenzar con V-, E-, J- o P- (Ejemplo: V-12345678)",
         );
         hideLoading();
         return; // Detenemos el envío
