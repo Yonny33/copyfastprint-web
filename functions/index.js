@@ -215,7 +215,8 @@ app.post("/api/ventas", async (req, res) => {
 
     // Asegurar que el estado del pedido esté definido antes de procesar
     if (!ventaData.estado_pedido) {
-      ventaData.estado_pedido = saldoPendienteInput > 0.01 ? "Pendiente" : "Pagado";
+      ventaData.estado_pedido =
+        saldoPendienteInput > 0.01 ? "Pendiente" : "Pagado";
     }
 
     // Transacción: Descontar stock y registrar venta simultáneamente
@@ -569,6 +570,64 @@ app.get("/api/dashboard", async (req, res) => {
     res
       .status(500)
       .json({ status: "error", message: "Error interno del servidor." });
+  }
+});
+
+// Endpoint para OBTENER tasas de cambio (Conectado a API externa via .env)
+app.get("/api/exchange-rates", async (req, res) => {
+  try {
+    // 1. Intentar usar variables de entorno (.env)
+    // El sistema buscará EXCHANGE_API_URL (url completa) o EXCHANGE_API_KEY (para construirla)
+    const apiUrl = process.env.EXCHANGE_API_URL;
+    const apiKey = process.env.EXCHANGE_API_KEY;
+
+    let rates = {};
+
+    if (apiUrl || apiKey) {
+      // Si tienes la URL completa en .env, la usa. Si solo tienes la KEY, asume un servicio estándar (ej. ExchangeRate-API)
+      const urlToFetch =
+        apiUrl || `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
+
+      const response = await fetch(urlToFetch);
+      if (!response.ok) {
+        throw new Error(
+          `Error al consultar API externa: ${response.statusText}`,
+        );
+      }
+      const data = await response.json();
+
+      // --- MEJORA: Validar si la API externa devolvió un error ---
+      // Si la respuesta no es 'success', lanzamos un error para que sea capturado por el catch.
+      if (data.result !== "success") {
+        throw new Error(
+          `Error de la API externa: ${data["error-type"] || "Respuesta inválida"}`,
+        );
+      }
+
+      // Adaptador: Normalizamos la respuesta (algunas APIs usan 'conversion_rates', otras 'rates')
+      // Y pasamos la fecha de actualización si existe
+      const responsePayload = {
+        rates: data.conversion_rates || data.rates || {},
+        last_updated: data.time_last_update_utc || new Date().toUTCString(),
+      };
+      return res.status(200).json(responsePayload);
+    } else {
+      // 2. Fallback: Si no se lee el .env, usamos valores de referencia para no romper la UI
+      console.warn(
+        "No se detectó configuración de API en .env. Usando tasas de referencia.",
+      );
+      const responsePayload = {
+        rates: { USD: 1.0, EUR: 0.93, VES: 45.0, COP: 3900.0, BRL: 5.1 },
+        last_updated: "Valores de Respaldo",
+      };
+      return res.status(200).json(responsePayload);
+    }
+  } catch (error) {
+    console.error("Error al obtener tasas de cambio:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message || "Error al obtener tasas.",
+    });
   }
 });
 
