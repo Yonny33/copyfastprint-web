@@ -349,6 +349,57 @@ app.put("/api/ventas/:id", async (req, res) => {
   }
 });
 
+// Endpoint para ELIMINAR una venta (y restaurar stock si aplica)
+app.delete("/api/ventas/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.runTransaction(async (t) => {
+      const ventaRef = db.collection("ventas").doc(id);
+      const ventaDoc = await t.get(ventaRef);
+
+      if (!ventaDoc.exists) {
+        throw new Error("Venta no encontrada");
+      }
+
+      const ventaData = ventaDoc.data();
+
+      // Si la venta afectó inventario (tiene id_producto y cantidad), restauramos el stock
+      if (ventaData.id_producto && ventaData.cantidad) {
+        const productoRef = db
+          .collection("inventario")
+          .doc(ventaData.id_producto);
+        const productoDoc = await t.get(productoRef);
+
+        if (productoDoc.exists) {
+          const stockActual = parseFloat(productoDoc.data().stock_actual || 0);
+          const cantidadRestaurar = parseFloat(ventaData.cantidad || 0);
+          t.update(productoRef, {
+            stock_actual: stockActual + cantidadRestaurar,
+          });
+        }
+      }
+
+      // Eliminar la venta
+      t.delete(ventaRef);
+    });
+
+    res
+      .status(200)
+      .json({
+        status: "success",
+        message: "Venta eliminada y stock restaurado (si aplicaba).",
+      });
+  } catch (error) {
+    console.error("Error al eliminar venta:", error);
+    res
+      .status(500)
+      .json({
+        status: "error",
+        message: "Error al eliminar venta: " + error.message,
+      });
+  }
+});
+
 // Endpoint para OBTENER todos los gastos (para Reportes)
 app.get("/api/gastos", async (req, res) => {
   try {
@@ -384,6 +435,22 @@ app.post("/api/gastos", async (req, res) => {
     res
       .status(500)
       .json({ status: "error", message: "Error al añadir el gasto." });
+  }
+});
+
+// Endpoint para ELIMINAR un gasto
+app.delete("/api/gastos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.collection("gastos").doc(id).delete();
+    res
+      .status(200)
+      .json({ status: "success", message: "Gasto eliminado con éxito" });
+  } catch (error) {
+    console.error("Error al eliminar gasto:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al eliminar gasto." });
   }
 });
 

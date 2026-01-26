@@ -6,10 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
-  const editModal = document.getElementById("edit-modal");
-  const editForm = document.getElementById("edit-form");
-  const editFormTitle = document.getElementById("edit-form-title");
-  const closeModalButtons = document.querySelectorAll(".close-button");
 
   // --- ESTADO Y CONFIGURACIÓN ---
   const API_URL = "/api"; // <-- URL Relativa para usar el rewrite de Firebase
@@ -129,49 +125,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const actionsTd = document.createElement("td");
       actionsTd.className = "actions";
-      actionsTd.innerHTML = `<button class="btn-edit" data-id="${item.id}" data-type="${type}"><i class="fas fa-edit"></i></button>`;
+      // Botón de eliminar con estilo rojo
+      actionsTd.innerHTML = `<button class="btn-delete" data-id="${item.id}" data-type="${type}" title="Eliminar" style="background-color: var(--error-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: background 0.3s;"><i class="fas fa-trash"></i></button>`;
       tr.appendChild(actionsTd);
       tbody.appendChild(tr);
     });
 
     tbody.addEventListener("click", (event) => {
-      const button = event.target.closest(".btn-edit");
+      const button = event.target.closest(".btn-delete");
       if (button) {
-        handleEditClick(button.dataset.id, button.dataset.type);
+        handleDeleteClick(button.dataset.id, button.dataset.type);
       }
     });
   };
 
-  // --- LÓGICA DE EDICIÓN (ADAPTADA) ---
-  const handleEditClick = (id, type) => {
-    const sourceData = type === "venta" ? recentVentas : recentGastos;
-    const record = sourceData.find((item) => String(item.id) === String(id));
-    if (record) {
-      openEditModal(record, type);
+  // --- LÓGICA DE ELIMINACIÓN ---
+  const handleDeleteClick = async (id, type) => {
+    if (
+      !confirm(
+        `¿Estás seguro de que deseas eliminar este registro de ${type}? Esta acción no se puede deshacer.`,
+      )
+    ) {
+      return;
     }
-  };
 
-  const openEditModal = (record, type) => {
-    editForm.innerHTML = "";
-    editFormTitle.textContent = `Editar ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-    buildEditForm(record, type);
-    editModal.style.display = "block";
-  };
+    showLoading(true);
+    try {
+      const endpoint = type === "venta" ? "ventas" : "gastos";
+      const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
 
-  const closeModal = () => {
-    if (editModal) editModal.style.display = "none";
-  };
-
-  const buildEditForm = (record, type) => {
-    // La lógica para construir el formulario sigue siendo la misma
-    // ... (código de buildEditForm de la versión anterior)
-  };
-
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    alert(
-      "La función de guardar/editar se conectará en el siguiente paso. ¡Primero, veamos los datos en vivo!",
-    );
+      if (result.status === "success") {
+        alert(result.message);
+        loadDashboardData(); // Recargar la tabla
+      } else {
+        throw new Error(result.message || "Error al eliminar.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error: " + error.message);
+    } finally {
+      showLoading(false);
+    }
   };
 
   // --- FUNCIÓN PRINCIPAL DE CARGA (CONECTADA A FIREBASE) ---
@@ -225,6 +222,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- INICIALIZACIÓN ---
   loadDashboardData();
-  closeModalButtons.forEach((btn) => btn.addEventListener("click", closeModal));
-  editForm.addEventListener("submit", handleFormSubmit); // Aún escucha, pero muestra un alert
 });
