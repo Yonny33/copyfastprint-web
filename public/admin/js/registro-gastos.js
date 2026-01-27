@@ -4,42 +4,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const loadingOverlay = document.getElementById("loading-overlay");
   const API_URL = "/api";
+  const fechaInput = document.getElementById("fecha");
 
-  const showLoading = () => (loadingOverlay.style.display = "flex");
-  const hideLoading = () => (loadingOverlay.style.display = "none");
-
-  const setInitialDate = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    const formattedToday = `${yyyy}-${mm}-${dd}`;
-    const dateInput = document.getElementById("fecha");
-    if (dateInput) {
-      dateInput.value = formattedToday;
-    }
+  const showLoading = (show) => {
+    if (loadingOverlay) loadingOverlay.style.display = show ? "flex" : "none";
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    showLoading();
-
-    const user = firebase.auth().currentUser;
-    if (!user) {
-      alert("La sesión ha caducado. Por favor, inicie sesión de nuevo.");
-      window.location.href = "login-registro.html";
-      hideLoading();
-      return;
-    }
-    const usuario = user.email;
+    showLoading(true);
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    const payload = {
-      usuario: usuario,
-      ...data, // Utilizar el spread operator para incluir todos los campos del formulario
-    };
+    // Combinar el tipo de documento (V-, J-) con el número de RIF/Cédula
+    if (data.tipo_documento && data.rit) {
+      data.rit = `${data.tipo_documento}${data.rit}`;
+    }
+    // Ya no necesitamos el campo auxiliar
+    delete data.tipo_documento;
 
     try {
       const response = await fetch(`${API_URL}/gastos`, {
@@ -47,38 +30,39 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(data),
       });
 
-      // Primero, verificar si la respuesta es OK. Si no, algo falló a nivel de red o servidor.
+      const result = await response.json().catch(() => null);
+
       if (!response.ok) {
         throw new Error(
-          `Error de red o servidor: ${response.status} ${response.statusText}`,
+          (result && result.message) ||
+            `Error del servidor: ${response.status} ${response.statusText}`,
         );
       }
 
-      const result = await response.json();
-
       if (result.status === "success") {
-        alert("¡Gasto registrado con éxito!");
+        alert(result.message || "¡Gasto registrado con éxito!");
         form.reset();
-        setInitialDate();
+        if (fechaInput) fechaInput.valueAsDate = new Date(); // Resetear fecha a hoy
       } else {
         throw new Error(
           result.message ||
-            "Ocurrió un error desconocido al procesar el gasto.",
+            "Ocurrió un error desconocido al registrar el gasto.",
         );
       }
     } catch (error) {
-      console.error("Error detallado al registrar el gasto:", error);
-      alert(
-        `Se produjo un error crítico. Por favor, revisa la consola para más detalles. Mensaje: ${error.message}`,
-      );
+      console.error("Error al registrar el gasto:", error);
+      alert(`Error: ${error.message}`);
     } finally {
-      hideLoading();
+      showLoading(false);
     }
   };
 
-  setInitialDate();
+  // Inicialización
+  if (fechaInput) {
+    fechaInput.valueAsDate = new Date();
+  }
   form.addEventListener("submit", handleFormSubmit);
 });
