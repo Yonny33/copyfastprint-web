@@ -245,7 +245,13 @@ app.post("/api/ventas", async (req, res) => {
         throw new Error("El producto no existe en el inventario.");
       }
 
-      const stockActual = parseFloat(productoDoc.data().stock_actual || 0);
+      const productoData = productoDoc.data();
+      // Detectar si es un servicio (por campo 'tipo' o por Categoría 'Servicios')
+      const esServicio =
+        productoData.tipo === "servicio" ||
+        (productoData.categoria &&
+          productoData.categoria.toLowerCase() === "servicios");
+      const stockActual = parseFloat(productoData.stock_actual || 0);
       const nuevoStock = stockActual - cantidad;
 
       let existingDoc = null;
@@ -256,8 +262,10 @@ app.post("/api/ventas", async (req, res) => {
       // --- FASE 3: ESCRITURAS (WRITES) ---
       // Ahora sí, aplicamos todos los cambios.
 
-      // 1. Actualizar Stock
-      t.update(productoRef, { stock_actual: nuevoStock });
+      // 1. Actualizar Stock (Solo si NO es un servicio)
+      if (!esServicio) {
+        t.update(productoRef, { stock_actual: nuevoStock });
+      }
 
       // 2. Actualizar o Crear Venta
       if (existingDoc) {
@@ -371,11 +379,19 @@ app.delete("/api/ventas/:id", async (req, res) => {
         const productoDoc = await t.get(productoRef);
 
         if (productoDoc.exists) {
-          const stockActual = parseFloat(productoDoc.data().stock_actual || 0);
-          const cantidadRestaurar = parseFloat(ventaData.cantidad || 0);
-          t.update(productoRef, {
-            stock_actual: stockActual + cantidadRestaurar,
-          });
+          const prodData = productoDoc.data();
+          const esServicio =
+            prodData.tipo === "servicio" ||
+            (prodData.categoria &&
+              prodData.categoria.toLowerCase() === "servicios");
+
+          if (!esServicio) {
+            const stockActual = parseFloat(prodData.stock_actual || 0);
+            const cantidadRestaurar = parseFloat(ventaData.cantidad || 0);
+            t.update(productoRef, {
+              stock_actual: stockActual + cantidadRestaurar,
+            });
+          }
         }
       }
 
@@ -383,20 +399,16 @@ app.delete("/api/ventas/:id", async (req, res) => {
       t.delete(ventaRef);
     });
 
-    res
-      .status(200)
-      .json({
-        status: "success",
-        message: "Venta eliminada y stock restaurado (si aplicaba).",
-      });
+    res.status(200).json({
+      status: "success",
+      message: "Venta eliminada y stock restaurado (si aplicaba).",
+    });
   } catch (error) {
     console.error("Error al eliminar venta:", error);
-    res
-      .status(500)
-      .json({
-        status: "error",
-        message: "Error al eliminar venta: " + error.message,
-      });
+    res.status(500).json({
+      status: "error",
+      message: "Error al eliminar venta: " + error.message,
+    });
   }
 });
 
@@ -502,24 +514,37 @@ app.get("/api/dashboard", async (req, res) => {
     const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
 
     let ingresosMes = 0;
+    let ingresosTotal = 0; // Nuevo: Acumulador histórico
+
     ventasSnapshot.docs.forEach((doc) => {
       const venta = doc.data();
+      const monto = parseFloat(venta.venta_bruta || 0);
       const fechaVenta = new Date(venta.fecha);
+
+      ingresosTotal += monto; // Sumamos todo para el histórico
+
       if (fechaVenta >= primerDiaMes) {
-        ingresosMes += parseFloat(venta.venta_bruta || 0);
+        ingresosMes += monto;
       }
     });
 
     let gastosMes = 0;
+    let gastosTotal = 0; // Nuevo: Acumulador histórico
+
     gastosSnapshot.docs.forEach((doc) => {
       const gasto = doc.data();
+      const monto = parseFloat(gasto.monto || 0);
       const fechaGasto = new Date(gasto.fecha);
+
+      gastosTotal += monto; // Sumamos todo para el histórico
+
       if (fechaGasto >= primerDiaMes) {
-        gastosMes += parseFloat(gasto.monto || 0);
+        gastosMes += monto;
       }
     });
 
     const balanceNeto = ingresosMes - gastosMes;
+    const balanceGeneral = ingresosTotal - gastosTotal; // Cálculo histórico real
 
     // --- Cálculos adicionales de KPIs ---
 
@@ -618,7 +643,7 @@ app.get("/api/dashboard", async (req, res) => {
           alertasInventario: alertasInventario,
           totalItemsStock: totalItemsStock,
           clientesConDeuda: clientesDeudores.size,
-          balanceGeneral: balanceNeto, // Simplificado
+          balanceGeneral: balanceGeneral, // Usamos el cálculo histórico
           totalSaldoPendiente: totalSaldoPendiente,
         },
         chartData: {
@@ -637,6 +662,96 @@ app.get("/api/dashboard", async (req, res) => {
     res
       .status(500)
       .json({ status: "error", message: "Error interno del servidor." });
+  }
+});
+
+// Endpoint para ANÁLISIS ANUAL (Datos agregados por año/mes)
+app.get("/api/analisis", async (req, res) => {
+  try {
+    const [ventasSnapshot, gastosSnapshot] = await Promise.all([
+      db.collection("ventas").get(),
+      db.collection("gastos").get(),
+    ]);
+
+    const yearsData = {};
+
+    // Helper para inicializar año
+    const initYear = (year) => {
+      if (!yearsData[year]) {
+        yearsData[year] = {
+          year: year,
+          months: Array(12)
+            .fill(null)
+            .map(() => ({ ingresos: 0, gastos: 0, neto: 0 })),
+          totalIngresos: 0,
+          totalGastos: 0,
+          totalNeto: 0,
+          mesEstrella: { mes: -1, valor: -Infinity },
+        };
+      }
+    };
+
+    // Procesar Ventas
+    ventasSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const fecha = new Date(data.fecha);
+      if (isNaN(fecha.getTime())) return;
+
+      const year = fecha.getFullYear();
+      const month = fecha.getMonth(); // 0-11
+      const monto = parseFloat(data.venta_bruta || 0);
+
+      initYear(year);
+      yearsData[year].months[month].ingresos += monto;
+      yearsData[year].totalIngresos += monto;
+    });
+
+    // Procesar Gastos
+    gastosSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const fecha = new Date(data.fecha);
+      if (isNaN(fecha.getTime())) return;
+
+      const year = fecha.getFullYear();
+      const month = fecha.getMonth(); // 0-11
+      const monto = parseFloat(data.monto || 0);
+
+      initYear(year);
+      yearsData[year].months[month].gastos += monto;
+      yearsData[year].totalGastos += monto;
+    });
+
+    // Calcular Netos y Mes Estrella
+    Object.values(yearsData).forEach((yearData) => {
+      let maxNeto = -Infinity;
+      let bestMonth = -1;
+
+      yearData.months.forEach((mes, index) => {
+        mes.neto = mes.ingresos - mes.gastos;
+        // Solo consideramos mes estrella si hubo actividad positiva
+        if (mes.neto > maxNeto && (mes.ingresos > 0 || mes.gastos > 0)) {
+          maxNeto = mes.neto;
+          bestMonth = index;
+        }
+      });
+
+      yearData.totalNeto = yearData.totalIngresos - yearData.totalGastos;
+      yearData.rentabilidad =
+        yearData.totalIngresos > 0
+          ? ((yearData.totalNeto / yearData.totalIngresos) * 100).toFixed(1)
+          : 0;
+      yearData.mesEstrella = { mes: bestMonth, valor: maxNeto };
+    });
+
+    // Convertir a array y ordenar por año descendente
+    const sortedData = Object.values(yearsData).sort((a, b) => b.year - a.year);
+
+    res.status(200).json({ status: "success", data: sortedData });
+  } catch (error) {
+    console.error("Error en análisis anual:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al generar análisis." });
   }
 });
 

@@ -91,7 +91,18 @@ document.addEventListener("DOMContentLoaded", function () {
         result.data.forEach((producto) => {
           // Usamos el `id_producto` como valor y el `nombre` como texto visible
           if (producto.id_producto && producto.nombre) {
-            const option = new Option(producto.nombre, producto.id_producto);
+            // Detectar si es servicio para mostrar (∞) o el stock real
+            const esServicio =
+              producto.tipo === "servicio" ||
+              (producto.categoria &&
+                producto.categoria.toLowerCase() === "servicios");
+            const stockInfo = esServicio
+              ? " (∞)"
+              : ` (Stock: ${producto.stock_actual || 0})`;
+            const option = new Option(
+              `${producto.nombre}${stockInfo}`,
+              producto.id_producto,
+            );
             productoSelect.add(option);
           }
         });

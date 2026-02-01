@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAuth();
   }
 
-  // --- ELEMENTOS DEL DOM ---
+  // --- ELEMENTOS DEL DOM --- 
   const loadingOverlay = document.getElementById("loading-overlay");
 
   // --- ESTADO Y CONFIGURACIÓN ---

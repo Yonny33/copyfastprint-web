@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const stockChartCanvas = document.getElementById("stock-chart");
 
   let allProducts = [];
-  let stockChart = null; 
+  let stockChart = null;
 
   // --- HELPERS DE FORMATO ---
   const formatDateForDisplay = (dateString) => {
@@ -38,6 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   inventarioForm.addEventListener("submit", handleFormSubmit);
   searchInput.addEventListener("input", handleSearch);
+
+  // Listener para detectar si es servicio y bloquear stock visualmente
+  const categoriaInput = inventarioForm.elements["categoria"];
+  if (categoriaInput) {
+    categoriaInput.addEventListener("input", toggleStockInputs);
+    categoriaInput.addEventListener("change", toggleStockInputs);
+  }
 
   // --- FUNCIONES PRINCIPALES ---
 
@@ -83,10 +90,9 @@ document.addEventListener("DOMContentLoaded", function () {
     products.forEach((product) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${product.codigo || ""}</td>
                 <td>${product.nombre || ""}</td>
                 <td>${product.categoria || ""}</td>
-                <td>${product.stock_actual !== null ? product.stock_actual : ""}</td>
+                <td>${product.tipo === "servicio" || (product.categoria && product.categoria.toLowerCase() === "servicios") ? "∞" : product.stock_actual !== null ? product.stock_actual : ""}</td>
                 <td>${product.unidad_medida || ""}</td>
                 <td>${product.stock_minimo !== null ? product.stock_minimo : ""}</td>
                 <td>${product.proveedor || ""}</td>
@@ -251,11 +257,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const filteredProducts = allProducts.filter(
       (p) =>
         (p.nombre || "").toLowerCase().includes(searchTerm) ||
-        (p.codigo || "").toLowerCase().includes(searchTerm) ||
         (p.categoria || "").toLowerCase().includes(searchTerm),
     );
     renderInventoryTable(filteredProducts);
     renderStockChart(filteredProducts);
+  }
+
+  // --- LÓGICA DE UI PARA SERVICIOS ---
+  function toggleStockInputs() {
+    const categoriaInput = inventarioForm.elements["categoria"];
+    const stockInput = inventarioForm.elements["stock_actual"];
+    const stockMinInput = inventarioForm.elements["stock_minimo"];
+
+    if (!categoriaInput || !stockInput) return;
+
+    const isService = categoriaInput.value.trim().toLowerCase() === "servicios";
+
+    if (isService) {
+      stockInput.disabled = true;
+      stockInput.value = "";
+      stockInput.placeholder = "Infinito (∞)";
+      if (stockMinInput) {
+        stockMinInput.disabled = true;
+        stockMinInput.value = "";
+      }
+    } else {
+      stockInput.disabled = false;
+      stockInput.placeholder = "";
+      if (stockMinInput) stockMinInput.disabled = false;
+    }
   }
 
   // --- FUNCIONES UTILITARIAS ---
@@ -292,6 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .split("T")[0];
       }
     }
+    toggleStockInputs(); // Aplicar estado inicial de los inputs
     productModal.style.display = "block";
   }
 

@@ -76,6 +76,11 @@
                 ><i class="fas fa-chart-line fa-fw"></i> Reportes</a
               >
             </li>
+            <li>
+              <a href="analisis.html"
+                ><i class="fas fa-brain fa-fw"></i> Análisis</a
+              >
+            </li>
           </ul>
         </nav>
         <div class="sidebar-footer">
@@ -121,7 +126,6 @@
             <table id="tabla-inventario">
               <thead>
                 <tr>
-                  <th>Código</th>
                   <th>Nombre</th>
                   <th>Categoría</th>
                   <th>Stock</th>
@@ -152,16 +156,6 @@
           <form id="inventario-form">
             <input type="hidden" id="id_producto" name="id_producto" />
             <div class="form-row">
-              <div class="form-group">
-                <label for="codigo">Código de Producto</label>
-                <input
-                  type="text"
-                  id="codigo"
-                  name="codigo"
-                  class="form-control"
-                  required
-                />
-              </div>
               <div class="form-group">
                 <label for="nombre">Nombre del Producto</label>
                 <input
