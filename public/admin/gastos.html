@@ -139,13 +139,20 @@
                   <input type="date" id="fecha" name="fecha" required />
                 </div>
                 <div class="form-group">
-                  <label for="proveedor">Nombre del Proveedor *</label>
-                  <input type="text" id="proveedor" name="proveedor" required />
+                  <label for="proveedor">Concepto / Proveedor *</label>
+                  <input
+                    type="text"
+                    id="proveedor"
+                    name="proveedor"
+                    placeholder="Ej: Pago de internet, Almuerzo, Compra de tinta"
+                    required
+                  />
                 </div>
                 <div class="form-group">
-                  <label for="rit">RIF / Cédula (Proveedor)</label>
+                  <label for="rit">RIF / Cédula (Opcional)</label>
                   <div style="display: flex; gap: 10px">
                     <select
+                      title="Tipo de documento"
                       name="tipo_documento"
                       id="tipo_documento"
                       style="width: 80px; min-width: 80px"
@@ -235,6 +242,17 @@
               <p>
                 Registrar cada gasto es fundamental para mantener un control
                 preciso de la salud financiera del negocio.
+              </p>
+            </div>
+            <div class="info-box">
+              <h3><i class="fas fa-lightbulb"></i> ¿Cómo registrar?</h3>
+              <p>
+                <strong>Para compras:</strong> Usa el nombre del proveedor (Ej:
+                "Proveedor de Tinta XYZ").<br />
+                <strong>Para servicios:</strong> Usa el concepto (Ej: "Pago de
+                Internet - Junio").<br />
+                <strong>Para gastos varios:</strong> Usa una descripción corta (Ej:
+                "Almuerzo del equipo").
               </p>
             </div>
             <div class="info-box">

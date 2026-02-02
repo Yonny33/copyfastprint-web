@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Ya no necesitamos el campo auxiliar
     delete data.tipo_documento;
 
+    // Asegurar que el monto se envíe como número
+    data.monto = parseFloat(data.monto) || 0;
+
     try {
       const response = await fetch(`${API_URL}/gastos`, {
         method: "POST",
