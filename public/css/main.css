@@ -242,6 +242,68 @@ h4 {
   color: var(--text-primary);
 }
 
+/* =========================================
+   MENÚ DESPLEGABLE (DROPDOWN)
+   ========================================= */
+.nav-links li {
+  position: relative;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 240px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  border-radius: 4px;
+  padding: 0;
+  list-style: none;
+  border-top: 3px solid var(--primary-color); /* Color primario */
+}
+
+.dropdown-menu li {
+  width: 100%;
+}
+
+.dropdown-menu li a {
+  color: #333 !important;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+  transition:
+    background 0.3s,
+    color 0.3s;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f9f9f9;
+  color: var(--primary-color) !important;
+  padding-left: 20px;
+}
+
+/* Mostrar menú al pasar el mouse */
+.nav-links li:hover .dropdown-menu {
+  display: block;
+}
+
+/* Icono pequeño en el menú principal */
+.dropdown-icon {
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+/* Elementos deshabilitados (Pronto) */
+.dropdown-item-disabled {
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
 .footer {
   background-color: var(--background-card);
   color: var(--text-secondary);
@@ -1114,6 +1176,15 @@ h4 {
   }
   .section-heading h2 {
     font-size: 2.4rem;
+  }
+
+  /* Ajuste para que el menú desplegable se vea bien en celulares */
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    width: 100%;
+    border-top: none;
+    border-left: 3px solid var(--primary-color);
   }
 }
 

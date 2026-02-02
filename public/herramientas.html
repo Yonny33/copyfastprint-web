@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Armar Metro DTF - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+
+    <!-- Estilos -->
+    <!-- Asumo que tienes un style.css público, si no, crea uno o usa este bloque -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/tools.css" />
+
+    <!-- Fabric.js para el lienzo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  </head>
+  <body>
+    <!-- BARRA DE NAVEGACIÓN (Copia esto de tu index.html para mantener consistencia) -->
+    <header class="header">
+      <div class="nav-container container">
+        <div class="logo">
+          <a href="/index.html" class="logo-part">COPYFAST</a>
+          <a
+            href="/admin/login-registro.html"
+            class="logo-ampersand"
+            title="Acceso Admin"
+            >&</a
+          >
+          <a href="/index.html" class="logo-part">PRINT</a>
+        </div>
+        <nav>
+          <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/diseño.html">Diseños</a></li>
+            <li><a href="/acercade.html">Acerca de</a></li>
+            <li><a href="/cotizacion.html">Cotización</a></li>
+            <li><a href="/conversor-divisas.html">Conversor</a></li>
+            <li>
+              <a href="/herramientas.html" class="active"
+                >Herramientas <i class="fas fa-chevron-down dropdown-icon"></i
+              ></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="/herramientas.html"
+                    ><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item-disabled"
+                    ><i class="fas fa-magic"></i> Remover Fondo (Pronto)</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item-disabled"
+                    ><i class="fas fa-crop-alt"></i> Quitar Bordes (Pronto)</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item-disabled"
+                    ><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño
+                    (Pronto)</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
+          </ul>
+        </nav>
+        <div class="nav-toggle" id="nav-toggle">
+          <i class="fas fa-bars"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Taller de Armado DTF</h1>
+        <p>
+          Prepara tu archivo de impresión tú mismo. Elige el ancho de tu bobina
+          y acomoda tus diseños.
+        </p>
+        <a href="#instructions" class="btn-instruction-link">
+          <i class="fas fa-info-circle"></i> Ver cómo funciona la mesa
+        </a>
+      </section>
+
+      <!-- SELECCIÓN DE MESA DE TRABAJO -->
+      <section class="workspace-selector container">
+        <h2>1. Elige el Ancho de Bobina</h2>
+        <div class="options-grid">
+          <div class="option-card" onclick="selectWorkspace(58)">
+            <div class="icon"><i class="fas fa-print"></i></div>
+            <h3>DTF 58cm</h3>
+            <p>Para impresiones de gran formato. Ancho útil: 58cm.</p>
+            <button class="btn-select">Seleccionar 58cm</button>
+          </div>
+          <div class="option-card" onclick="selectWorkspace(28)">
+            <div class="icon"><i class="fas fa-scroll"></i></div>
+            <h3>DTF 28cm</h3>
+            <p>Para formato pequeño/A3. Ancho útil: 28cm.</p>
+            <button class="btn-select">Seleccionar 28cm</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ÁREA DE TRABAJO (Oculta al inicio) -->
+      <section
+        id="dtf-workspace"
+        class="workspace-area container"
+        style="display: none"
+      >
+        <!-- Info de la mesa (Estático arriba) -->
+        <div class="workspace-header">
+          <span class="info-badge" id="workspace-info">Mesa: 58cm x 100cm</span>
+        </div>
+
+        <!-- BARRA FLOTANTE DE HERRAMIENTAS (FAB) -->
+        <div class="floating-toolbar">
+          <!-- Subir Imagen -->
+          <div class="fab-container">
+            <label for="img-upload" class="fab-btn upload" title="Subir Imágenes">
+              <i class="fas fa-upload"></i>
+            </label>
+            <span class="fab-tooltip">Subir PNG</span>
+            <input type="file" id="img-upload" accept="image/png" multiple hidden />
+          </div>
+
+          <!-- Agregar Metro -->
+          <div class="fab-container">
+            <button class="fab-btn extend" id="btn-add-meter" title="Agregar 1 Metro">
+              <i class="fas fa-ruler-vertical"></i>
+            </button>
+            <span class="fab-tooltip">+1 Metro</span>
+          </div>
+
+          <!-- Eliminar -->
+          <div class="fab-container">
+            <button class="fab-btn delete" id="btn-delete" title="Eliminar Seleccionado">
+              <i class="fas fa-trash"></i>
+            </button>
+            <span class="fab-tooltip">Eliminar</span>
+          </div>
+
+          <!-- Limpiar Todo -->
+          <div class="fab-container">
+            <button class="fab-btn clear" id="btn-clear" title="Limpiar Mesa">
+              <i class="fas fa-eraser"></i>
+            </button>
+            <span class="fab-tooltip">Limpiar Todo</span>
+          </div>
+
+          <!-- Descargar -->
+          <div class="fab-container">
+            <button class="fab-btn download" id="btn-download" title="Descargar Archivo">
+              <i class="fas fa-download"></i>
+            </button>
+            <span class="fab-tooltip">Descargar</span>
+          </div>
+
+          <!-- Separador -->
+          <div style="height: 10px;"></div>
+
+          <!-- Ir al Inicio / Centrar -->
+          <div class="fab-container">
+            <button class="fab-btn scroll-top" id="btn-center-view" title="Ir al Inicio">
+              <i class="fas fa-crosshairs"></i>
+            </button>
+            <span class="fab-tooltip">Centrar Vista</span>
+          </div>
+        </div>
+
+        <div class="canvas-container-wrapper">
+          <!-- Estructura para reglas y canvas -->
+          <div class="design-layout">
+            <div id="ruler-top" class="ruler-top"></div>
+            <div class="design-row">
+              <div id="ruler-left" class="ruler-left"></div>
+              <canvas id="c"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          <h3><i class="fas fa-lightbulb"></i> Instrucciones y Trucos:</h3>
+          <ul>
+            <li><strong>Subir:</strong> Carga tus PNGs. El sistema los organizará automáticamente buscando espacio libre.</li>
+            <li><strong>Guías:</strong> Haz clic sobre las reglas (arriba o izquierda) para crear líneas guía rojas de ayuda.</li>
+            <li><strong>Rotar:</strong> Usa el manejador superior de la imagen para girar. Verás los grados exactos.</li>
+            <li><strong>Bordes:</strong> Si una imagen toca el límite de impresión, el borde se pondrá rojo (#8b0000). ¡Cuidado!</li>
+            <li><strong>Medidas:</strong> Al cambiar el tamaño, verás las dimensiones en centímetros en tiempo real.</li>
+            <li><strong>Finalizar:</strong> Al descargar, recortaremos automáticamente el espacio sobrante del metro.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Tooltip para dimensiones -->
+    <div id="dim-tooltip" class="dim-tooltip" style="display: none"></div>
+
+    <!-- Scripts -->
+    <script src="/js/scripts.js"></script>
+    <script src="/js/dtf-tool.js"></script>
+  </body>
+</html>

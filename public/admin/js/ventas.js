@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const abonoRecibidoInput = document.getElementById("abono_recibido");
   const saldoPendienteInput = document.getElementById("saldo_pendiente");
   const fechaInput = document.getElementById("fecha");
+  const metodoPagoSelect = document.getElementById("metodo_pago");
 
   // --- FUNCIONES ---
 
@@ -35,6 +36,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     ventaBrutaInput.value = ventaBruta.toFixed(2);
     saldoPendienteInput.value = saldoPendiente.toFixed(2);
+
+    // Lógica inteligente: Si no hay abono, no hay pago que registrar
+    if (abonoRecibido <= 0) {
+      metodoPagoSelect.disabled = true;
+      metodoPagoSelect.value = ""; // Limpiar selección
+      metodoPagoSelect.required = false;
+    } else {
+      metodoPagoSelect.disabled = false;
+      metodoPagoSelect.required = true;
+    }
   };
 
   // Carga los clientes desde tu Google Sheet
@@ -132,6 +143,11 @@ document.addEventListener("DOMContentLoaded", function () {
     data.venta_bruta = ventaBrutaInput.value;
     data.saldo_pendiente = saldoPendienteInput.value;
 
+    // Si el abono es 0, el método de pago es "N/A" (porque el select estaba disabled)
+    if ((parseFloat(data.abono_recibido) || 0) <= 0) {
+      data.metodo_pago = "N/A";
+    }
+
     // --- Información del Producto Seleccionado ---
     const selectedProduct =
       productoSelect.options[productoSelect.selectedIndex];
@@ -190,7 +206,8 @@ document.addEventListener("DOMContentLoaded", function () {
     precioUnitarioInput &&
     abonoRecibidoInput &&
     clienteSelect &&
-    productoSelect
+    productoSelect &&
+    metodoPagoSelect
   ) {
     // Listeners para cálculos automáticos
     cantidadInput.addEventListener("input", actualizarCalculos);
