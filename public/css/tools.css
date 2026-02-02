@@ -309,3 +309,35 @@
     box-shadow: none; /* Quitar sombra en barra oscura */
   }
 }
+
+/* --- CONTROLES DE REMOVER FONDO --- */
+.tool-controls {
+  background-color: var(--background-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  border: 1px solid #333;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+}
+
+.control-group input[type="range"] {
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
