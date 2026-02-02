@@ -6,29 +6,12 @@
     <title>Remover Fondo - COPYFAST&PRINT</title>
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png" 
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
 
     <!-- Estilos -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="/css/tools.css" />
   </head>
@@ -38,12 +21,7 @@
       <div class="nav-container container">
         <div class="logo">
           <a href="/index.html" class="logo-part">COPYFAST</a>
-          <a
-            href="/admin/login-registro.html"
-            class="logo-ampersand"
-            title="Acceso Admin"
-            >&</a
-          >
+          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
           <a href="/index.html" class="logo-part">PRINT</a>
         </div>
         <nav>
@@ -54,39 +32,18 @@
             <li><a href="/cotizacion.html">Cotización</a></li>
             <li><a href="/conversor-divisas.html">Conversor</a></li>
             <li>
-              <a href="/herramientas.html" class="active"
-                >Herramientas <i class="fas fa-chevron-down dropdown-icon"></i
-              ></a>
+              <a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
               <ul class="dropdown-menu">
-                <li>
-                  <a href="/herramientas.html"
-                    ><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a
-                  >
-                </li>
-                <li>
-                  <a href="/remover-fondo.html"
-                    ><i class="fas fa-magic"></i> Remover Fondo</a
-                  >
-                </li>
-                <li>
-                  <a href="#" class="dropdown-item-disabled"
-                    ><i class="fas fa-crop-alt"></i> Quitar Bordes (Pronto)</a
-                  >
-                </li>
-                <li>
-                  <a href="#" class="dropdown-item-disabled"
-                    ><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño
-                    (Pronto)</a
-                  >
-                </li>
+                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
+                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
+                <li><a href="#" class="dropdown-item-disabled"><i class="fas fa-crop-alt"></i> Quitar Bordes (Pronto)</a></li>
+                <li><a href="#" class="dropdown-item-disabled"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño (Pronto)</a></li>
               </ul>
             </li>
             <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
           </ul>
         </nav>
-        <div class="nav-toggle" id="nav-toggle">
-          <i class="fas fa-bars"></i>
-        </div>
+        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
       </div>
     </header>
 
@@ -106,9 +63,7 @@
         <!-- PANEL DE CONTROL -->
         <div class="tool-controls">
           <div class="control-group">
-            <label for="tolerance"
-              ><i class="fas fa-sliders-h"></i> Tolerancia:</label
-            >
+            <label for="tolerance"><i class="fas fa-sliders-h"></i> Tolerancia:</label>
             <input type="range" id="tolerance" min="0" max="100" value="20" />
             <span id="tolerance-val">20</span>
           </div>
@@ -136,7 +91,6 @@
           </div>
           <canvas id="c"></canvas>
         </div>
-
         <!-- BARRA FLOTANTE (FAB) -->
         <div class="floating-toolbar">
           <!-- Subir Imagen -->
