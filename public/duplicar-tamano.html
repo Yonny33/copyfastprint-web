@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Duplicar Tamaño - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/tools.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="nav-container container">
+        <div class="logo">
+          <a href="/index.html" class="logo-part">COPYFAST</a>
+          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
+          <a href="/index.html" class="logo-part">PRINT</a>
+        </div>
+        <nav>
+          <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/diseño.html">Diseños</a></li>
+            <li><a href="/acercade.html">Acerca de</a></li>
+            <li><a href="/cotizacion.html">Cotización</a></li>
+            <li><a href="/conversor-divisas.html">Conversor</a></li>
+            <li>
+              <a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
+                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
+                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
+                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
+              </ul>
+            </li>
+            <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
+          </ul>
+        </nav>
+        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Duplicar Tamaño (Upscale)</h1>
+        <p>
+          Aumenta la resolución de tus imágenes sin perder calidad para impresiones grandes.
+        </p>
+        <a href="#instructions" class="btn-instruction-link">
+          <i class="fas fa-info-circle"></i> Ver instrucciones
+        </a>
+      </section>
+
+      <section class="workspace-area container">
+        <div class="tool-controls">
+          <div class="control-group">
+            <label>Factor de escala:</label>
+            <select id="scale-factor" style="padding: 5px; border-radius: 4px;">
+                <option value="2">2x (Duplicar)</option>
+                <option value="4">4x (Cuadruplicar)</option>
+                <option value="8">8x (Octuplicar)</option>
+            </select>
+            <div id="dimensions-info" class="info-badge" style="display: none; margin-left: 15px;"></div>
+          </div>
+        </div>
+
+        <div class="canvas-container-wrapper" id="canvas-wrapper" style="min-height: 400px; align-items: center; justify-content: center;">
+          <div id="placeholder-text" style="color: #666; text-align: center">
+            <i class="fas fa-expand-arrows-alt" style="font-size: 3rem; margin-bottom: 1rem; display: block"></i>
+            Sube una imagen para aumentar su tamaño
+          </div>
+          <canvas id="c-upscale" style="display:none;"></canvas>
+        </div>
+
+        <div class="floating-toolbar">
+          <div class="fab-container">
+            <label for="img-upload-upscale" class="fab-btn upload" title="Subir Imagen">
+              <i class="fas fa-upload"></i>
+            </label>
+            <span class="fab-tooltip">Subir Imagen</span>
+            <input type="file" id="img-upload-upscale" accept="image/*" hidden />
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn restore" id="btn-reset-upscale" title="Restaurar (2x)">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <span class="fab-tooltip">Restaurar</span>
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn delete" id="btn-delete-upscale" title="Eliminar Imagen">
+              <i class="fas fa-trash"></i>
+            </button>
+            <span class="fab-tooltip">Eliminar</span>
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn download" id="btn-download-upscale" title="Descargar">
+              <i class="fas fa-download"></i>
+            </button>
+            <span class="fab-tooltip">Descargar</span>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          <h3><i class="fas fa-lightbulb"></i> Cómo usar:</h3>
+          <ul>
+            <li><strong>1. Subir:</strong> Carga tu imagen (JPG o PNG).</li>
+            <li><strong>2. Escalar:</strong> Selecciona el factor de aumento (2x, 4x u 8x) en el menú superior.</li>
+            <li><strong>3. Verificar:</strong> Observa las nuevas dimensiones en la etiqueta de información junto al selector.</li>
+            <li><strong>4. Restaurar:</strong> Si no te convence, usa el botón de restaurar para volver a 2x.</li>
+            <li><strong>5. Descargar:</strong> Guarda tu imagen en alta resolución lista para imprimir.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
+
+    <script src="/js/scripts.js"></script>
+    <script src="/js/duplicar-tamano.js"></script>
+  </body>
+</html>

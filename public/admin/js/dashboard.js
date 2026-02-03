@@ -56,44 +56,100 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("ingresos-gastos-chart");
     if (!canvas) return;
     if (ingresosGastosChart) ingresosGastosChart.destroy();
+
+    // Crear degradados para efecto "Luminoso/Neón"
+    const ctx = canvas.getContext("2d");
+    
+    const gradientIngresos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientIngresos.addColorStop(0, 'rgba(16, 185, 129, 0.6)'); // Verde brillante arriba
+    gradientIngresos.addColorStop(1, 'rgba(16, 185, 129, 0.0)'); // Transparente abajo
+
+    const gradientGastos = ctx.createLinearGradient(0, 0, 0, 400);
+    gradientGastos.addColorStop(0, 'rgba(239, 68, 68, 0.6)'); // Rojo brillante arriba
+    gradientGastos.addColorStop(1, 'rgba(239, 68, 68, 0.0)'); // Transparente abajo
+
     ingresosGastosChart = new Chart(canvas.getContext("2d"), {
-      type: "bar",
+      type: "line", // Cambiamos a 'line' para un look más fluido (o 'bar' si prefieres barras)
       data: {
         labels: chartData.labels,
         datasets: [
           {
             label: "Ingresos",
             data: chartData.ingresos,
-            backgroundColor: "rgba(75, 192, 192, 0.7)",
+            backgroundColor: gradientIngresos,
+            borderColor: "#10b981", // Verde Neón
+            borderWidth: 3,
+            pointBackgroundColor: "#10b981",
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: "#10b981",
+            fill: true, // Rellenar el área bajo la línea
+            tension: 0.4 // Curvas suaves
           },
           {
             label: "Gastos",
             data: chartData.gastos,
-            backgroundColor: "rgba(255, 99, 132, 0.7)",
+            backgroundColor: gradientGastos,
+            borderColor: "#ef4444", // Rojo Neón
+            borderWidth: 3,
+            pointBackgroundColor: "#ef4444",
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: "#ef4444",
+            fill: true,
+            tension: 0.4
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false,
+        },
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: 'rgba(255, 255, 255, 0.05)', // Líneas de guía muy sutiles
+              drawBorder: false
+            },
             ticks: {
-              color: "var(--text-secondary)",
+              color: "#a0a0a0",
+              font: { family: "'Segoe UI', sans-serif" },
               callback: (v) => formatCurrency(v),
             },
           },
           x: {
+            grid: {
+              display: false // Ocultar líneas verticales para limpieza
+            },
             ticks: {
-              color: "var(--text-secondary)",
+              color: "#a0a0a0",
               autoSkip: true,
               maxTicksLimit: 20,
             },
           },
         },
         plugins: {
-          legend: { position: "top", labels: { color: "var(--text-primary)" } },
+          legend: { 
+            position: "top", 
+            labels: { 
+              color: "#eaeaea",
+              font: { size: 12, family: "'Segoe UI', sans-serif" },
+              usePointStyle: true
+            } 
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            displayColors: true
+          }
         },
       },
     });

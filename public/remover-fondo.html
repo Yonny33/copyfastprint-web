@@ -36,8 +36,8 @@
               <ul class="dropdown-menu">
                 <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
                 <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
-                <li><a href="#" class="dropdown-item-disabled"><i class="fas fa-crop-alt"></i> Quitar Bordes (Pronto)</a></li>
-                <li><a href="#" class="dropdown-item-disabled"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño (Pronto)</a></li>
+                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
+                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
               </ul>
             </li>
             <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
@@ -62,17 +62,56 @@
       <section class="workspace-area container">
         <!-- PANEL DE CONTROL -->
         <div class="tool-controls">
-          <div class="control-group">
+          <!-- Botones de Herramientas -->
+          <div class="tools-selection">
+            <button class="tool-btn" id="btn-ai" title="IA Automática">
+              <i class="fas fa-robot"></i> Auto IA
+            </button>
+            <button class="tool-btn active" id="tool-wand" title="Varita Mágica">
+              <i class="fas fa-magic"></i> Varita
+            </button>
+            <button class="tool-btn" id="tool-eraser" title="Borrador Manual">
+              <i class="fas fa-eraser"></i> Borrador
+            </button>
+          </div>
+
+          <!-- Controles Varita -->
+          <div class="control-group group-wand">
             <label for="tolerance"><i class="fas fa-sliders-h"></i> Tolerancia:</label>
             <input type="range" id="tolerance" min="0" max="100" value="20" />
             <span id="tolerance-val">20</span>
           </div>
-          <div class="control-group">
+          <div class="control-group group-wand">
+            <label for="feather"><i class="fas fa-feather-alt"></i> Suavizado:</label>
+            <input type="range" id="feather" min="0" max="10" value="0" />
+            <span id="feather-val">0</span>
+          </div>
+          <div class="control-group group-wand">
             <label class="checkbox-label">
               <input type="checkbox" id="contiguous" checked />
               <span class="checkmark"></span>
               Modo Contiguo (Solo lo que toca)
             </label>
+          </div>
+
+          <!-- Control de Fondo de Visualización -->
+          <div class="control-group">
+            <label><i class="fas fa-fill-drip"></i> Fondo:</label>
+            <div class="bg-selector">
+              <button class="bg-btn checker active" data-bg="checker" title="Transparente"></button>
+              <button class="bg-btn white" data-bg="#ffffff" title="Blanco"></button>
+              <button class="bg-btn black" data-bg="#000000" title="Negro"></button>
+              <button class="bg-btn red" data-bg="#ff0000" title="Rojo (Contraste)"></button>
+              <button class="bg-btn plus" id="btn-add-color" title="Más colores / Código Hex"><i class="fas fa-plus"></i></button>
+              <input type="color" id="custom-bg-color" style="visibility: hidden; position: absolute; width: 0; height: 0;">
+            </div>
+          </div>
+
+          <!-- Controles Pincel (Borrador/Restaurar) -->
+          <div class="control-group group-brush" style="display: none;">
+            <label for="brush-size"><i class="fas fa-circle"></i> Tamaño Pincel:</label>
+            <input type="range" id="brush-size" min="1" max="100" value="20" />
+            <span id="brush-size-val">20px</span>
           </div>
         </div>
 
@@ -169,7 +208,15 @@
       </section>
     </main>
 
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
+
+    <!-- Cursor Personalizado -->
+    <div id="brush-cursor" class="brush-cursor"></div>
+
     <!-- Scripts -->
+    <!-- Librería de IA para remover fondo -->
+    <script src="https://unpkg.com/@imgly/background-removal@1.5.5/dist/imgly-background-removal.umd.min.js"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/remover-fondo.js"></script>
   </body>

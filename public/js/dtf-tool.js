@@ -5,6 +5,18 @@ let currentHeightCm = 100; // Altura actual (inicia en 1 metro)
 // NOTA: Para impresión real se necesita más calidad, pero para armar el layout en web
 // usamos una escala manejable y al exportar podemos multiplicar.
 
+document.addEventListener('DOMContentLoaded', () => {
+    // Adjuntar eventos a las tarjetas de selección de forma moderna
+    document.querySelectorAll('.option-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const width = card.dataset.width;
+            if (width) {
+                selectWorkspace(parseInt(width, 10));
+            }
+        });
+    });
+});
+
 // Aseguramos que la función sea accesible globalmente
 window.selectWorkspace = function (widthCm) {
   if (typeof fabric === "undefined") {
@@ -360,10 +372,14 @@ function deleteSelected() {
 
 // --- LIMPIAR TODO ---
 document.getElementById("btn-clear").addEventListener("click", function () {
-  if (confirm("¿Estás seguro de borrar todo el lienzo?")) {
-    canvas.clear();
-    // Restaurar color de fondo transparente (null) o blanco si se prefiere
-    canvas.setBackgroundColor(null, canvas.renderAll.bind(canvas));
+  if (confirm("¿Estás seguro de borrar todas las imágenes del lienzo?")) {
+    // Filtra y elimina todos los objetos que NO son bordes ni guías
+    const objectsToRemove = canvas.getObjects().filter(obj => !obj.isBorder && !obj.isGuide);
+    objectsToRemove.forEach(obj => canvas.remove(obj));
+    
+    // Limpia la selección activa y renderiza los cambios
+    canvas.discardActiveObject();
+    canvas.renderAll();
   }
 });
 
@@ -398,6 +414,11 @@ document.getElementById("btn-center-view").addEventListener("click", function ()
 
 // --- DESCARGAR ---
 document.getElementById("btn-download").addEventListener("click", function () {
+  // 1. Mostrar Overlay de Carga
+  showLoading("Generando Alta Calidad (8x)...");
+
+  // Usamos setTimeout para permitir que el navegador renderice el overlay antes de bloquearse
+  setTimeout(() => {
   // Deseleccionar objetos para que no salgan los bordes de selección en la imagen
   canvas.discardActiveObject();
   canvas.renderAll();
@@ -427,7 +448,7 @@ document.getElementById("btn-download").addEventListener("click", function () {
   // Multiplicador para mejorar calidad (exportar a mayor resolución que la pantalla)
   // Si en pantalla 1cm = 15px, multiplicamos por 4 para tener 60px/cm (~150 DPI)
   // Para 300 DPI necesitaríamos multiplicar por ~8, pero puede ser muy pesado para el navegador.
-  const multiplier = 4;
+  const multiplier = 8;
 
   const dataURL = canvas.toDataURL({
     format: "png",
@@ -452,7 +473,46 @@ document.getElementById("btn-download").addEventListener("click", function () {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
+  // 2. Ocultar Overlay
+  hideLoading();
+  }, 100);
 });
+
+// --- RESTAURAR IMAGEN (RESET) ---
+document.getElementById("btn-reset-img").addEventListener("click", function () {
+  const activeObject = canvas.getActiveObject();
+  if (activeObject && activeObject.type === "image") {
+    activeObject.scale(1); // Volver al tamaño original (100%)
+    activeObject.rotate(0); // Enderezar
+    activeObject.set({ flipX: false, flipY: false });
+    canvas.requestRenderAll();
+    updateDimTooltip(activeObject, true); // Mostrar dimensiones restauradas
+  }
+});
+
+// --- FUNCIONES DE UI (CARGA) ---
+function showLoading(text) {
+    let overlay = document.getElementById('tool-loader');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'tool-loader';
+        overlay.className = 'tool-loading-overlay';
+        overlay.innerHTML = `
+            <div class="tool-spinner"></div>
+            <div class="tool-loading-text">${text}</div>
+        `;
+        document.body.appendChild(overlay);
+    } else {
+        overlay.querySelector('.tool-loading-text').textContent = text;
+        overlay.style.display = 'flex';
+    }
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('tool-loader');
+    if (overlay) overlay.style.display = 'none';
+}
 
 // --- MANEJO DE RESPONSIVE DEL CANVAS (Opcional) ---
 // FabricJS no es responsive por defecto, pero el contenedor CSS tiene overflow:auto

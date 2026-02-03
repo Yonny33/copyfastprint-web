@@ -73,13 +73,13 @@
                   >
                 </li>
                 <li>
-                  <a href="/remover-fondo.html"
-                    ><i class="fas fa-magic"></i> Remover Fondo</a >
+                  <a href="/quitar-bordes.html"
+                    ><i class="fas fa-crop-alt"></i> Quitar Bordes</a
+                  >
                 </li>
                 <li>
-                  <a href="#" class="dropdown-item-disabled"
-                    ><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño
-                    (Pronto)</a
+                  <a href="/duplicar-tamano.html"
+                    ><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a
                   >
                 </li>
               </ul>
@@ -109,13 +109,13 @@
       <section class="workspace-selector container">
         <h2>1. Elige el Ancho de Bobina</h2>
         <div class="options-grid">
-          <div class="option-card" onclick="selectWorkspace(58)">
+          <div class="option-card" data-width="58">
             <div class="icon"><i class="fas fa-print"></i></div>
             <h3>DTF 58cm</h3>
             <p>Para impresiones de gran formato. Ancho útil: 58cm.</p>
             <button class="btn-select">Seleccionar 58cm</button>
           </div>
-          <div class="option-card" onclick="selectWorkspace(28)">
+          <div class="option-card" data-width="28">
             <div class="icon"><i class="fas fa-scroll"></i></div>
             <h3>DTF 28cm</h3>
             <p>Para formato pequeño/A3. Ancho útil: 28cm.</p>
@@ -163,6 +163,17 @@
               <i class="fas fa-ruler-vertical"></i>
             </button>
             <span class="fab-tooltip">+1 Metro</span>
+          </div>
+
+          <!-- Restaurar Imagen -->
+          <div class="fab-container">
+            <button class="fab-btn restore"
+              id="btn-reset-img"
+              title="Restaurar Imagen (Tamaño Original)"
+            >
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <span class="fab-tooltip">Restaurar</span>
           </div>
 
           <!-- Eliminar -->
@@ -255,6 +266,9 @@
 
     <!-- Tooltip para dimensiones -->
     <div id="dim-tooltip" class="dim-tooltip" style="display: none"></div>
+
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
 
     <!-- Scripts -->
     <script src="/js/scripts.js"></script>

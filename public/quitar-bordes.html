@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quitar Bordes (Semitransparencia) - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/tools.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="nav-container container">
+        <div class="logo">
+          <a href="/index.html" class="logo-part">COPYFAST</a>
+          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
+          <a href="/index.html" class="logo-part">PRINT</a>
+        </div>
+        <nav>
+          <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/diseño.html">Diseños</a></li>
+            <li><a href="/acercade.html">Acerca de</a></li>
+            <li><a href="/cotizacion.html">Cotización</a></li>
+            <li><a href="/conversor-divisas.html">Conversor</a></li>
+            <li>
+              <a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
+                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
+                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
+                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
+              </ul>
+            </li>
+            <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
+          </ul>
+        </nav>
+        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Quitar Bordes y Semitransparencia</h1>
+        <p>
+          Elimina los halos blancos y suaviza los bordes de tus imágenes para un acabado DTF perfecto.
+        </p>
+        <a href="#instructions" class="btn-instruction-link">
+          <i class="fas fa-info-circle"></i> Ver instrucciones
+        </a>
+      </section>
+
+      <section class="workspace-area container">
+        <div class="tool-controls">
+          <div class="control-group">
+            <label for="feather-strength"><i class="fas fa-feather-alt"></i> Intensidad:</label>
+            <input type="range" id="feather-strength" min="0" max="10" value="1" />
+            <span id="feather-strength-val">1</span>
+          </div>
+        </div>
+
+        <div class="canvas-container-wrapper" id="canvas-wrapper" style="min-height: 400px; align-items: center; justify-content: center;">
+          <div id="placeholder-text" style="color: #666; text-align: center">
+            <i class="fas fa-crop-alt" style="font-size: 3rem; margin-bottom: 1rem; display: block"></i>
+            Sube una imagen para suavizar bordes
+          </div>
+          <canvas id="c-borders" style="display:none;"></canvas>
+        </div>
+
+        <div id="halo-warning-container" style="display: none; text-align: center; margin-top: 20px;">
+          <button id="btn-fix-halo" class="btn btn-primary" style="background-color: #8b0000; border: none; animation: pulse 2s infinite;">
+            <i class="fas fa-exclamation-triangle"></i> Eliminar Halo Detectado
+          </button>
+        </div>
+
+        <div class="floating-toolbar">
+          <div class="fab-container">
+            <label for="img-upload-borders" class="fab-btn upload" title="Subir Imagen">
+              <i class="fas fa-upload"></i>
+            </label>
+            <span class="fab-tooltip">Subir Imagen</span>
+            <input type="file" id="img-upload-borders" accept="image/*" hidden />
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn zoom" id="btn-zoom-in" title="Acercar">
+              <i class="fas fa-search-plus"></i>
+            </button>
+            <span class="fab-tooltip">Acercar</span>
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn zoom" id="btn-zoom-out" title="Alejar">
+              <i class="fas fa-search-minus"></i>
+            </button>
+            <span class="fab-tooltip">Alejar</span>
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn delete" id="btn-delete-borders" title="Eliminar Imagen">
+              <i class="fas fa-trash"></i>
+            </button>
+            <span class="fab-tooltip">Eliminar</span>
+          </div>
+          <div class="fab-container">
+            <button class="fab-btn download" id="btn-download-borders" title="Descargar">
+              <i class="fas fa-download"></i>
+            </button>
+            <span class="fab-tooltip">Descargar</span>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          <h3><i class="fas fa-lightbulb"></i> Cómo usar:</h3>
+          <ul>
+            <li><strong>1. Subir:</strong> Carga tu imagen (PNG recomendado).</li>
+            <li><strong>2. Detectar:</strong> El sistema analizará automáticamente si hay bordes sucios (halos). Si el borde de la imagen se pone rojo, ¡hay problemas!</li>
+            <li><strong>3. Corregir:</strong> Usa el botón rojo "Eliminar Halo" para una limpieza automática o ajusta la "Intensidad" manualmente.</li>
+            <li><strong>4. Verificar:</strong> Usa el Zoom para inspeccionar los bordes. Busca el borde verde brillante que indica que está limpio.</li>
+            <li><strong>5. Descargar:</strong> Guarda tu imagen procesada lista para impresión DTF.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
+
+    <script src="/js/scripts.js"></script>
+    <script src="/js/quitar-bordes.js"></script>
+  </body>
+</html>
