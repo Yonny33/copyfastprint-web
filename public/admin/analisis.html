@@ -29,9 +29,26 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+      // Configuración Global de Chart.js - Estilo Corporativo (Rojo)
+      if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.color = "#a0a0a0";
+        
+        // Líneas y Puntos (para gráficos de tendencia)
+        Chart.defaults.elements.line.borderColor = "#8b0000";
+        Chart.defaults.elements.line.backgroundColor = "rgba(139, 0, 0, 0.2)";
+        Chart.defaults.elements.line.tension = 0.4; // Curvas suaves modernas
+        
+        Chart.defaults.elements.point.backgroundColor = "#8b0000";
+        Chart.defaults.elements.point.borderColor = "#fff";
+        Chart.defaults.elements.point.hoverBackgroundColor = "#ff0000";
+        Chart.defaults.elements.point.radius = 4;
+      }
+    </script>
   </head>
-  <body>
+  <body class="admin-page">
     <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="spinner"></div>
       <p>Analizando datos...</p>

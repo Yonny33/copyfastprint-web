@@ -38,13 +38,13 @@
         
         <form id="loginForm">
             <p style="text-align: center; color: var(--text-secondary); margin-top: -1rem; margin-bottom: 2rem;">Acceso de Administrador</p>
-            <div class="form-group">
+            <div class="form-group floating">
+                <input type="email" id="username" name="username" required autocomplete="username" placeholder=" ">
                 <label for="username"><i class="fas fa-user"></i> Correo Electrónico</label>
-                <input type="email" id="username" name="username" required autocomplete="username">
             </div>
-            <div class="form-group">
+            <div class="form-group floating">
+                <input type="password" id="password" name="password" required autocomplete="current-password" placeholder=" ">
                 <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
             <div id="login-error" style="display: none;"></div>
             <button type="submit" id="loginButton" class="btn-submit full-width">Entrar</button>

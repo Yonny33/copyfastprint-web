@@ -68,7 +68,7 @@ function generateHTML() {
           category,
           imagePaths,
           title,
-          "Pasa el mouse para ver más vistas.",
+          "Haz clic para ver todas las vistas disponibles.",
         );
       }
     });

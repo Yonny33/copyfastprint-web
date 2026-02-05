@@ -45,19 +45,22 @@
 }
 
 .option-card {
-  background-color: var(--background-card); /* Usando variable de main.css */
-  border: 1px solid #333;
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
   cursor: pointer;
   transition:
     transform 0.3s,
-    border-color 0.3s;
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 .option-card:hover {
   transform: translateY(-5px);
-  border-color: var(--primary-color);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
 }
 .option-card .icon {
   font-size: 3rem;
@@ -378,7 +381,9 @@
 
 /* --- CONTROLES DE REMOVER FONDO --- */
 .tool-controls {
-  background-color: var(--background-card);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 1.5rem;
   border-radius: 8px;
   margin-bottom: 2rem;
@@ -387,7 +392,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  border: 1px solid #333;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tools-selection {

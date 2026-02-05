@@ -5,8 +5,8 @@
 :root {
   --primary-color: #8b0000; /* Deep Red from Logo */
   --accent-glow: rgba(139, 0, 0, 0.5);
-  --background-dark: #121212; /* Main dark background */
-  --background-card: #1e1e1e; /* Lighter background for cards */
+  --background-dark: #050505; /* Negro Profundo Premium */
+  --background-card: rgba(255, 255, 255, 0.03); /* Base para efecto vidrio */
   --text-primary: #eaeaea; /* Primary text color, slightly off-white */
   --text-secondary: #a0a0a0; /* Secondary text for subtitles, p */
   --border-color: #333333;
@@ -31,6 +31,9 @@ body {
   color: var(--text-primary);
   background-color: var(--background-dark);
   line-height: 1.7;
+  /* Fondo con luz ambiental sutil para dar profundidad */
+  background-image: radial-gradient(circle at 50% 0%, rgba(139, 0, 0, 0.1), transparent 70%);
+  background-attachment: fixed;
 }
 
 /* --- MEJORA: Scrollbar Personalizado (Igual que Admin) --- */
@@ -136,7 +139,7 @@ h4 {
 
 .section-heading {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 80px; /* MÁS ESPACIO: Da elegancia y separa mejor el contenido */
 }
 
 .section-heading h2 {
@@ -305,32 +308,52 @@ h4 {
 }
 
 .footer {
-  background-color: var(--background-card);
+  background-color: #080808; /* Fondo casi negro para continuidad con el Hero */
   color: var(--text-secondary);
-  padding: 50px 20px;
+  padding: 40px 20px; /* Altura reducida para un footer más compacto */
   text-align: center;
-  border-top: 1px solid var(--border-color);
-  margin-top: 50px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* Borde muy sutil */
+  margin-top: 0; /* CORRECCIÓN: Elimina la franja negra separadora */
+  position: relative;
+  overflow: hidden;
 }
+
+/* Efecto Aurora en el Footer (Coherencia con el Home) */
+.footer::before {
+  content: '';
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 200px;
+  background: radial-gradient(circle, rgba(139, 0, 0, 0.15) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.footer-content, .social-networks {
+  position: relative;
+  z-index: 1;
+}
+
 .footer-content h2 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--text-primary);
-}
-.footer-content span {
-  color: var(--primary-color);
-}
-.footer-content h5 {
-  font-weight: 400;
-  font-size: 1.1rem;
-  margin-top: 10px;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
 }
 .social-networks {
-  margin-top: 30px;
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 25px; /* Usamos gap para espaciado uniforme */
 }
 .social-networks a {
   color: var(--text-secondary);
-  margin: 0 15px;
-  font-size: 1.8rem;
+  margin: 0;
+  font-size: 1.5rem; /* Iconos un poco más pequeños y elegantes */
   transition:
     color 0.3s,
     transform 0.3s;
@@ -344,51 +367,111 @@ h4 {
    4. PAGE-SPECIFIC STYLES
    ============================================================================= */
 
-/* --- Home Page: Hero Section --- */
+/* --- Home Page: Hero Section (MODERNIZADO - AURORA DARK) --- */
 .hero-section {
   min-height: 90vh;
   display: flex;
   align-items: center;
+  justify-content: center; /* Centrado vertical */
+  background-color: #050505; /* Negro profundo premium */
+  position: relative;
+  overflow: hidden;
+  padding-top: 80px; /* Espacio para el header fijo */
+  padding-bottom: 120px; /* Espacio extra inferior para separar el botón del footer */
 }
+
+/* Efecto de fondo animado (Aurora Roja) */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle at center, rgba(139, 0, 0, 0.18) 0%, transparent 65%);
+  filter: blur(90px); /* Suavizado extremo para efecto de luz */
+  animation: pulseGlow 8s ease-in-out infinite alternate;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .hero-container {
   display: flex;
+  flex-direction: column; /* Cambiamos de fila a columna */
   align-items: center;
-  justify-content: space-between;
-  gap: 50px;
+  justify-content: center;
+  text-align: center; /* Texto centrado */
+  gap: 30px;
+  position: relative;
+  z-index: 1;
+  max-width: 900px; /* Limitamos el ancho para lectura cómoda */
+  margin: 0 auto;
 }
+
 .hero-text {
-  max-width: 55%;
+  max-width: 100%; /* Ahora ocupa todo el ancho disponible */
 }
 .hero-text .subtitle {
   color: var(--primary-color);
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 3px; /* Más espaciado para elegancia */
   text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: block;
+  font-size: 0.9rem;
 }
 .hero-text h1 {
-  font-size: 3.8rem;
-  line-height: 1.1;
+  font-size: 4.5rem; /* Título mucho más grande e impactante */
+  line-height: 1.05;
   margin-bottom: 25px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  /* Efecto de texto degradado sutil */
+  background: linear-gradient(to bottom right, #ffffff 30%, #a0a0a0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 .hero-text p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  max-width: 500px;
-  margin-bottom: 35px;
+  font-size: 1.25rem;
+  color: #a0a0a0;
+  max-width: 700px;
+  margin: 0 auto 40px; /* Centrado horizontalmente */
+  line-height: 1.6;
 }
 .hero-text .btn-primary {
-  padding: 18px 35px;
-  font-size: 1.1rem;
+  padding: 16px 40px;
+  font-size: 1.15rem;
+  border-radius: 50px; /* Botones redondeados modernos */
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
+/* Ocultamos la imagen para el estilo minimalista */
 .hero-image {
-  max-width: 40%;
+  display: none;
 }
-.hero-image img {
-  width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 0 40px -10px var(--accent-glow);
+
+/* Animación del resplandor */
+@keyframes pulseGlow {
+  0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Animación de entrada para el texto (Fade In Up) */
+.hero-text > * {
+  opacity: 0;
+  animation: fadeInUp 1s ease-out forwards;
+}
+.hero-text .subtitle { animation-delay: 0.2s; }
+.hero-text h1 { animation-delay: 0.4s; }
+.hero-text p { animation-delay: 0.6s; }
+.hero-text .btn { animation-delay: 0.8s; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Gallery Page (diseño.html) --- */
@@ -420,10 +503,13 @@ h4 {
   gap: 30px;
 }
 .design-card {
-  background-color: var(--background-card);
-  border-radius: 10px;
+  background: var(--background-card); /* Efecto Vidrio */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
@@ -575,11 +661,13 @@ h4 {
   gap: 30px;
 }
 .value-item {
-  background-color: var(--background-card);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 30px;
   text-align: center;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
@@ -612,10 +700,21 @@ h4 {
   gap: 50px;
 }
 .quote-form-wrapper {
-  background-color: var(--background-card);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.quote-form-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
+}
+.quote-form .form-group:last-child {
+  margin-bottom: 0;
 }
 .form-grid {
   display: grid;
@@ -630,36 +729,59 @@ h4 {
 .form-group {
   margin-bottom: 25px;
 }
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: var(--text-secondary);
+
+/* --- ESTILOS DE FORMULARIO FLOTANTE (IGUAL QUE ADMIN) --- */
+.form-group.floating {
+  position: relative;
+  margin-bottom: 1.5rem;
 }
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="number"],
-.form-group input[type="date"],
-.form-group textarea,
-.form-group select {
+
+.form-group.floating input,
+.form-group.floating select,
+.form-group.floating textarea {
   width: 100%;
-  padding: 12px;
-  background-color: var(--background-dark);
+  padding: 24px 16px 8px; /* Espacio para la etiqueta */
+  background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
-  border-radius: 5px;
+  border-radius: 8px;
   color: var(--text-primary);
   font-size: 1rem;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
+  transition: all 0.2s;
+  height: 56px;
 }
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+
+.form-group.floating textarea {
+  height: auto;
+  min-height: 120px;
+}
+
+.form-group.floating input:focus,
+.form-group.floating select:focus,
+.form-group.floating textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.form-group.floating label {
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.form-group.floating input:focus ~ label,
+.form-group.floating input:not(:placeholder-shown) ~ label,
+.form-group.floating textarea:focus ~ label,
+.form-group.floating textarea:not(:placeholder-shown) ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 .radio-group {
   display: flex;
@@ -717,11 +839,22 @@ h4 {
   font-size: 1.2rem;
 }
 .quote-sidebar .info-box {
-  background-color: var(--background-card);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 30px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   margin-bottom: 30px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añadido para consistencia */
+}
+/* Efecto Hover para tarjetas de cotización (Igual que Acerca de) */
+.quote-sidebar .info-box:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 15px 30px rgba(0, 0, 0, 0.2),
+    0 0 20px var(--accent-glow);
 }
 .quote-sidebar .info-box h3 {
   font-size: 1.4rem;
@@ -789,6 +922,12 @@ h4 {
   transform: scale(1.03);
 }
 
+/* Animación de entrada para el formulario */
+.animate-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0; /* Comienza invisible */
+}
+
 /* --- Specs Page (especificaciones.html) --- */
 .tech-comparison-section {
   display: grid;
@@ -797,12 +936,20 @@ h4 {
   margin-bottom: 50px;
 }
 .tech-card {
-  background-color: var(--background-card);
-  border: 1px solid var(--border-color);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.tech-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
 }
 .tech-card-header {
   display: flex;
@@ -858,11 +1005,19 @@ h4 {
   gap: 30px;
 }
 .spec-item {
-  background-color: var(--background-card);
-  border: 1px solid var(--border-color);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 30px;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.spec-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
 }
 .spec-item i {
   font-size: 2.5rem;
@@ -881,11 +1036,14 @@ h4 {
   color: var(--text-primary);
 }
 .cta-block {
-  background-color: var(--background-card);
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 50px 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 .cta-block h2 {
   font-size: 2.2rem;
@@ -915,11 +1073,18 @@ h4 {
   margin: 0 auto;
 }
 .currency-calculator {
-  background-color: var(--background-card);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
+  background: var(--background-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.currency-calculator:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
 }
 .calculator-header {
   display: flex;
@@ -1102,14 +1267,8 @@ h4 {
     text-align: center;
   }
   .hero-text {
-    max-width: 100%;
-  }
-  .hero-text p {
-    margin: 0 auto 35px;
-  }
-  .hero-image {
-    max-width: 60%;
-    margin-top: 40px;
+    /* Ya está centrado en escritorio, mantenemos */
+    padding: 0 20px;
   }
   .hero-text h1 {
     font-size: 3rem;
@@ -1157,9 +1316,6 @@ h4 {
   }
   .hero-text h1 {
     font-size: 2.5rem;
-  }
-  .hero-image {
-    max-width: 80%;
   }
   .gallery-grid {
     grid-template-columns: 1fr;

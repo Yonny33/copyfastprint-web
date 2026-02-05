@@ -31,9 +31,36 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script>
+      // Configuración Global de Chart.js - Estilo Corporativo (Rojo)
+      if (typeof Chart !== 'undefined') {
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.color = "#a0a0a0";
+        // Barras Rojas
+        Chart.defaults.elements.bar.backgroundColor = "rgba(139, 0, 0, 0.8)";
+        Chart.defaults.elements.bar.borderColor = "#8b0000";
+        Chart.defaults.elements.bar.borderWidth = 1;
+        Chart.defaults.elements.bar.borderRadius = 4;
+        Chart.defaults.elements.bar.hoverBackgroundColor = "#ff0000";
+
+        // --- NUEVO: Barras Horizontales y Etiquetas de Valor ---
+        Chart.defaults.indexAxis = 'y'; // Cambia la orientación a horizontal
+        
+        // Configuración de DataLabels (Números en la punta)
+        if (typeof ChartDataLabels !== 'undefined') {
+          Chart.register(ChartDataLabels);
+          Chart.defaults.plugins.datalabels.color = '#eaeaea';
+          Chart.defaults.plugins.datalabels.anchor = 'end';
+          Chart.defaults.plugins.datalabels.align = 'end';
+          Chart.defaults.plugins.datalabels.font = { weight: 'bold' };
+          Chart.defaults.layout.padding = { right: 50 }; // Espacio para los números
+        }
+      }
+    </script>
   </head>
-  <body>
+  <body class="admin-page">
     <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="spinner"></div>
       <p>Cargando...</p>
@@ -104,17 +131,16 @@
             <i class="fas fa-plus"></i> Añadir Nuevo Producto
           </button>
           <div class="search-bar">
-            <i class="fas fa-search"></i>
             <input
               type="text"
               id="search-input"
               placeholder="Buscar por nombre, código o categoría..."
             />
+            <i class="fas fa-search"></i>
           </div>
         </div>
 
         <div class="card-table">
-          <h3><i class="fas fa-chart-bar"></i> Stock Actual de Productos</h3>
           <div class="chart-container-medium">
             <canvas id="stock-chart"></canvas>
           </div>
@@ -156,41 +182,42 @@
           <form id="inventario-form">
             <input type="hidden" id="id_producto" name="id_producto" />
             <div class="form-row">
-              <div class="form-group">
-                <label for="nombre">Nombre del Producto</label>
+              <div class="form-group floating">
                 <input
                   type="text"
                   id="nombre"
                   name="nombre"
                   class="form-control"
+                  placeholder=" "
                   required
                 />
+                <label for="nombre">Nombre del Producto</label>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label for="categoria">Categoría</label>
+              <div class="form-group floating">
                 <input
                   type="text"
                   id="categoria"
                   name="categoria"
                   class="form-control"
-                  placeholder="Ej: Papelería, Insumos, etc."
+                  placeholder=" "
                 />
+                <label for="categoria">Categoría</label>
               </div>
-              <div class="form-group">
-                <label for="proveedor">Proveedor</label>
+              <div class="form-group floating">
                 <input
                   type="text"
                   id="proveedor"
                   name="proveedor"
                   class="form-control"
+                  placeholder=" "
                 />
+                <label for="proveedor">Proveedor</label>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label for="stock_actual">Stock Actual</label>
+              <div class="form-group floating">
                 <input
                   type="number"
                   id="stock_actual"
@@ -198,39 +225,43 @@
                   class="form-control"
                   required
                   step="any"
+                  placeholder=" "
                 />
+                <label for="stock_actual">Stock Actual</label>
               </div>
-              <div class="form-group">
-                <label for="stock_minimo">Stock Mínimo de Alerta</label>
+              <div class="form-group floating">
                 <input
                   type="number"
                   id="stock_minimo"
                   name="stock_minimo"
                   class="form-control"
                   step="any"
+                  placeholder=" "
                 />
+                <label for="stock_minimo">Stock Mínimo de Alerta</label>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group">
-                <label for="unidad_medida">Unidad de Medida</label>
+              <div class="form-group floating">
                 <input
                   type="text"
                   id="unidad_medida"
                   name="unidad_medida"
                   class="form-control"
-                  placeholder="Ej: kg, L, unidad"
+                  placeholder=" "
                 />
+                <label for="unidad_medida">Unidad de Medida</label>
               </div>
-              <div class="form-group">
-                <label for="fecha_ingreso">Fecha de Ingreso</label>
+              <div class="form-group floating">
                 <input
                   type="date"
                   id="fecha_ingreso"
                   name="fecha_ingreso"
                   class="form-control"
+                  placeholder=" "
                   required
                 />
+                <label for="fecha_ingreso">Fecha de Ingreso</label>
               </div>
             </div>
             <div class="form-buttons">

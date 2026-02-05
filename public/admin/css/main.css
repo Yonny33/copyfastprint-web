@@ -13,6 +13,13 @@
   --error-color: #ef4444;
   --warning-color: #f59e0b;
   --cancel-color: #5a5a5a;
+  accent-color: var(--primary-color); /* Fuerza el color rojo en controles nativos */
+}
+
+/* Selección de texto global (para que no se vea azul al seleccionar) */
+::selection {
+  background-color: var(--primary-color);
+  color: #ffffff;
 }
 
 body.admin-page,
@@ -42,21 +49,38 @@ body.login-page-body {
 /* =============================================================================
    2. ADMIN - LAYOUT PRINCIPAL
    ============================================================================= */
+/* El contenedor principal ahora solo define el layout general, el sidebar es fijo */
 .admin-grid-container {
-  display: grid;
-  grid-template-columns: 260px 1fr;
   min-height: 100vh;
+  display: flex; /* Usamos flexbox para el layout principal */
+}
+
+/* Contenido principal que se desplaza y respeta el sidebar fijo */
+.admin-main-content {
+  margin-left: 260px; /* Empuja el contenido principal para que no se superponga al sidebar */
+  flex-grow: 1; /* Permite que el contenido principal ocupe el espacio restante */
+  padding: 2.5rem;
+  overflow-y: auto; /* Permite el scroll en el contenido principal */
+  background-color: var(--background-dark);
 }
 
 /* =============================================================================
    3. ADMIN - BARRA LATERAL
    ============================================================================= */
 .admin-sidebar {
-  background-color: var(--background-dark);
+  position: fixed; /* Hace que la barra lateral se quede fija */
+  top: 0;
+  left: 0;
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+  width: 260px; /* Ancho fijo */
+  background: rgba(18, 18, 18, 0.8); /* Fondo semi-transparente */
+  backdrop-filter: blur(10px); /* Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(10px); /* Para compatibilidad con Safari */
+  z-index: 100; /* Asegura que esté por encima del contenido */
   display: flex;
   flex-direction: column;
   padding: 1.5rem 0;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid rgba(255, 255, 255, 0.08); /* Borde más sutil */
 }
 .sidebar-header {
   text-align: center;
@@ -89,10 +113,12 @@ body.login-page-body {
   font-weight: 500;
   transition: all 0.2s ease;
   border-left: 4px solid transparent;
+  border-radius: 0 8px 8px 0; /* Bordes redondeados en el lado derecho */
 }
 .sidebar-nav a:hover {
-  background-color: var(--background-card);
-  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.05); /* Fondo gris sutil y elegante */
+  color: var(--primary-color); /* Color de acento al pasar el mouse */
+  border-left-color: var(--primary-color); /* Borde rojo activo */
 }
 .sidebar-nav .active a {
   background-color: var(--primary-color);
@@ -104,16 +130,7 @@ body.login-page-body {
   font-size: 1.1rem;
 }
 .sidebar-footer {
-  display: none;
-} /* OCULTADO: El botón ahora es flotante */
-
-/* =============================================================================
-   4. ADMIN - CONTENIDO PRINCIPAL
-   ============================================================================= */
-.admin-main-content {
-  padding: 2.5rem;
-  overflow-y: auto;
-  background-color: var(--background-dark);
+  display: none; /* OCULTADO: El botón ahora es flotante */
 }
 .section-heading {
   margin-bottom: 2.5rem;
@@ -196,6 +213,7 @@ body.login-page-body {
 }
 .kpi-icon.balance {
   color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
 }
 .kpi-info h3 {
   font-size: 0.8rem; /* Título más pequeño */
@@ -209,6 +227,20 @@ body.login-page-body {
   font-weight: 700;
   color: var(--text-primary);
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+/* Colores específicos para números de KPIs */
+#kpi-ingresos-mes {
+  color: var(--success-color);
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+#kpi-gastos-mes {
+  color: var(--error-color);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+#kpi-saldo-pendiente {
+  color: var(--warning-color);
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 
 /* =============================================================================
@@ -248,6 +280,19 @@ body.login-page-body {
   gap: 2rem;
   margin-bottom: 2rem;
 }
+
+/* Ajuste para limitar altura y asegurar alineación en Dashboard */
+.recent-activity-grid .card-table {
+  max-height: 400px; /* Limita la altura para que no sean infinitas */
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Evita desbordamiento horizontal en Grid */
+}
+.recent-activity-grid .table-responsive {
+  overflow-y: auto; /* Habilita scroll vertical interno */
+  min-height: 0; /* Asegura que el scroll funcione correctamente */
+}
+
 .table-responsive {
   overflow-x: auto;
 }
@@ -432,29 +477,60 @@ tbody tr:hover {
    ============================================================================= */
 .toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Botón a la izq, Buscador a la der */
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite que se adapte si falta espacio */
 }
 .search-bar {
   position: relative;
-  width: 350px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: auto;
 }
 .search-bar i {
   position: absolute;
-  left: 15px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-secondary);
+  font-size: 1.2rem;
+  transition: color 0.3s;
+  pointer-events: none; /* Permite hacer clic en el input a través del icono */
+  z-index: 1;
 }
 .search-bar input {
-  width: 100%;
-  padding: 0.85rem 0.85rem 0.85rem 40px;
-  background-color: var(--background-card);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-primary);
+  width: 40px; /* Ancho inicial (solo el icono) */
+  padding: 10px 40px 10px 10px; /* Espacio para el texto y el icono a la derecha */
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent; /* Línea invisible inicialmente */
+  color: transparent; /* Texto invisible inicialmente */
   font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+.search-bar input::placeholder {
+  color: transparent;
+}
+
+/* Efecto Hover / Focus: Expande el buscador y muestra la línea roja */
+.search-bar:hover input,
+.search-bar input:focus,
+.search-bar input:not(:placeholder-shown) {
+  width: 300px; /* Ancho expandido */
+  border-bottom-color: var(--primary-color); /* Línea roja */
+  color: var(--text-primary);
+  cursor: text;
+}
+.search-bar:hover input::placeholder,
+.search-bar input:focus::placeholder {
+  color: var(--text-secondary);
+}
+.search-bar:hover i,
+.search-bar:focus-within i {
+  color: var(--primary-color); /* Icono rojo al activar */
 }
 .modal {
   display: none;
@@ -678,6 +754,7 @@ td.actions {
   }
   .admin-sidebar {
     display: flex;
+    position: sticky; /* En móvil, se vuelve sticky para no ocupar 100vh */
     flex-direction: row;
     align-items: center;
     padding: 0.5rem;
@@ -686,6 +763,9 @@ td.actions {
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none; /* Firefox: Ocultar scrollbar pero permitir scroll */
+    width: 100%; /* Ocupa todo el ancho */
+    height: auto; /* Altura automática */
+    background: var(--background-dark); /* Fondo sólido en móvil para evitar problemas de blur */
   }
   .admin-sidebar::-webkit-scrollbar {
     display: none; /* Chrome/Safari: Ocultar scrollbar */
@@ -717,6 +797,7 @@ td.actions {
     background-color: var(--primary-color);
   }
   .filter-controls {
+    grid-template-columns: 1fr; /* En móvil, los filtros se apilan */
     grid-template-columns: 1fr;
   }
   .filter-buttons {
@@ -731,6 +812,7 @@ td.actions {
     gap: 1.5rem;
   }
   .search-bar {
+    width: 100%; /* Ocupa todo el ancho */
     width: 100%;
   }
 }
@@ -739,6 +821,7 @@ td.actions {
     padding: 1.5rem;
   }
   .sidebar-header {
+    display: none; /* Ocultar el logo en pantallas muy pequeñas */
     display: none;
   }
   .kpi-grid {
@@ -815,16 +898,18 @@ td.actions {
   z-index: 5;
 }
 .modern-table tbody tr {
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.03); /* Fondo oscuro translúcido */
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   transition:
     box-shadow 0.2s,
-    transform 0.2s;
+    transform 0.2s,
+    background-color 0.2s;
 }
 .modern-table tbody tr:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 .modern-table td,
 .modern-table th {
@@ -832,8 +917,12 @@ td.actions {
   padding: 1rem 1.25rem;
 }
 .modern-table tbody td {
-  color: #333;
-} /* FIX: Texto oscuro para legibilidad */
+  color: var(--text-primary); /* Texto claro para modo oscuro */
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+.modern-table tbody tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+.modern-table tbody tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
 /* --- Modal de Abono (Reportes) --- */
 .modal-overlay {
@@ -1097,4 +1186,128 @@ input:checked + .slider:before {
   font-size: 0.8rem;
   font-weight: bold;
   box-shadow: 0 0 5px gold;
+}
+
+/* =============================================================================
+   17. ADMIN - FORMULARIOS MODERNOS (FLOATING LABELS)
+   ============================================================================= */
+.form-group.floating {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-group.floating input,
+.form-group.floating select {
+  height: 56px; /* Altura fija para inputs y selects */
+  padding: 24px 16px 8px; /* Espacio superior para la etiqueta */
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+/* Soporte para Textarea */
+.form-group.floating textarea {
+  padding: 24px 16px 8px;
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s;
+  min-height: 120px; /* Altura mínima para áreas de texto */
+}
+
+.form-group.floating input:focus,
+.form-group.floating select:focus,
+.form-group.floating textarea:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  outline: none;
+}
+
+/* Efecto Hover (Pasar el mouse) para Inputs y Selects */
+.form-group.floating input:hover,
+.form-group.floating select:hover,
+.form-group.floating textarea:hover,
+.form-inline-group input:hover,
+.form-inline-group select:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+
+.form-group.floating label {
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.form-group.floating input:focus ~ label,
+.form-group.floating input:not(:placeholder-shown) ~ label,
+.form-group.floating select:focus ~ label,
+.form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
+.form-group.floating textarea:focus ~ label,
+.form-group.floating textarea:not(:placeholder-shown) ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* --- CORRECCIONES DE UI (SELECTS Y ALINEACIÓN) --- */
+
+/* 1. Evitar superposición en Selects: La etiqueta siempre flota */
+.form-group.floating select ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* 2. Corregir color de fondo en opciones del menú desplegable (Modo Oscuro) */
+select option {
+  background-color: var(--background-card);
+  color: var(--text-primary);
+}
+
+/* 3. Clase para alinear inputs compuestos (Cédula/RIF) */
+.form-inline-group {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Centra verticalmente los elementos */
+}
+
+.form-inline-group select,
+.form-inline-group input {
+  height: 56px;
+  margin-bottom: 0;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+.form-inline-group select:focus,
+.form-inline-group input:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  outline: none;
+}
+
+/* 4. Corrección para etiquetas flotantes en grupos en línea (Cédula/RIF) */
+.form-group.floating .form-inline-group ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
 }

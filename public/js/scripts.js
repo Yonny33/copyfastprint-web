@@ -118,10 +118,12 @@ if (backToTopButton) {
 
 // Solo ejecutar si estamos en una página con la galería.
 const lightboxModal = document.getElementById("modal-lightbox");
-const galleryImages = Array.from(document.querySelectorAll(".design-card img"));
+const designCards = document.querySelectorAll(".design-card");
 
-if (lightboxModal && galleryImages.length > 0) {
+if (lightboxModal && designCards.length > 0) {
+  let currentGallery = []; // Array de imágenes del producto actual
   let currentImgIndex = 0;
+  let activeCard = null;
 
   // Crear botones de navegación si no existen
   function ensureLightboxNavButtons() {
@@ -147,27 +149,27 @@ if (lightboxModal && galleryImages.length > 0) {
     const modalTitle = document.getElementById("modal-title");
     const modalDescription = document.getElementById("modal-description");
     const whatsappBtn = document.getElementById("modal-whatsapp-btn");
+
+    // Navegación circular
+    if (index < 0) index = currentGallery.length - 1;
+    if (index >= currentGallery.length) index = 0;
+
     currentImgIndex = index;
-    modalImg.src = galleryImages[index].src;
+    modalImg.src = currentGallery[currentImgIndex];
 
-    const designCard = galleryImages[index].closest(".design-card");
-    const titleElement = designCard.querySelector(".card-info h3");
-    const descriptionElement = designCard.querySelector(".card-info p");
-
+    // Obtener info de la tarjeta activa
+    const titleElement = activeCard.querySelector(".card-info h3") || activeCard.querySelector("h3");
+    const descriptionElement = activeCard.querySelector(".card-info p") || activeCard.querySelector("p");
+    
     const titulo = titleElement ? titleElement.textContent : "Diseño";
     modalTitle.textContent = titulo;
     modalDescription.textContent = descriptionElement ? descriptionElement.textContent : "";
-    let color = "";
-    const altText = galleryImages[index].alt;
-    const match = altText.match(/Suéter\s+([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)/i);
-    if (match) {
-      color = match[1];
-    }
 
-    const imagenUrl = galleryImages[index].src;
+    // Usar la URL completa para el enlace de WhatsApp
+    const imagenUrl = new URL(currentGallery[currentImgIndex], window.location.origin).href;
 
     const mensaje = encodeURIComponent(
-      `Hola, me interesa el diseño: ${titulo} en color: ${color}. Enlace de la imagen: ${imagenUrl}`
+      `Hola, me interesa el diseño: ${titulo}. Enlace de la imagen: ${imagenUrl}`
     );
     // NÚMERO DE WHATSAPP ACTUALIZADO
     whatsappBtn.href = `https://wa.me/584220135069?text=${mensaje}`;
@@ -176,12 +178,28 @@ if (lightboxModal && galleryImages.length > 0) {
     document.body.style.overflow = "hidden";
   }
 
-  // Evento click en cada imagen para abrir el lightbox
-  galleryImages.forEach((img, idx) => {
-    img.style.cursor = "pointer";
-    img.addEventListener("click", function () {
+  // Evento click en cada TARJETA (no solo la imagen)
+  designCards.forEach((card) => {
+    card.style.cursor = "pointer";
+    card.addEventListener("click", function (e) {
+      // Evitar abrir si se hace clic en botones internos
+      if (e.target.closest('button') || e.target.closest('a')) return;
+
+      activeCard = card;
+      const dataImages = card.getAttribute("data-images");
+
+      if (dataImages) {
+        // Si tiene múltiples imágenes (generado por el script), úsalas
+        try {
+          currentGallery = JSON.parse(dataImages);
+        } catch (err) { console.error("Error parsing images", err); currentGallery = [card.querySelector("img").src]; }
+      } else {
+        // Si es una tarjeta simple, usa solo la imagen principal
+        currentGallery = [card.querySelector("img").src];
+      }
+
       ensureLightboxNavButtons();
-      showLightboxImage(idx);
+      showLightboxImage(0); // Empezar por la primera imagen
     });
   });
 
@@ -203,14 +221,11 @@ if (lightboxModal && galleryImages.length > 0) {
   document.addEventListener("click", function (e) {
     if (e.target.id === "modal-next") {
       e.stopPropagation();
-      let next = (currentImgIndex + 1) % galleryImages.length;
-      showLightboxImage(next);
+      showLightboxImage(currentImgIndex + 1);
     }
     if (e.target.id === "modal-prev") {
       e.stopPropagation();
-      let prev =
-        (currentImgIndex - 1 + galleryImages.length) % galleryImages.length;
-      showLightboxImage(prev);
+      showLightboxImage(currentImgIndex - 1);
     }
   });
 
@@ -218,13 +233,10 @@ if (lightboxModal && galleryImages.length > 0) {
   document.addEventListener("keydown", function (e) {
     if (lightboxModal.style.display === "flex") {
       if (e.key === "ArrowRight") {
-        let next = (currentImgIndex + 1) % galleryImages.length;
-        showLightboxImage(next);
+        showLightboxImage(currentImgIndex + 1);
       }
       if (e.key === "ArrowLeft") {
-        let prev =
-          (currentImgIndex - 1 + galleryImages.length) % galleryImages.length;
-        showLightboxImage(prev);
+        showLightboxImage(currentImgIndex - 1);
       }
       if (e.key === "Escape") {
         lightboxModal.style.display = "none";

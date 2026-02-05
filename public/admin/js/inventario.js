@@ -117,19 +117,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const productsToShow = products.slice(0, 20);
     const labels = productsToShow.map((p) => p.nombre);
     const data = productsToShow.map((p) => parseFloat(p.stock_actual) || 0);
-    const stockMinimo = productsToShow.map(
-      (p) => parseFloat(p.stock_minimo) || 0,
-    );
-    const backgroundColors = data.map((stock, index) =>
-      stock <= stockMinimo[index]
-        ? "rgba(255, 99, 132, 0.6)"
-        : "rgba(54, 162, 235, 0.6)",
-    );
-    const borderColors = data.map((stock, index) =>
-      stock <= stockMinimo[index]
-        ? "rgba(255, 99, 132, 1)"
-        : "rgba(54, 162, 235, 1)",
-    );
 
     if (stockChart) stockChart.destroy();
 
@@ -141,8 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             label: "Stock Actual",
             data: data,
-            backgroundColor: backgroundColors,
-            borderColor: borderColors,
             borderWidth: 1,
           },
         ],
@@ -150,7 +135,10 @@ document.addEventListener("DOMContentLoaded", function () {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true } },
+        indexAxis: 'y', // Refuerzo para barras horizontales
+        scales: {
+          x: { beginAtZero: true, grid: { color: "rgba(255, 255, 255, 0.05)" } }
+        },
         plugins: { legend: { display: false } },
       },
     });

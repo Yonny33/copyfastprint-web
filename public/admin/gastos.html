@@ -50,7 +50,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
   </head>
-  <body>
+  <body class="admin-page">
     <!-- Google Tag Manager (noscript) -->
     <noscript
       ><iframe
@@ -130,26 +130,22 @@
           <!-- Columna del formulario -->
           <div class="form-container">
             <form id="registro-gastos-form">
-              <div class="form-group full-width">
-                <h3 class="form-section-title">Registrar Nuevo Gasto</h3>
-              </div>
               <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group floating">
+                  <input type="date" id="fecha" name="fecha" placeholder=" " required />
                   <label for="fecha">Fecha del Gasto *</label>
-                  <input type="date" id="fecha" name="fecha" required />
                 </div>
-                <div class="form-group">
-                  <label for="proveedor">Concepto / Proveedor *</label>
+                <div class="form-group floating">
                   <input type="text"
                     id="proveedor"
                     name="proveedor"
-                    placeholder="Ej: Pago de internet, Almuerzo, Compra de tinta"
+                    placeholder=" "
                     required
                   />
+                  <label for="proveedor">Concepto / Proveedor *</label>
                 </div>
                 <div class="form-group">
-                  <label for="rit">RIF / Cédula (Opcional)</label>
-                  <div style="display: flex; gap: 10px">
+                  <div class="form-inline-group">
                     <select title="Tipo de documento"
                       name="tipo_documento"
                       id="tipo_documento"
@@ -168,27 +164,28 @@
                     />
                   </div>
                 </div>
-                <div class="form-group">
-                  <label for="monto">Monto Total (Bs.) *</label>
+                <div class="form-group floating">
                   <input type="number"
                     id="monto"
                     name="monto"
                     step="0.01"
                     min="0.01"
+                    placeholder=" "
                     required
                   />
+                  <label for="monto">Monto Total (Bs.) *</label>
                 </div>
-                <div class="form-group full-width">
-                  <label for="descripcion">Descripción del Gasto *</label>
+                <div class="form-group full-width floating">
                   <textarea id="descripcion"
                     name="descripcion"
                     rows="3"
+                    placeholder=" "
                     required
                   ></textarea>
+                  <label for="descripcion">Descripción del Gasto *</label>
                 </div>
-                <div class="form-group">
-                  <label for="categoria">Categoría *</label>
-                  <select id="categoria" name="categoria" required>
+                <div class="form-group floating">
+                  <select id="categoria" name="categoria" required placeholder=" ">
                     <option value="">Selecciona una categoría</option>
                     <option value="Servicios Publicos">
                       Servicios Públicos (Agua, Luz, Teléfono)
@@ -209,10 +206,10 @@
                     <option value="Alimentación">Alimentación y Viáticos</option>
                     <option value="Otro">Otro</option>
                   </select>
+                  <label for="categoria">Categoría *</label>
                 </div>
-                <div class="form-group">
-                  <label for="metodo_pago">Método de Pago *</label>
-                  <select id="metodo_pago" name="metodo_pago" required>
+                <div class="form-group floating">
+                  <select id="metodo_pago" name="metodo_pago" required placeholder=" ">
                     <option value="">Selecciona uno</option>
                     <option value="Efectivo">Efectivo</option>
                     <option value="Transferencia">Transferencia</option>
@@ -220,6 +217,7 @@
                     <option value="Zelle">Zelle</option>
                     <option value="Otro">Otro</option>
                   </select>
+                  <label for="metodo_pago">Método de Pago *</label>
                 </div>
               </div>
               <div class="form-actions">
