@@ -139,15 +139,19 @@
         <div class="currency-calculator-container">
           <div class="currency-calculator">
             <div class="calculator-header">
-              <i class="fas fa-calculator"></i>
+              <i class="fas fa-exchange-alt"></i>
               <h3>Conversor</h3>
-              <button
-                class="refresh-btn"
-                id="refreshRates"
-                title="Actualizar tasas"
-              >
-                <i class="fas fa-sync-alt"></i>
-              </button>
+              <div class="header-actions">
+                <button class="action-btn" id="openCalcBtn" title="Abrir Calculadora">
+                  <i class="fas fa-calculator"></i>
+                </button>
+                <button class="action-btn" id="clearConverterBtn" title="Limpiar Conversor">
+                  <i class="fas fa-eraser"></i>
+                </button>
+                <button class="action-btn" id="refreshRates" title="Actualizar tasas">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+              </div>
             </div>
             <div class="calculator-body">
               <div class="currency-input-group">
@@ -210,6 +214,41 @@
                 <div class="spinner"></div>
                 <p>Actualizando tasas...</p>
               </div>
+            </div>
+          </div>
+
+          <!-- CALCULADORA SENCILLA (Oculta por defecto) -->
+          <div class="simple-calculator" id="simpleCalculator" style="display: none;">
+            <div class="calc-header">
+              <h3>Calculadora</h3>
+              <button class="close-calc-btn" id="closeCalcBtn" title="Cerrar"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="calc-display">
+              <input type="text" id="calcDisplay" readonly value="0">
+            </div>
+            <div class="calc-keys">
+              <button class="calc-key operator" data-action="clear">C</button>
+              <button class="calc-key operator" data-action="/">&divide;</button>
+              <button class="calc-key operator" data-action="*">&times;</button>
+              <button class="calc-key operator" data-action="backspace"><i class="fas fa-backspace"></i></button>
+              
+              <button class="calc-key" data-number="7">7</button>
+              <button class="calc-key" data-number="8">8</button>
+              <button class="calc-key" data-number="9">9</button>
+              <button class="calc-key operator" data-action="-">-</button>
+              
+              <button class="calc-key" data-number="4">4</button>
+              <button class="calc-key" data-number="5">5</button>
+              <button class="calc-key" data-number="6">6</button>
+              <button class="calc-key operator" data-action="+">+</button>
+              
+              <button class="calc-key" data-number="1">1</button>
+              <button class="calc-key" data-number="2">2</button>
+              <button class="calc-key" data-number="3">3</button>
+              <button class="calc-key equals" data-action="calculate">=</button>
+              
+              <button class="calc-key zero" data-number="0">0</button>
+              <button class="calc-key" data-number=".">.</button>
             </div>
           </div>
         </div>

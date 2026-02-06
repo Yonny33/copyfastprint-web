@@ -136,7 +136,7 @@ if (lightboxModal && designCards.length > 0) {
     }
     if (!document.getElementById("modal-next")) {
       const nextBtn = document.createElement("button");
-      nextBtn.id = "lightbox-next";
+      nextBtn.id = "modal-next";
       nextBtn.innerHTML = "&#10095;";
       nextBtn.className = "lightbox-nav";
       lightboxModal.appendChild(nextBtn);

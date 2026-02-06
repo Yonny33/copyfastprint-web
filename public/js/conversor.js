@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const calculateBtn = document.getElementById("calculateBtn");
   const swapBtn = document.getElementById("swapBtn");
   const refreshBtn = document.getElementById("refreshRates");
+  const clearConverterBtn = document.getElementById("clearConverterBtn");
+  const openCalcBtn = document.getElementById("openCalcBtn");
   const resultAmount = document.getElementById("resultAmount");
   const exchangeRateDisplay = document.getElementById("exchangeRate");
   const lastUpdateDisplay = document.getElementById("lastUpdate");
@@ -122,5 +124,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Carga inicial de las tasas de cambio
     fetchExchangeRates();
+
+    // === FUNCIONALIDAD DE LIMPIEZA ===
+    if (clearConverterBtn) {
+      clearConverterBtn.addEventListener("click", () => {
+        amountInput.value = "1";
+        // Disparar evento input para recalcular
+        amountInput.dispatchEvent(new Event("input"));
+      });
+    }
+
+    // === FUNCIONALIDAD DE LA CALCULADORA ===
+    const simpleCalculator = document.getElementById("simpleCalculator");
+    const closeCalcBtn = document.getElementById("closeCalcBtn");
+    const calcDisplay = document.getElementById("calcDisplay");
+    const calcKeys = document.querySelectorAll(".calc-key");
+
+    // Abrir/Cerrar Calculadora
+    if (openCalcBtn && simpleCalculator && closeCalcBtn) {
+      openCalcBtn.addEventListener("click", () => {
+        simpleCalculator.style.display = "block";
+      });
+      closeCalcBtn.addEventListener("click", () => {
+        simpleCalculator.style.display = "none";
+      });
+    }
+
+    // Lógica de la Calculadora
+    if (calcDisplay && calcKeys.length > 0) {
+      let expression = "";
+
+      const updateDisplay = () => {
+        calcDisplay.value = expression || "0";
+        calcDisplay.scrollLeft = calcDisplay.scrollWidth; // Auto-scroll al final
+      };
+
+      const processInput = (key, type) => {
+        if (type === "number") {
+          // Evitar múltiples puntos en el mismo número
+          if (key === ".") {
+            const parts = expression.split(/[\+\-\*\/]/);
+            const currentPart = parts[parts.length - 1];
+            if (currentPart && currentPart.includes(".")) return;
+            if (!currentPart) key = "0.";
+          }
+          expression += key;
+        } else if (type === "operator") {
+          if (expression === "" && key !== "-") return; // Solo permitir negativo al inicio
+          const lastChar = expression.slice(-1);
+          if (["+", "-", "*", "/"].includes(lastChar)) {
+            // Reemplazar operador si ya existe uno
+            expression = expression.slice(0, -1) + key;
+          } else {
+            expression += key;
+          }
+        } else if (type === "action") {
+          if (key === "clear") {
+            expression = "";
+          } else if (key === "backspace") {
+            expression = expression.slice(0, -1);
+          } else if (key === "calculate") {
+            try {
+              if (expression) {
+                // Evaluar expresión de forma segura
+                // eslint-disable-next-line no-new-func
+                const result = new Function("return " + expression)();
+                // Limitar decimales y convertir a string
+                expression = String(Math.round(result * 100000) / 100000);
+              }
+            } catch (e) {
+              expression = "Error";
+              setTimeout(() => { expression = ""; updateDisplay(); }, 1500);
+            }
+          }
+        }
+        updateDisplay();
+      };
+
+      // 1. Eventos de Clic en Botones (Ratón/Táctil)
+      calcKeys.forEach((key) => {
+        key.addEventListener("click", () => {
+          const action = key.dataset.action;
+          const number = key.dataset.number;
+
+          if (number !== undefined) processInput(number, "number");
+          else if (["+", "-", "*", "/"].includes(action)) processInput(action, "operator");
+          else if (action) processInput(action, "action");
+        });
+      });
+
+      // 2. Eventos de Teclado (PC)
+      document.addEventListener("keydown", (e) => {
+        // Solo si la calculadora está visible
+        if (simpleCalculator.style.display === "none") return;
+        
+        const key = e.key;
+        if (/^[0-9.]$/.test(key)) { e.preventDefault(); processInput(key, "number"); }
+        else if (["+", "-", "*", "/"].includes(key)) { e.preventDefault(); processInput(key, "operator"); }
+        else if (key === "Enter" || key === "=") { e.preventDefault(); processInput("calculate", "action"); }
+        else if (key === "Backspace") { e.preventDefault(); processInput("backspace", "action"); }
+        else if (key === "Escape") { e.preventDefault(); processInput("clear", "action"); }
+      });
+    }
   }
 });
