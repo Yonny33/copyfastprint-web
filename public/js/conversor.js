@@ -217,6 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document.addEventListener("keydown", (e) => {
         // Solo si la calculadora está visible
         if (simpleCalculator.style.display === "none") return;
+
+        // Si el usuario está escribiendo en un campo de texto (ej: conversor), no interceptar
+        // EXCEPCIÓN: Permitir escribir si el foco está en el display de la calculadora
+        if ((e.target.tagName === "INPUT" && e.target !== calcDisplay) || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
         
         const key = e.key;
         if (/^[0-9.]$/.test(key)) { e.preventDefault(); processInput(key, "number"); }
