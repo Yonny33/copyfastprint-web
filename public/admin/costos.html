@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Costos y Rentabilidad</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="admin-page">
+    <div class="admin-grid-container">
+        <!-- Sidebar (Navegación) -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3>CopyFast<span>Print</span></h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="admin.html"><i class="fas fa-home fa-fw"></i> Dashboard</a></li>
+                    <li><a href="ventas.html"><i class="fas fa-shopping-cart fa-fw"></i> Ventas</a></li>
+                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+                    <li><a href="inventario.html"><i class="fas fa-boxes fa-fw"></i> Inventario</a></li>
+                    <li class="active"><a href="costos.html"><i class="fas fa-chart-pie fa-fw"></i> Costos</a></li>
+                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+                    <li><a href="analisis.html"><i class="fas fa-brain fa-fw"></i> Análisis</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <main class="admin-main-content">
+            <div class="section-heading">
+                <h2>Gestión de Costos</h2>
+                <div class="divider"></div>
+                <p>Analiza la rentabilidad real de cada producto y ajusta tus precios.</p>
+            </div>
+
+            <!-- KPIs Rápidos de Rentabilidad -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon ingresos"><i class="fas fa-percentage"></i></div>
+                    <div class="kpi-info">
+                        <h3>Margen Promedio</h3>
+                        <p id="avg-margin">0%</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon inventario"><i class="fas fa-check-double"></i></div>
+                    <div class="kpi-info">
+                        <h3>Productos Analizados</h3>
+                        <p id="products-analyzed">0/0</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon balance"><i class="fas fa-coins"></i></div>
+                    <div class="kpi-info">
+                        <h3>Ganancia Potencial (Stock)</h3>
+                        <p id="potential-profit">$0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Maestra de Costos -->
+            <div class="card-table modern-table">
+                <div class="toolbar">
+                    <h3>Listado de Productos</h3>
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Buscar producto...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table id="costos-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio Venta</th>
+                                <th>Costo Unitario (Bs.)</th>
+                                <th>Margen (Bs.)</th>
+                                <th>Rentabilidad (%)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se llena dinámicamente con JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay de Carga -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+    </div>
+
+    <!-- Modal Calculadora de Costo Unitario -->
+    <div id="cost-calculator-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-calculator"></i> Calculadora de Costos</h3>
+                <span class="close-button" id="close-calc-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Pestañas de Navegación -->
+                <div class="calc-tabs">
+                    <button class="tab-btn active" data-tab="tab-lote">📦 Compra por Lote</button>
+                    <button class="tab-btn" data-tab="tab-prod">👕 Producción / Sublimación</button>
+                    <button class="tab-btn" data-tab="tab-precio">💲 Definir Precio</button>
+                </div>
+
+                <!-- TAB 1: Compra por Lote (Lo que ya teníamos) -->
+                <div id="tab-lote" class="tab-content" style="display: block;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Ideal para reventa. Divide gastos de transporte entre unidades compradas.
+                    </p>
+                    <div class="form-group floating">
+                        <input type="number" id="calc-total-cost" step="0.01" placeholder=" ">
+                        <label>Costo Total de la Compra (Bs.)</label>
+                    </div>
+                    <div class="form-group floating">
+                        <input type="number" id="calc-quantity" step="1" placeholder=" ">
+                        <label>Unidades (Ej: 60)</label>
+                    </div>
+                    <div class="form-group floating">
+                        <input type="number" id="calc-extra" step="0.01" value="0" placeholder=" ">
+                        <label>Gastos Extra (Pasaje, Envío) (Bs.)</label>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Producción / Sublimación (NUEVO) -->
+                <div id="tab-prod" class="tab-content" style="display: none;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Suma materiales, mano de obra y servicios para obtener el costo real de fabricación.
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group floating">
+                            <input type="number" id="prod-base" step="0.01" placeholder=" ">
+                            <label>Costo Prenda Base (Bs.)</label>
+                        </div>
+                        <div class="form-group floating">
+                            <input type="number" id="prod-materials" step="0.01" placeholder=" ">
+                            <label>Papel + Tinta + Cinta (Bs.)</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group floating">
+                            <input type="number" id="prod-labor" step="0.01" placeholder=" ">
+                            <label>Mano de Obra / Diseño (Bs.)</label>
+                        </div>
+                        <div class="form-group floating">
+                            <input type="number" id="prod-overhead" step="0.01" placeholder=" ">
+                            <label>Luz / Internet / Desgaste (Bs.)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Definir Precio (NUEVO) -->
+                <div id="tab-precio" class="tab-content" style="display: none;">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Calcula el precio de venta aplicando un porcentaje de ganancia al costo.
+                    </p>
+                    <div class="info-box" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; text-align: center;">
+                        <span style="display: block; color: #aaa; font-size: 0.85rem;">Costo Base Calculado:</span>
+                        <h3 id="display-base-cost" style="color: var(--text-primary); margin: 0; font-size: 1.5rem;">Bs. 0.00</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group floating">
+                            <input type="number" id="calc-margin-percent" step="1" placeholder=" ">
+                            <label>Ganancia Deseada (%)</label>
+                        </div>
+                        <div class="form-group floating">
+                            <input type="number" id="calc-final-price" step="0.01" placeholder=" ">
+                            <label>Precio de Venta (Bs.)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="text-align: center; margin: 1.5rem 0; background: rgba(255,255,255,0.05);">
+                    <span style="display: block; color: #aaa; font-size: 0.85rem; margin-bottom: 5px;">Costo de Producción Unitario:</span>
+                    <h2 id="calc-result-display" style="color: var(--success-color); margin: 0; font-size: 2rem;">Bs. 0.00</h2>
+                    <div id="calc-profit-preview" style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 5px;">
+                        <!-- Aquí se mostrará la ganancia estimada -->
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="btn-apply-calc" class="btn-submit full-width">
+                        <i class="fas fa-check"></i> Aplicar a Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de Firebase -->
+    <script src="/__/firebase/8.10.1/firebase-app.js"></script>
+    <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
+    <script src="/__/firebase/init.js"></script>
+
+    <!-- Scripts de la aplicación -->
+    <script src="js/auth.js"></script>
+    <script src="js/costos.js"></script>
+</body>
+</html>

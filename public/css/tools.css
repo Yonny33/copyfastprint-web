@@ -99,7 +99,8 @@
 
 .floating-toolbar {
   position: fixed;
-  left: 30px;
+  left: 10px;
+  right: auto;
   top: 55%;
   transform: translateY(-50%);
   display: flex;
@@ -180,6 +181,7 @@
 .fab-tooltip {
   position: absolute;
   left: 70px;
+  right: auto;
   background-color: rgba(0, 0, 0, 0.85);
   color: white;
   padding: 6px 12px;
@@ -351,7 +353,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   /* Barra flotante en móviles: Pegada abajo horizontalmente */
   .floating-toolbar {
     top: auto;

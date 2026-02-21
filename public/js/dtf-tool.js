@@ -448,13 +448,29 @@ document.getElementById("btn-download").addEventListener("click", function () {
   // Multiplicador para mejorar calidad (exportar a mayor resolución que la pantalla)
   // Si en pantalla 1cm = 15px, multiplicamos por 4 para tener 60px/cm (~150 DPI)
   // Para 300 DPI necesitaríamos multiplicar por ~8, pero puede ser muy pesado para el navegador.
-  const multiplier = 8;
+  let multiplier = 8;
+  let dataURL = "";
 
-  const dataURL = canvas.toDataURL({
-    format: "png",
-    quality: 1,
-    multiplier: multiplier,
-  });
+  // Intento de exportación con degradación elegante (Fallback)
+  try {
+      try {
+          dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
+      } catch (e) {
+          console.warn("Error exportando a 8x (posible falta de memoria). Reintentando a 4x...");
+          multiplier = 4;
+          dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
+      }
+  } catch (e) {
+      console.warn("Error exportando a 4x. Reintentando a 2x...");
+      multiplier = 2;
+      dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
+  }
+
+  if (!dataURL) {
+      alert("Error: La imagen es demasiado grande para la memoria de este dispositivo. Intenta reducir el tamaño de la mesa.");
+      hideLoading();
+      return;
+  }
 
   // Restaurar altura original
   if (maxBottom > 0) {

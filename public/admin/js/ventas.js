@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Información del Cliente ---
     // IMPORTANTE: Forzamos la asignación de id_cliente para asegurar que llegue al backend
     const selectedClient = clienteSelect.options[clienteSelect.selectedIndex];
-    if (selectedClient && selectedClient.value) {
+    if (selectedClient && selectedClient.value !== "") {
       data.id_cliente = selectedClient.value;
       data.nombre_cliente = selectedClient.text; // Enviamos el nombre también por seguridad
     }

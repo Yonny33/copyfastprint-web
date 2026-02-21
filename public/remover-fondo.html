@@ -47,25 +47,30 @@
       </div>
     </header>
 
-    <main class="main-content">
-      <section class="tools-hero">
-        <h1>Remover Fondo (Varita Mágica)</h1>
-        <p>
-          Haz clic sobre el color que deseas eliminar para hacerlo transparente.
-          Ideal para logos con fondo blanco.
-        </p>
-        <a href="#instructions" class="btn-instruction-link"
-          ><i class="fas fa-info-circle"></i> Ver instrucciones</a
-        >
+    <main>
+      <section class="hero-section" style="min-height: 60vh; padding-bottom: 80px;">
+        <div class="container hero-container">
+          <div class="hero-text">
+            <span class="subtitle">HERRAMIENTAS</span>
+            <h1>Remover Fondo</h1>
+            <p>Haz clic sobre el color que deseas eliminar para hacerlo transparente. Ideal para logos con fondo blanco.</p>
+            <a href="#instructions" class="btn-instruction-link" style="color: var(--primary-color); border-bottom: 1px dashed var(--primary-color);">
+              <i class="fas fa-info-circle"></i> Ver instrucciones
+            </a>
+          </div>
+        </div>
       </section>
 
-      <section class="workspace-area container">
+      <section class="workspace-area container animate-up" style="padding-bottom: 80px;">
         <!-- PANEL DE CONTROL -->
         <div class="tool-controls">
           <!-- Botones de Herramientas -->
           <div class="tools-selection">
-            <button class="tool-btn" id="btn-ai" title="IA Automática">
-              <i class="fas fa-robot"></i> Auto IA
+            <button class="tool-btn" id="btn-ai" title="IA Local (Gratis Ilimitada)">
+              <i class="fas fa-robot"></i> IA Local
+            </button>
+            <button class="tool-btn" id="btn-removebg" title="Usar Remove.bg (Alta Precisión - Requiere API Key)">
+              <i class="fas fa-cloud"></i> Remove.bg
             </button>
             <button class="tool-btn active" id="tool-wand" title="Varita Mágica">
               <i class="fas fa-magic"></i> Varita
@@ -130,50 +135,6 @@
           </div>
           <canvas id="c"></canvas>
         </div>
-        <!-- BARRA FLOTANTE (FAB) -->
-        <div class="floating-toolbar">
-          <!-- Subir Imagen -->
-          <div class="fab-container">
-            <label for="img-upload" class="fab-btn upload" title="Subir Imagen">
-              <i class="fas fa-upload"></i>
-            </label>
-            <span class="fab-tooltip">Subir Imagen</span>
-            <input type="file" id="img-upload" accept="image/*" hidden />
-          </div>
-
-          <!-- Deshacer -->
-          <div class="fab-container">
-            <button class="fab-btn clear" id="btn-undo" title="Deshacer">
-              <i class="fas fa-undo"></i>
-            </button>
-            <span class="fab-tooltip">Deshacer</span>
-          </div>
-
-          <!-- Reset -->
-          <div class="fab-container">
-            <button
-              class="fab-btn delete"
-              id="btn-reset"
-              title="Restaurar Original"
-            >
-              <i class="fas fa-sync-alt"></i>
-            </button>
-            <span class="fab-tooltip">Restaurar</span>
-          </div>
-
-          <!-- Descargar -->
-          <div class="fab-container">
-            <button
-              class="fab-btn download"
-              id="btn-download"
-              title="Descargar PNG"
-            >
-              <i class="fas fa-download"></i>
-            </button>
-            <span class="fab-tooltip">Descargar</span>
-          </div>
-        </div>
-
         <div class="instructions" id="instructions">
           <h3><i class="fas fa-lightbulb"></i> Cómo usar:</h3>
           <ul>
@@ -206,7 +167,78 @@
           </ul>
         </div>
       </section>
+
+      <!-- BARRA FLOTANTE (FAB) - Movida fuera de la sección animada para que sea fixed real -->
+      <div class="floating-toolbar">
+        <!-- Subir Imagen -->
+        <div class="fab-container">
+          <label for="img-upload" class="fab-btn upload" title="Subir Imagen">
+            <i class="fas fa-upload"></i>
+          </label>
+          <span class="fab-tooltip">Subir Imagen</span>
+          <input type="file" id="img-upload" accept="image/*" hidden />
+        </div>
+
+        <!-- Deshacer -->
+        <div class="fab-container">
+          <button class="fab-btn clear" id="btn-undo" title="Deshacer">
+            <i class="fas fa-undo"></i>
+          </button>
+          <span class="fab-tooltip">Deshacer</span>
+        </div>
+
+        <!-- Reset -->
+        <div class="fab-container">
+          <button
+            class="fab-btn delete"
+            id="btn-reset"
+            title="Restaurar Original"
+          >
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <span class="fab-tooltip">Restaurar</span>
+        </div>
+
+        <!-- Descargar -->
+        <div class="fab-container">
+          <button
+            class="fab-btn download"
+            id="btn-download"
+            title="Descargar PNG"
+          >
+            <i class="fas fa-download"></i>
+          </button>
+          <span class="fab-tooltip">Descargar</span>
+        </div>
+      </div>
     </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <h2>COPY<span>FAST&</span>PRINT</h2>
+          <h5>Tu Solución Integral en Impresión y Personalización</h5>
+        </div>
+        <div class="social-networks">
+          <a href="https://www.instagram.com/copyfastprint/" target="_blank"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://wa.me/584220135069" target="_blank"
+            ><i class="fab fa-whatsapp"></i
+          ></a>
+          <a href="https://www.facebook.com/profile.php?id=61578120201237"
+            target="_blank"
+            ><i class="fab fa-facebook"></i
+          ></a>
+          <a href="https://co.pinterest.com/copyfastprint/" target="_blank"
+            ><i class="fab fa-pinterest"></i
+          ></a>
+          <a href="https://www.tiktok.com/@copyfastprint" target="_blank"
+            ><i class="fab fa-tiktok"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
 
     <!-- Botón Ir Arriba -->
     <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
@@ -216,7 +248,7 @@
 
     <!-- Scripts -->
     <!-- Librería de IA para remover fondo -->
-    <script src="https://unpkg.com/@imgly/background-removal@1.5.5/dist/imgly-background-removal.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/imgly-background-removal.umd.min.js" crossorigin="anonymous"></script>
     <script src="/js/scripts.js"></script>
     <script src="/js/remover-fondo.js"></script>
   </body>

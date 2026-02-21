@@ -186,11 +186,16 @@ document.addEventListener("DOMContentLoaded", () => {
           } else if (key === "calculate") {
             try {
               if (expression) {
-                // Evaluar expresión de forma segura
-                // eslint-disable-next-line no-new-func
-                const result = new Function("return " + expression)();
-                // Limitar decimales y convertir a string
-                expression = String(Math.round(result * 100000) / 100000);
+                // SEGURIDAD: Validar que la expresión solo contenga números y operadores matemáticos
+                if (/^[0-9+\-*/().\s]+$/.test(expression)) {
+                    // Evaluar expresión de forma segura
+                    // eslint-disable-next-line no-new-func
+                    const result = new Function("return " + expression)();
+                    // Limitar decimales y convertir a string
+                    expression = String(Math.round(result * 100000) / 100000);
+                } else {
+                    throw new Error("Entrada inválida");
+                }
               }
             } catch (e) {
               expression = "Error";

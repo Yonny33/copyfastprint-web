@@ -1,4 +1,5 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const express = require("express");
 const cors = require("cors");
@@ -160,10 +161,21 @@ app.delete("/api/inventario/:id", async (req, res) => {
 // Endpoint para OBTENER todas las ventas (para Reportes)
 app.get("/api/ventas", async (req, res) => {
   try {
+    // OPTIMIZACIÓN: Paginación y Límites
+    // Si no se especifica límite, traemos solo las últimas 100 para no saturar
+    const limit = req.query.limit ? parseInt(req.query.limit) : 100;
+    
     // Obtenemos ventas y clientes en paralelo para cruzar la Cédula
+    // Nota: En sistemas muy grandes, esto se reemplaza por "denormalización" (guardar nombre en la venta)
     const [ventasSnapshot, clientesSnapshot] = await Promise.all([
-      db.collection("ventas").get(),
-      db.collection("clientes").get(),
+      db.collection("ventas")
+        .orderBy("fecha", "desc")
+        .limit(limit)
+        .get(),
+      // Solo traemos campos necesarios de clientes para ahorrar ancho de banda
+      db.collection("clientes")
+        .select("nombre", "cedula", "rif")
+        .get(),
     ]);
 
     const clientesMap = {};
@@ -415,7 +427,12 @@ app.delete("/api/ventas/:id", async (req, res) => {
 // Endpoint para OBTENER todos los gastos (para Reportes)
 app.get("/api/gastos", async (req, res) => {
   try {
-    const snapshot = await db.collection("gastos").get();
+    const limit = req.query.limit ? parseInt(req.query.limit) : 100;
+    const snapshot = await db.collection("gastos")
+        .orderBy("fecha", "desc")
+        .limit(limit)
+        .get();
+        
     const gastos = snapshot.docs
       .map((doc) => ({
         id: doc.id,
@@ -469,118 +486,138 @@ app.delete("/api/gastos/:id", async (req, res) => {
 // Endpoint para OBTENER los datos del dashboard (KPIs, gráficos, etc.)
 app.get("/api/dashboard", async (req, res) => {
   try {
-    // Consultamos todas las colecciones necesarias en paralelo
+    const ahora = new Date();
+    // Calcular primer día del mes actual para filtrar
+    const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const primerDiaMesISO = primerDiaMes.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+
+    // Calcular fecha de hace 6 meses para el gráfico (evitar leer toda la historia)
+    const seisMesesAtras = new Date(ahora.getFullYear(), ahora.getMonth() - 5, 1);
+    const seisMesesAtrasISO = seisMesesAtras.toISOString().split('T')[0];
+
+    // --- ESTRATEGIA DE AHORRO DE COSTOS ---
+    // 1. Usamos .count() para totales (Costo: 1 lectura por cada 1000 docs).
+    // 2. Usamos filtros de fecha para traer solo datos recientes.
+    // 3. Usamos .select() para no descargar descripciones largas o datos innecesarios.
+
     const [
-      ventasSnapshot,
-      gastosSnapshot,
-      clientesSnapshot,
+      ventasMesSnapshot,
+      gastosMesSnapshot,
+      ventasGraficoSnapshot,
+      gastosGraficoSnapshot,
+      totalClientesCount,
       inventarioSnapshot,
+      deudasSnapshot, // NUEVO: Traemos todas las deudas, no solo las del mes
     ] = await Promise.all([
-      db.collection("ventas").get(),
-      db.collection("gastos").get(),
-      db.collection("clientes").get(),
-      db.collection("inventario").get(),
+      // 1. Ventas del Mes Actual (Para KPI Ingresos)
+      db.collection("ventas")
+        .where("fecha", ">=", primerDiaMesISO)
+        .select("venta_bruta", "saldo_pendiente", "id_cliente")
+        .get(),
+      
+      // 2. Gastos del Mes Actual (Para KPI Gastos)
+      db.collection("gastos")
+        .where("fecha", ">=", primerDiaMesISO)
+        .select("monto")
+        .get(),
+
+      // 3. Ventas últimos 6 meses (Para Gráfico) - Optimizada
+      db.collection("ventas")
+        .where("fecha", ">=", seisMesesAtrasISO)
+        .select("fecha", "venta_bruta")
+        .get(),
+
+      // 4. Gastos últimos 6 meses (Para Gráfico)
+      db.collection("gastos")
+        .where("fecha", ">=", seisMesesAtrasISO)
+        .select("fecha", "monto")
+        .get(),
+
+      // 5. Total Clientes (Aggregation Query - Muy Barato)
+      db.collection("clientes").count().get(),
+
+      // 6. Inventario (Solo traemos stock y mínimos para calcular alertas)
+      db.collection("inventario")
+        .select("stock_actual", "stock_minimo")
+        .get(),
+
+      // 7. CORRECCIÓN: Traer TODAS las ventas con saldo pendiente > 0
+      db.collection("ventas")
+        .where("saldo_pendiente", ">", 0.01)
+        .select("saldo_pendiente", "id_cliente") // Solo traemos lo necesario
+        .get(),
     ]);
 
-    // Crear mapa de clientes para búsqueda rápida (ID -> Nombre)
-    const clientesMap = {};
-    clientesSnapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      clientesMap[doc.id] = data.nombre || "Sin Nombre";
-    });
+    // --- PROCESAMIENTO EN MEMORIA (CPU Barata vs Lecturas Caras) ---
 
-    const ultimasVentas = ventasSnapshot.docs
-      .map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          // Si la venta no tiene nombre guardado, lo buscamos en el mapa de clientes usando el ID
-          nombre_cliente:
-            data.nombre_cliente ||
-            clientesMap[data.id_cliente] ||
-            "Cliente General",
-        };
-      })
-      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-      .slice(0, 10);
-    const ultimosGastos = gastosSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-      .slice(0, 10);
-
-    // Lógica de KPIs (esto es un cálculo real basado en los datos de Firestore)
-    const ahora = new Date();
-    const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-
+    // 1. KPIs del Mes
     let ingresosMes = 0;
-    let ingresosTotal = 0; // Nuevo: Acumulador histórico
 
-    ventasSnapshot.docs.forEach((doc) => {
-      const venta = doc.data();
-      const monto = parseFloat(venta.venta_bruta || 0);
-      const fechaVenta = new Date(venta.fecha);
-
-      ingresosTotal += monto; // Sumamos todo para el histórico
-
-      if (fechaVenta >= primerDiaMes) {
-        ingresosMes += monto;
-      }
+    ventasMesSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      ingresosMes += parseFloat(data.venta_bruta || 0);
     });
 
     let gastosMes = 0;
-    let gastosTotal = 0; // Nuevo: Acumulador histórico
-
-    gastosSnapshot.docs.forEach((doc) => {
-      const gasto = doc.data();
-      const monto = parseFloat(gasto.monto || 0);
-      const fechaGasto = new Date(gasto.fecha);
-
-      gastosTotal += monto; // Sumamos todo para el histórico
-
-      if (fechaGasto >= primerDiaMes) {
-        gastosMes += monto;
-      }
+    gastosMesSnapshot.docs.forEach((doc) => {
+      gastosMes += parseFloat(doc.data().monto || 0);
     });
 
     const balanceNeto = ingresosMes - gastosMes;
-    const balanceGeneral = ingresosTotal - gastosTotal; // Cálculo histórico real
 
-    // --- Cálculos adicionales de KPIs ---
+    // 1.1 CORRECCIÓN SALDO PENDIENTE TOTAL (Real, de todas las fechas)
+    let totalSaldoPendiente = 0;
+    const clientesDeudores = new Set();
+    
+    deudasSnapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        totalSaldoPendiente += parseFloat(data.saldo_pendiente || 0);
+        if (data.id_cliente) clientesDeudores.add(data.id_cliente);
+    });
 
-    // 1. Total de Clientes
-    const totalClientes = clientesSnapshot.size;
-
-    // 2. Alertas de Inventario (Stock bajo) y Valor del Inventario
+    // 2. Inventario
     let alertasInventario = 0;
     let totalItemsStock = 0;
-
     inventarioSnapshot.docs.forEach((doc) => {
       const prod = doc.data();
       const stock = parseFloat(prod.stock_actual || 0);
       const min = parseFloat(prod.stock_minimo || 0);
-
       totalItemsStock += stock;
-      if (stock <= min) {
-        alertasInventario++;
-      }
+      if (stock <= min) alertasInventario++;
     });
 
-    // 3. Cálculo de Deudas y Saldo Pendiente
-    let totalSaldoPendiente = 0;
-    const clientesDeudores = new Set();
+    // 3. Total Clientes (Desde Aggregation)
+    const totalClientes = totalClientesCount.data().count;
 
-    ventasSnapshot.docs.forEach((doc) => {
-      const venta = doc.data();
-      const saldo = parseFloat(venta.saldo_pendiente || 0);
+    // 4. CORRECCIÓN BALANCE GENERAL (Estrategia Lazy Init)
+    // Intentamos leer el acumulado rápido. Si es 0 o no existe, calculamos el real una vez y lo guardamos.
+    let balanceGeneralHistorico = 0;
+    const statsDoc = await db.doc("stats/general").get();
+    
+    if (statsDoc.exists && statsDoc.data().totalIngresos !== undefined) {
+        // Camino Rápido: Usamos el dato guardado
+        const s = statsDoc.data();
+        balanceGeneralHistorico = (s.totalIngresos || 0) - (s.totalGastos || 0);
+    } else {
+        // Camino de Recuperación: Si está en 0, leemos todo el historial UNA VEZ para corregirlo
+        console.log("Recalculando Balance General Histórico...");
+        const [allVentas, allGastos] = await Promise.all([
+            db.collection("ventas").select("venta_bruta").get(),
+            db.collection("gastos").select("monto").get()
+        ]);
+        
+        let tIngresos = 0;
+        allVentas.docs.forEach(d => tIngresos += parseFloat(d.data().venta_bruta || 0));
+        let tGastos = 0;
+        allGastos.docs.forEach(d => tGastos += parseFloat(d.data().monto || 0));
+        
+        balanceGeneralHistorico = tIngresos - tGastos;
+        
+        // Guardamos para que la próxima vez sea rápido
+        await db.doc("stats/general").set({ totalIngresos: tIngresos, totalGastos: tGastos, lastUpdated: new Date() });
+    }
 
-      if (saldo > 0.01) {
-        totalSaldoPendiente += saldo;
-        if (venta.id_cliente) clientesDeudores.add(venta.id_cliente);
-      }
-    });
-
-    // 4. Datos para el Gráfico (Últimos 6 meses)
+    // 4. Datos para el Gráfico (Usando los snapshots filtrados de 6 meses)
     const months = [
       "Ene",
       "Feb",
@@ -612,7 +649,7 @@ app.get("/api/dashboard", async (req, res) => {
       const endOfMonth = new Date(year, monthIndex + 1, 0, 23, 59, 59);
 
       // Sumar ventas del mes
-      const ingresosEsteMes = ventasSnapshot.docs.reduce((acc, doc) => {
+      const ingresosEsteMes = ventasGraficoSnapshot.docs.reduce((acc, doc) => {
         const v = doc.data();
         const fecha = new Date(v.fecha);
         return fecha >= startOfMonth && fecha <= endOfMonth
@@ -622,7 +659,7 @@ app.get("/api/dashboard", async (req, res) => {
       chartIngresos.push(ingresosEsteMes);
 
       // Sumar gastos del mes
-      const gastosEsteMes = gastosSnapshot.docs.reduce((acc, doc) => {
+      const gastosEsteMes = gastosGraficoSnapshot.docs.reduce((acc, doc) => {
         const g = doc.data();
         const fecha = new Date(g.fecha);
         return fecha >= startOfMonth && fecha <= endOfMonth
@@ -631,6 +668,21 @@ app.get("/api/dashboard", async (req, res) => {
       }, 0);
       chartGastos.push(gastosEsteMes);
     }
+
+    // NOTA: Para obtener las "Últimas Ventas" en la tabla, hacemos una query pequeña extra
+    // Esto es más barato que traer TODAS las ventas y cortarlas en JS.
+    const ultimasVentasSnapshot = await db.collection("ventas")
+        .orderBy("fecha", "desc")
+        .limit(5)
+        .get();
+    
+    const ultimasVentas = ultimasVentasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const ultimosGastosSnapshot = await db.collection("gastos")
+        .orderBy("fecha", "desc")
+        .limit(5)
+        .get();
+    const ultimosGastos = ultimosGastosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     const response = {
       status: "success",
@@ -643,7 +695,7 @@ app.get("/api/dashboard", async (req, res) => {
           alertasInventario: alertasInventario,
           totalItemsStock: totalItemsStock,
           clientesConDeuda: clientesDeudores.size,
-          balanceGeneral: balanceGeneral, // Usamos el cálculo histórico
+          balanceGeneral: balanceGeneralHistorico, // ¡Ahora sí es real y barato!
           totalSaldoPendiente: totalSaldoPendiente,
         },
         chartData: {
@@ -813,6 +865,32 @@ app.get("/api/exchange-rates", async (req, res) => {
   }
 });
 
+// Endpoint de Mantenimiento: Recalcular totales históricos (Ejecutar una sola vez para inicializar)
+app.post("/api/admin/recalcular-totales", async (req, res) => {
+  try {
+    const [ventas, gastos] = await Promise.all([
+      db.collection("ventas").select("venta_bruta").get(),
+      db.collection("gastos").select("monto").get()
+    ]);
+
+    let totalIngresos = 0;
+    ventas.docs.forEach(doc => totalIngresos += parseFloat(doc.data().venta_bruta || 0));
+
+    let totalGastos = 0;
+    gastos.docs.forEach(doc => totalGastos += parseFloat(doc.data().monto || 0));
+
+    await db.doc("stats/general").set({
+      totalIngresos,
+      totalGastos,
+      lastUpdated: new Date()
+    });
+
+    res.json({ status: "success", message: "Totales recalculados correctamente", data: { totalIngresos, totalGastos } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // --- Exportar la API de Express como una Cloud Function ---
 // Cada vez que se llame a esta función HTTPS, se ejecutará nuestra app de Express.
 exports.api = onRequest(
@@ -825,3 +903,86 @@ exports.api = onRequest(
   },
   app,
 );
+
+// ==================================================================
+// === TRIGGERS (DISPARADORES) DE FIRESTORE =========================
+// ==================================================================
+// Estos se ejecutan automáticamente en segundo plano cuando cambian los datos.
+
+// 1. Actualizar estadísticas cuando se crea una VENTA
+exports.onVentaCreated = onDocumentCreated({
+  document: "ventas/{ventaId}",
+  region: "us-central1",
+  maxInstances: 10
+}, async (event) => {
+  const data = event.data.data();
+  const monto = parseFloat(data.venta_bruta || 0);
+  
+  await db.doc("stats/general").set({
+    totalIngresos: admin.firestore.FieldValue.increment(monto),
+    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+});
+
+// 2. Actualizar estadísticas cuando se elimina una VENTA
+exports.onVentaDeleted = onDocumentDeleted({
+  document: "ventas/{ventaId}",
+  region: "us-central1",
+  maxInstances: 10
+}, async (event) => {
+  const data = event.data.data();
+  const monto = parseFloat(data.venta_bruta || 0);
+  
+  await db.doc("stats/general").set({
+    totalIngresos: admin.firestore.FieldValue.increment(-monto), // Restamos
+    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+});
+
+// 3. Actualizar estadísticas cuando se edita una VENTA
+exports.onVentaUpdated = onDocumentUpdated({
+  document: "ventas/{ventaId}",
+  region: "us-central1",
+  maxInstances: 10
+}, async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+  const diff = parseFloat(after.venta_bruta || 0) - parseFloat(before.venta_bruta || 0);
+  
+  if (Math.abs(diff) > 0.01) {
+    await db.doc("stats/general").set({
+      totalIngresos: admin.firestore.FieldValue.increment(diff),
+      lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
+});
+
+// 4. Actualizar estadísticas cuando se crea un GASTO
+exports.onGastoCreated = onDocumentCreated({
+  document: "gastos/{gastoId}",
+  region: "us-central1",
+  maxInstances: 10
+}, async (event) => {
+  const data = event.data.data();
+  const monto = parseFloat(data.monto || 0);
+  
+  await db.doc("stats/general").set({
+    totalGastos: admin.firestore.FieldValue.increment(monto),
+    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+});
+
+// 5. Actualizar estadísticas cuando se elimina un GASTO
+exports.onGastoDeleted = onDocumentDeleted({
+  document: "gastos/{gastoId}",
+  region: "us-central1",
+  maxInstances: 10
+}, async (event) => {
+  const data = event.data.data();
+  const monto = parseFloat(data.monto || 0);
+  
+  await db.doc("stats/general").set({
+    totalGastos: admin.firestore.FieldValue.increment(-monto),
+    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+});

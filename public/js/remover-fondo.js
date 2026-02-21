@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Nuevos controles
     const btnAI = document.getElementById("btn-ai");
+    const btnRemoveBg = document.getElementById("btn-removebg");
     const toolBtns = document.querySelectorAll(".tool-btn");
     const brushSizeSlider = document.getElementById("brush-size");
     const brushSizeVal = document.getElementById("brush-size-val");
@@ -50,6 +51,17 @@ document.addEventListener("DOMContentLoaded", function () {
             updateBrushCursor({ clientX: lastMouseX, clientY: lastMouseY });
         }
     });
+
+    // Botón Remove.bg (API Externa)
+    if (btnRemoveBg) {
+        btnRemoveBg.addEventListener("click", () => {
+            if (!originalImage) {
+                alert("Por favor, sube una imagen primero.");
+                return;
+            }
+            runRemoveBgAPI();
+        });
+    }
 
     // Selector de Herramientas
     toolBtns.forEach(btn => {
@@ -292,8 +304,22 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Verificar si la librería cargó
         if (typeof imglyRemoveBackground === 'undefined') {
-            alert("La librería de IA no se pudo cargar. Verifica tu conexión a internet o intenta recargar la página.");
-            return;
+            // INTENTO DE RECUPERACIÓN: Si no cargó al inicio, intentamos descargarla ahora
+            showLoading("Descargando motor de IA...");
+            try {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/imgly-background-removal.umd.min.js";
+                    script.crossOrigin = "anonymous";
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+            } catch (e) {
+                hideLoading();
+                alert("La librería de IA no se pudo cargar. Verifica tu conexión a internet o intenta recargar la página.");
+                return;
+            }
         }
 
         saveState();
@@ -302,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             // Configuración necesaria para que la IA encuentre sus modelos en la nube
             const config = {
-                publicPath: "https://unpkg.com/@imgly/background-removal-data@1.5.5/dist/",
+                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.5.5/dist/",
                 debug: true // Ayuda a ver errores en consola si los hay
             };
 
@@ -322,6 +348,64 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error IA:", error);
             alert("Error al procesar con IA: " + error.message + "\nIntenta con la varita mágica.");
             hideLoading();
+        }
+    }
+
+    // 4. Acción de API Remove.bg (Alternativa Robusta)
+    async function runRemoveBgAPI() {
+        let apiKey = localStorage.getItem("removebg_api_key");
+        
+        if (!apiKey) {
+            apiKey = prompt("Para usar esta función, ingresa tu API Key de Remove.bg:\n(Puedes obtener una gratis en remove.bg/api)");
+            if (apiKey) {
+                localStorage.setItem("removebg_api_key", apiKey.trim());
+            } else {
+                return;
+            }
+        }
+
+        showLoading("Remove.bg Procesando...");
+
+        const formData = new FormData();
+        formData.append("size", "auto");
+        
+        // Preferimos enviar el archivo original si existe, si no, la URL
+        if (originalFile) {
+            formData.append("image_file", originalFile);
+        } else {
+            formData.append("image_url", originalImage.src);
+        }
+
+        try {
+            const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+                method: "POST",
+                headers: { "X-Api-Key": apiKey },
+                body: formData
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    saveState();
+                    hideLoading();
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            } else {
+                const errData = await response.json();
+                throw new Error(errData.errors[0].title || "Error desconocido en API");
+            }
+        } catch (error) {
+            hideLoading();
+            console.error("Error Remove.bg:", error);
+            if (confirm(`Error: ${error.message}.\n\n¿Tu API Key es correcta? ¿Quieres cambiarla?`)) {
+                localStorage.removeItem("removebg_api_key");
+                runRemoveBgAPI(); // Reintentar
+            }
         }
     }
 
