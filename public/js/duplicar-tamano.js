@@ -14,26 +14,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- ESTADO DE LA APLICACIÓN ---
     let originalImage = null;
-    let upscaledImageSrc = null;
-    let upscaler = null;
-    let isProcessing = false;
-
-    // --- INICIALIZACIÓN ---
-    // Inicializar el upscaler de forma perezosa la primera vez que se necesite
-    function getUpscaler() {
-        if (!upscaler) {
-            // Usamos un modelo por defecto que es bueno para arte general y fotos.
-            // Los modelos se descargan automáticamente la primera vez.
-            upscaler = new Upscaler({ model: 'esrgan-thick' });
-        }
-        return upscaler;
-    }
+    let isProcessing = false; // Para evitar ejecuciones simultáneas
 
     // --- EVENT LISTENERS ---
     uploadInput.addEventListener("change", handleImageUpload);
     scaleFactorSelect.addEventListener("change", () => {
         if (originalImage) {
-            runUpscale();
+            runScale();
         }
     });
     downloadBtn.addEventListener("click", handleDownload);
@@ -42,121 +29,71 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- FUNCIONES PRINCIPALES ---
 
-    // Nueva función para cargar y pre-procesar la imagen de forma segura
-    function loadImage(src) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                const MAX_DIMENSION = 1500; // Límite de píxeles (ancho o alto)
-                // Si la imagen es más grande que el límite, la reducimos para evitar errores de memoria.
-                if (img.width > MAX_DIMENSION || img.height > MAX_DIMENSION) {
-                    console.warn(`Imagen grande detectada (${img.width}x${img.height}). Reduciendo tamaño para estabilidad.`);
-                    
-                    const tempCanvas = document.createElement('canvas');
-                    const tempCtx = tempCanvas.getContext('2d');
-                    
-                    let newWidth, newHeight;
-                    if (img.width > img.height) {
-                        newWidth = MAX_DIMENSION;
-                        newHeight = (img.height * MAX_DIMENSION) / img.width;
-                    } else {
-                        newHeight = MAX_DIMENSION;
-                        newWidth = (img.width * MAX_DIMENSION) / img.height;
-                    }
-                    
-                    tempCanvas.width = newWidth;
-                    tempCanvas.height = newHeight;
-                    tempCtx.drawImage(img, 0, 0, newWidth, newHeight);
-                    
-                    // Creamos una nueva imagen a partir del canvas reducido
-                    const downscaledImg = new Image();
-                    downscaledImg.onload = () => resolve(downscaledImg);
-                    downscaledImg.onerror = reject;
-                    downscaledImg.src = tempCanvas.toDataURL();
-                } else {
-                    // La imagen tiene un tamaño aceptable, la usamos directamente
-                    resolve(img);
-                }
-            };
-            img.onerror = reject;
-            img.src = src;
-        });
-    }
-
-    async function handleImageUpload(e) {
+    function handleImageUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = async function (event) {
-            try {
-                showLoading("Cargando imagen...");
-                originalImage = await loadImage(event.target.result);
+        reader.onload = function (event) {
+            const img = new Image();
+            img.onload = function () {
+                originalImage = img;
                 placeholder.style.display = "none";
                 canvas.style.display = "block";
-                runUpscale(); // Ejecutar el primer upscale al subir
-            } catch (error) {
-                console.error("Error al cargar la imagen:", error);
-                alert("Hubo un problema al cargar el archivo de imagen. Intenta con otra imagen.");
-                hideLoading();
-            }
+                runScale(); // Ejecutar el primer escalado al subir
+            };
+            img.src = event.target.result;
         };
         reader.readAsDataURL(file);
         e.target.value = ""; // Permitir subir el mismo archivo de nuevo
     }
 
-    async function runUpscale() {
+    function runScale() {
         if (!originalImage || isProcessing) return;
 
         isProcessing = true;
-        showLoading("Ampliando con IA...");
+        showLoading("Procesando imagen...");
 
-        try {
-            const upscalerInstance = getUpscaler();
-            const scale = parseInt(scaleFactorSelect.value, 10);
-            
-            const progressCallback = (progress) => {
-                showLoading(`Ampliando con IA... ${Math.round(progress * 100)}%`);
-            };
+        // Usamos un setTimeout para que el navegador muestre el "cargando"
+        // antes de hacer el trabajo pesado de dibujar en el canvas.
+        setTimeout(() => {
+            try {
+                const scale = parseInt(scaleFactorSelect.value, 10);
+                const newWidth = originalImage.width * scale;
+                const newHeight = originalImage.height * scale;
 
-            upscaledImageSrc = await upscalerInstance.upscale(originalImage, {
-                output: 'src',
-                patchSize: 64, // Ajustes para mejor rendimiento
-                padding: 2,
-                scale: scale, // Pasar el factor de escala
-                progress: progressCallback
-            });
+                // Ajustar el tamaño del canvas a la nueva resolución
+                canvas.width = newWidth;
+                canvas.height = newHeight;
 
-            drawImageToCanvas(upscaledImageSrc);
+                // Activar el suavizado de imagen del navegador para mejor calidad
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
 
-        } catch (error) {
-            console.error("Error durante el upscale:", error);
-            alert("Ocurrió un error al ampliar la imagen. Puede que sea demasiado grande para la memoria del navegador.");
-        } finally {
-            isProcessing = false;
-            hideLoading();
-        }
-    }
+                // Dibujar la imagen original estirada en el canvas más grande
+                ctx.drawImage(originalImage, 0, 0, newWidth, newHeight);
 
-    function drawImageToCanvas(src) {
-        const img = new Image();
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            updateDimensionsInfo(img.width, img.height);
-        };
-        img.src = src;
+                updateDimensionsInfo(newWidth, newHeight);
+
+            } catch (error) {
+                console.error("Error durante el escalado:", error);
+                alert("Ocurrió un error al procesar la imagen.");
+            } finally {
+                isProcessing = false;
+                hideLoading();
+            }
+        }, 50); // Pequeña demora para mejorar la experiencia de usuario
     }
 
     function handleDownload() {
-        if (!upscaledImageSrc) {
-            alert("No hay imagen ampliada para descargar.");
+        if (!originalImage) {
+            alert("No hay imagen para descargar.");
             return;
         }
         const link = document.createElement("a");
         link.download = `imagen-ampliada-${Date.now()}.png`;
-        link.href = upscaledImageSrc;
+        // toDataURL() exportará el contenido actual del canvas
+        link.href = canvas.toDataURL("image/png");
         link.click();
     }
 
@@ -164,12 +101,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!originalImage) return;
         // Restaura al valor por defecto (2x) y re-ejecuta
         scaleFactorSelect.value = "2";
-        runUpscale();
+        runScale();
     }
 
     function handleDelete() {
         originalImage = null;
-        upscaledImageSrc = null;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         canvas.style.display = "none";
         placeholder.style.display = "block";
@@ -183,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- FUNCIONES DE UI (CARGA) ---
-    // (Asumimos que estas funciones existen en un script global o las defines aquí)
     function showLoading(text) {
         let overlay = document.getElementById('tool-loader');
         if (!overlay) {
