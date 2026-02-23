@@ -241,6 +241,14 @@ app.post("/api/ventas", async (req, res) => {
       const productoRef = db.collection("inventario").doc(idProducto);
       const productoDoc = await t.get(productoRef);
 
+      // 1.1 Leer Insumo Asociado (Si el producto consume otro material, ej: Suéter consume Papel)
+      let insumoRef = null;
+      let insumoDoc = null;
+      if (productoDoc.exists && productoDoc.data().id_insumo) {
+          insumoRef = db.collection("inventario").doc(productoDoc.data().id_insumo);
+          insumoDoc = await t.get(insumoRef);
+      }
+
       // 2. Leer Deuda Existente (si aplica)
       let querySnapshot = null;
       if (saldoPendienteInput > 0 && idCliente) {
@@ -277,6 +285,15 @@ app.post("/api/ventas", async (req, res) => {
       // 1. Actualizar Stock (Solo si NO es un servicio)
       if (!esServicio) {
         t.update(productoRef, { stock_actual: nuevoStock });
+      }
+
+      // 1.1 Actualizar Stock del Insumo Asociado (Si existe)
+      if (insumoDoc && insumoDoc.exists) {
+          const insumoData = insumoDoc.data();
+          const stockInsumo = parseFloat(insumoData.stock_actual || 0);
+          const consumoPorUnidad = parseFloat(productoData.cantidad_insumo || 0);
+          const descuentoTotal = consumoPorUnidad * cantidad;
+          t.update(insumoRef, { stock_actual: stockInsumo - descuentoTotal });
       }
 
       // 2. Actualizar o Crear Venta
