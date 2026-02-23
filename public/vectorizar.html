@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vectorizar Imagen - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/tools.css" />
+    
+    <!-- Estilo específico para el contenedor SVG -->
+    <style>
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 2rem;
+            min-height: 400px;
+        }
+        .preview-card {
+            background: var(--background-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .preview-header {
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+        .preview-viewport {
+            flex: 1;
+            background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+            background-size: 20px 20px;
+            background-color: #181818;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            min-height: 300px;
+        }
+        .preview-viewport img, .preview-viewport svg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #svg-output {
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        /* Regla de seguridad para que el SVG nunca se desborde */
+        #svg-output svg {
+            max-width: 100%;
+            max-height: 100%;
+            height: auto; /* Quitamos !important para evitar conflictos de renderizado */
+        }
+        @media (max-width: 768px) {
+            .comparison-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="nav-container container">
+        <div class="logo">
+          <a href="/index.html" class="logo-part">COPYFAST</a>
+          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
+          <a href="/index.html" class="logo-part">PRINT</a>
+        </div>
+        <nav>
+          <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/diseño.html">Diseños</a></li>
+            <li><a href="/acercade.html">Acerca de</a></li>
+            <li><a href="/cotizacion.html">Cotización</a></li>
+            <li><a href="/conversor-divisas.html">Conversor</a></li>
+            <li>
+              <a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
+                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
+                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
+                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
+                <li><a href="/vectorizar.html"><i class="fas fa-bezier-curve"></i> Vectorizar</a></li>
+              </ul>
+            </li>
+            <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
+          </ul>
+        </nav>
+        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Vectorizar Imagen (SVG)</h1>
+        <p>Convierte tus imágenes JPG o PNG a vectores editables SVG de alta calidad.</p>
+      </section>
+
+      <section class="workspace-area container">
+        
+        <div class="comparison-grid">
+          <!-- Lado Izquierdo: Original -->
+          <div class="preview-card">
+            <div class="preview-header">Imagen Original (Bitmap)</div>
+            <div class="preview-viewport" id="viewport-original">
+              <div id="placeholder-original" style="color: #555; text-align: center;">
+                <i class="fas fa-image" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                Sin imagen
+              </div>
+              <img id="img-original-preview" style="display: none;" />
+            </div>
+          </div>
+          
+          <!-- Lado Derecho: Vector -->
+          <div class="preview-card">
+            <div class="preview-header">Resultado Vectorizado (SVG)</div>
+            <div class="preview-viewport" id="viewport-vector">
+              <div id="placeholder-vector" style="color: #555; text-align: center;">
+                <i class="fas fa-bezier-curve" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                Esperando procesamiento...
+              </div>
+              <div id="svg-output"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-toolbar">
+          <div class="fab-container">
+            <label for="img-upload-vector" class="fab-btn upload" title="Subir Imagen">
+              <i class="fas fa-upload"></i>
+            </label>
+            <span class="fab-tooltip">Subir Imagen</span>
+            <input type="file" id="img-upload-vector" accept="image/*" hidden />
+          </div>
+          
+          <!-- Botón de Acción Principal -->
+          <div class="fab-container" id="container-process-btn" style="display: none;">
+            <button class="fab-btn" id="btn-process-vector" title="Vectorizar Ahora" style="background: var(--primary-color); color: white; border-color: white;">
+              <i class="fas fa-magic"></i>
+            </button>
+            <span class="fab-tooltip">Vectorizar Ahora</span>
+          </div>
+
+          <div class="fab-container">
+            <button class="fab-btn delete" id="btn-delete-vector" title="Eliminar Imagen">
+              <i class="fas fa-trash"></i>
+            </button>
+            <span class="fab-tooltip">Eliminar</span>
+          </div>
+          
+          <div class="fab-container">
+            <button class="fab-btn download" id="btn-download-vector" title="Descargar SVG">
+              <i class="fas fa-download"></i>
+            </button>
+            <span class="fab-tooltip">Descargar SVG</span>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          <h3><i class="fas fa-lightbulb"></i> Recomendaciones:</h3>
+          <ul>
+            <li><strong>Mejor resultado:</strong> Logos, iconos y dibujos en blanco y negro o colores planos.</li>
+            <li><strong>Fotografías:</strong> Se convertirán en un estilo artístico de "capas de colores".</li>
+            <li><strong>Formato:</strong> El archivo descargado será <strong>.SVG</strong>, compatible con Illustrator, CorelDraw y navegadores web.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Botón Ir Arriba -->
+    <a href="#" id="back-to-top" title="Ir arriba"><i class="fas fa-arrow-up"></i></a>
+
+    <!-- Librería ImageTracer (Motor de vectorización) -->
+    <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
+
+    <script src="/js/scripts.js"></script>
+    <script src="/js/vectorizar.js"></script>
+  </body>
+</html>
