@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dividir Imagen (A4) - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/tools.css" />
+    
+    <style>
+        .split-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            background: var(--background-card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .control-group input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 6px;
+        }
+        .pages-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .page-card {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 210px; /* Simula ancho A4 visualmente */
+        }
+        .page-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px dashed #ccc;
+        }
+        .page-info {
+            color: #333;
+            margin-top: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="nav-container container">
+        <div class="logo">
+          <a href="/index.html" class="logo-part">COPYFAST</a>
+          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
+          <a href="/index.html" class="logo-part">PRINT</a>
+        </div>
+        <nav>
+          <ul class="nav-links" id="nav-links">
+            <li><a href="/index.html">Inicio</a></li>
+            <li><a href="/diseño.html">Diseños</a></li>
+            <li><a href="/acercade.html">Acerca de</a></li>
+            <li><a href="/cotizacion.html">Cotización</a></li>
+            <li><a href="/conversor-divisas.html">Conversor</a></li>
+            <li><a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
+                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
+                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
+                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
+                <li><a href="/vectorizar.html"><i class="fas fa-bezier-curve"></i> Vectorizar</a></li>
+                <li><a href="/dividir-imagen.html"><i class="fas fa-cut"></i> Dividir para A4</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Dividir Imagen para Sublimación (A4)</h1>
+        <p>Corta diseños largos en varias hojas A4 con solapamiento para unir fácilmente.</p>
+      </section>
+
+      <section class="workspace-area container">
+        <div class="split-controls">
+            <div class="control-group">
+                <label>Ancho Papel (mm)</label>
+                <input type="number" id="paper-width" value="210" readonly title="Estándar A4">
+            </div>
+            <div class="control-group">
+                <label>Alto Imprimible (mm)</label>
+                <input type="number" id="paper-height" value="290" title="Dejamos un pequeño margen">
+            </div>
+            <div class="control-group">
+                <label>Solapamiento / Overlap (mm)</label>
+                <input type="number" id="overlap" value="10" title="Área repetida para unir las hojas">
+            </div>
+            <div class="control-group">
+                <label>Escala (%)</label>
+                <input type="number" id="scale-percent" value="100" min="10" max="500" step="10" title="Aumenta el tamaño para forzar la división en más hojas">
+            </div>
+            <div class="control-group">
+                <label>Forzar # Páginas</label>
+                <input type="number" id="target-pages" min="0" placeholder="Auto" title="Calcula la escala automáticamente para ocupar X páginas">
+            </div>
+            <div class="control-group" style="display: flex; align-items: flex-end;">
+                <button id="btn-rotate" class="btn-secondary" style="width: 100%; padding: 10px; cursor: pointer; border: 1px solid var(--border-color); background: transparent; color: var(--text-primary); border-radius: 6px;" title="Rotar 90 grados">
+                    <i class="fas fa-sync-alt"></i> Rotar
+                </button>
+            </div>
+            <div class="control-group" style="display: flex; align-items: flex-end;">
+                <label for="img-upload-split" class="btn-primary" style="width: 100%; text-align: center; cursor: pointer; margin: 0; padding: 10px;">
+                    <i class="fas fa-upload"></i> Subir Imagen
+                </label>
+                <input type="file" id="img-upload-split" accept="image/*" hidden />
+            </div>
+        </div>
+
+        <div id="output-container" class="pages-preview">
+            <!-- Aquí aparecerán las hojas cortadas -->
+        </div>
+      </section>
+
+      <!-- BARRA FLOTANTE (FAB) -->
+      <div class="floating-toolbar">
+        <div class="fab-container">
+          <label for="img-upload-split" class="fab-btn upload" title="Subir Imagen">
+            <i class="fas fa-upload"></i>
+          </label>
+          <span class="fab-tooltip">Subir Imagen</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn delete" id="btn-clear-split" title="Limpiar">
+            <i class="fas fa-trash"></i>
+          </button>
+          <span class="fab-tooltip">Limpiar</span>
+        </div>
+      </div>
+    </main>
+
+    <script src="/js/dividir-imagen.js"></script>
+  </body>
+</html>
