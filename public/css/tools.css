@@ -525,3 +525,90 @@
   70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(139, 0, 0, 0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 0, 0, 0); }
 }
+
+/* --- ESTILOS PARA LA HERRAMIENTA DE DIVIDIR IMAGEN --- */
+.split-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+    background: var(--background-card);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.control-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+.control-group input {
+    width: 100%;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+.split-actions {
+    background: var(--background-card);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-top: 20px;
+    text-align: center;
+}
+.split-info {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    min-height: 24px;
+}
+.btn-split-action {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-split-action:hover {
+    background: #a00000; /* Darker red */
+    transform: translateY(-2px);
+}
+.btn-split-action:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.pages-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+.page-card {
+    background: white;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 210px; /* Simula ancho A4 visualmente */
+}
+.page-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px dashed #ccc;
+}
+.page-info {
+    color: #333;
+    margin-top: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}

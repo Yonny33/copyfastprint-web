@@ -15,59 +15,6 @@
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="/css/tools.css" />
     
-    <style>
-        .split-controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            background: var(--background-card);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        .control-group input {
-            width: 100%;
-            padding: 8px;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 6px;
-        }
-        .pages-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .page-card {
-            background: white;
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            width: 210px; /* Simula ancho A4 visualmente */
-        }
-        .page-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-            border: 1px dashed #ccc;
-        }
-        .page-info {
-            color: #333;
-            margin-top: 5px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-    </style>
   </head>
   <body>
     <header class="header">
@@ -104,50 +51,62 @@
 
     <main class="main-content">
       <section class="tools-hero">
-        <h1>Dividir Imagen para Sublimación (A4)</h1>
-        <p>Corta diseños largos en varias hojas A4 con solapamiento para unir fácilmente.</p>
+        <h1>Dividir o Ajustar para A4</h1>
+        <p>Sube una imagen, indica su tamaño real y la herramienta la preparará para imprimir en hojas A4.</p>
       </section>
 
       <section class="workspace-area container">
+        <!-- CONTROLES -->
         <div class="split-controls">
+            <div class="control-group input-required">
+                <label for="design-width-mm">Ancho Real del Diseño (mm)</label>
+                <input type="number" id="design-width-mm" placeholder="Ej: 280">
+            </div>
             <div class="control-group">
+                <label for="print-margin-mm" title="El borde (en mm) que tu impresora no puede imprimir.">Margen de Impresión (mm)</label>
+                <input type="number" id="print-margin-mm" value="5">
+            </div>
+            <div class="control-group">
+                <label>Solapamiento (mm)</label>
+                <input type="number" id="overlap" value="15">
+            </div>
+             <div class="control-group">
+                 <label for="auto-trim" class="checkbox-label" title="Elimina el espacio transparente/blanco innecesario alrededor del diseño.">
+                    <input type="checkbox" id="auto-trim" checked>
+                    Optimizar bordes
+                </label>
+            </div>
+            <div class="control-group" style="display: none;"> 
                 <label>Ancho Papel (mm)</label>
-                <input type="number" id="paper-width" value="210" readonly title="Estándar A4">
-            </div>
-            <div class="control-group">
-                <label>Alto Imprimible (mm)</label>
-                <input type="number" id="paper-height" value="290" title="Dejamos un pequeño margen">
-            </div>
-            <div class="control-group">
-                <label>Solapamiento / Overlap (mm)</label>
-                <input type="number" id="overlap" value="10" title="Área repetida para unir las hojas">
-            </div>
-            <div class="control-group">
-                <label>Escala (%)</label>
-                <input type="number" id="scale-percent" value="100" min="10" max="500" step="10" title="Aumenta el tamaño para forzar la división en más hojas">
-            </div>
-            <div class="control-group">
-                <label>Forzar # Páginas</label>
-                <input type="number" id="target-pages" min="0" placeholder="Auto" title="Calcula la escala automáticamente para ocupar X páginas">
+                <input type="number" id="paper-width" value="210" readonly>
+                <label>Alto Papel (mm)</label>
+                <input type="number" id="paper-height" value="297" readonly>
             </div>
         </div>
 
+        <!-- BOTÓN DE ACCIÓN -->
+        <div class="split-actions">
+          <div id="split-info" class="split-info"></div>
+          <button class="btn-split-action" id="btn-process-action" disabled>Preparar Página(s)</button>
+        </div>
+
+        <!-- VISTA PREVIA -->
         <div id="output-container" class="pages-preview">
-            <!-- Aquí aparecerán las hojas cortadas -->
+            <p id="initial-message">1. Sube una imagen<br>2. Ingresa su ancho real</p>
         </div>
       </section>
 
       <!-- BARRA FLOTANTE (FAB) -->
       <div class="floating-toolbar">
         <div class="fab-container">
-          <label for="img-upload-split" class="fab-btn upload" title="Subir Imagen">
+          <label for="img-upload-split" class="fab-btn upload" title="Paso 1: Subir Imagen">
             <i class="fas fa-upload"></i>
           </label>
           <span class="fab-tooltip">Subir Imagen</span>
           <input type="file" id="img-upload-split" accept="image/*" hidden />
         </div>
         <div class="fab-container">
-          <button class="fab-btn restore" id="btn-rotate" title="Rotar 90°">
+          <button class="fab-btn restore" id="btn-rotate" title="Rotar 90° (recalcula la cuadrícula)">
             <i class="fas fa-sync-alt"></i>
           </button>
           <span class="fab-tooltip">Rotar 90°</span>
@@ -167,6 +126,6 @@
       </div>
     </main>
 
-    <script src="/js/dividir-imagen.js"></script>
+    <script src="/js/dividir-imagen.js?v=2.1"></script>
   </body>
 </html>
