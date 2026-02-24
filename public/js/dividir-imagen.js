@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputTargetPages = document.getElementById("target-pages");
     const btnRotate = document.getElementById("btn-rotate");
     const btnClear = document.getElementById("btn-clear-split");
+    const btnDownloadAll = document.getElementById("btn-download-all");
 
     let currentImg = null;
     let rotation = 0;
@@ -19,6 +20,17 @@ document.addEventListener("DOMContentLoaded", function () {
         currentImg = null;
         outputContainer.innerHTML = "";
         uploadInput.value = "";
+    });
+
+    // Funcionalidad Descargar Todo
+    if(btnDownloadAll) btnDownloadAll.addEventListener("click", () => {
+        const links = outputContainer.querySelectorAll("a[download]");
+        if(links.length === 0) {
+            alert("No hay imágenes para descargar.");
+            return;
+        }
+        // Descargar secuencialmente para evitar bloqueos del navegador
+        links.forEach((link, index) => setTimeout(() => link.click(), index * 300));
     });
     
     // Eventos para actualizar en tiempo real
