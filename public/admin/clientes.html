@@ -1,117 +1,144 @@
+
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5Q94FLN3");
-    </script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Clientes - Admin COPYFAST&PRINT</title>
-    <meta
-      name="description"
-      content="Panel de administración para la gestión de clientes."
-    />
+    <title>Gestión de Clientes - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de clientes." />
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
     <link rel="stylesheet" href="/admin/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Estilos Adicionales para la tabla y modal -->
+    <style>
+      .table-container {
+        background-color: var(--background-card);
+        border: 1px solid var(--border-color-soft);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        overflow-x: auto; /* Para tablas anchas en móviles */
+      }
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .table-header h3 {
+        margin: 0;
+        color: var(--text-primary);
+      }
+      .search-bar {
+        position: relative;
+      }
+      .search-bar input {
+        padding-left: 2.5rem;
+        border-radius: 8px;
+        background-color: var(--background-main);
+        border: 1px solid var(--border-color-soft);
+        color: var(--text-primary);
+      }
+      .search-bar .fa-search {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+      }
+      .responsive-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .responsive-table th, .responsive-table td {
+        padding: 0.8rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color-soft);
+      }
+      .responsive-table th {
+        background-color: var(--background-main);
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .responsive-table td .btn-action {
+        background: none;
+        border: none;
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+      }
+      .responsive-table td .btn-edit { color: var(--primary-color-light); }
+      .responsive-table td .btn-edit:hover { color: var(--primary-color); }
+      .responsive-table td .btn-delete { color: var(--error-color-light); }
+      .responsive-table td .btn-delete:hover { color: var(--error-color); }
+
+      /* Estilos para el Modal de Edición */
+      .modal {
+        display: none; /* Oculto por defecto */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background-color: var(--background-card);
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        animation: slide-down 0.3s ease-out;
+      }
+      @keyframes slide-down {
+        from { transform: translateY(-30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+      .modal-close:hover { color: var(--text-primary); }
+    </style>
   </head>
   <body class="admin-page">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
-
     <div class="admin-grid-container">
       <aside class="admin-sidebar">
         <div class="sidebar-header"><h3>COPY<span>FAST&</span>PRINT</h3></div>
         <nav class="sidebar-nav">
           <ul>
-            <li>
-              <a href="admin.html"
-                ><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a
-              >
-            </li>
-            <li>
-              <a href="ventas.html"
-                ><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a
-              >
-            </li>
-            <li>
-              <a href="gastos.html"
-                ><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a
-              >
-            </li>
-            <li class="active">
-              <a href="clientes.html"
-                ><i class="fas fa-users fa-fw"></i> Clientes</a
-              >
-            </li>
-            <li>
-              <a href="inventario.html"
-                ><i class="fas fa-box-open fa-fw"></i> Inventario</a
-              >
-            </li>
-            <li>
-              <a href="costos.html"
-                ><i class="fas fa-chart-pie fa-fw"></i> Costos</a
-              >
-            </li>
-            <li>
-              <a href="reportes.html"
-                ><i class="fas fa-chart-line fa-fw"></i> Reportes</a
-              >
-            </li>
-            <li>
-              <a href="analisis.html"
-                ><i class="fas fa-brain fa-fw"></i> Análisis</a
-              >
-            </li>
+            <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+            <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+            <li class="active"><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+            <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+            <li><a href="costos.html"><i class="fas fa-chart-pie fa-fw"></i> Costos</a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+            <li><a href="analisis.html"><i class="fas fa-brain fa-fw"></i> Análisis</a></li>
           </ul>
         </nav>
         <div class="sidebar-footer">
-          <button id="btnCerrarSesion" class="logout-btn">
-            <i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión
-          </button>
+          <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
         </div>
       </aside>
 
@@ -119,36 +146,17 @@
         <div class="section-heading">
           <h2>Gestión de Clientes</h2>
           <div class="divider"></div>
-          <p>
-            Añade nuevos clientes. El sistema asignará un ID único
-            automáticamente.
-          </p>
+          <p>Añade, busca, edita o elimina clientes de tu base de datos.</p>
         </div>
-        <div class="form-layout">
+
+        <div class="form-layout-vertical"> <!-- Cambiado para layout vertical -->
           <div class="form-container">
+            <h3>Registrar Nuevo Cliente</h3>
             <form id="registro-clientes-form">
               <div class="form-grid">
-                <div class="form-group">
-                  <div class="form-inline-group">
-                    <select
-                      name="tipo_documento"
-                      id="tipo_documento"
-                      style="width: 80px; min-width: 80px"
-                    >
-                      <option value="V">V-</option>
-                      <option value="E">E-</option>
-                      <option value="J">J-</option>
-                      <option value="P">P-</option>
-                    </select>
-                    <input
-                      type="number"
-                      id="cedula"
-                      name="cedula"
-                      placeholder="Ej: 12345678"
-                      required
-                      style="flex-grow: 1"
-                    />
-                  </div>
+                <div class="form-group floating">
+                  <input type="text" id="cedula" name="cedula" placeholder=" " required />
+                  <label for="cedula">Cédula / RIF *</label>
                 </div>
                 <div class="form-group floating">
                   <input type="text" id="nombre" name="nombre" placeholder=" " required />
@@ -164,48 +172,82 @@
                 </div>
               </div>
               <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                  <i class="fas fa-save"></i> Guardar Cliente
-                </button>
+                <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Guardar Cliente</button>
               </div>
             </form>
           </div>
 
-          <aside class="form-sidebar">
-            <div class="info-box">
-              <h3><i class="fas fa-id-card"></i> ID Automático</h3>
-              <p>
-                El sistema generará un <strong>ID de cliente</strong> único y
-                secuencial (ej: 000001) para cada nuevo registro. La Cédula/RIF
-                se usa para evitar duplicados.
-              </p>
+          <!-- Tabla de Clientes -->
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Clientes Registrados</h3>
+              <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Buscar cliente...">
+              </div>
             </div>
-            <div class="info-box">
-              <h3>
-                <i class="fas fa-list-alt"></i> Próximamente: Lista de Clientes
-              </h3>
-              <p>
-                Aquí se mostrará una tabla con todos los clientes registrados
-                para que puedas editarlos o eliminarlos fácilmente.
-              </p>
-            </div>
-          </aside>
+            <table class="responsive-table" id="clientes-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Cédula/RIF</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Filas de clientes se cargarán aquí dinámicamente -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
 
-    <div id="loading-overlay" class="loading-overlay" style="display: none">
+    <!-- Modal para Editar Cliente -->
+    <div id="edit-client-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" id="modal-close-btn">&times;</span>
+        <h3>Editar Cliente</h3>
+        <form id="edit-client-form">
+          <input type="hidden" id="edit-client-id">
+          <div class="form-grid">
+            <div class="form-group floating">
+              <input type="text" id="edit-cedula" name="cedula" placeholder=" " required />
+              <label for="edit-cedula">Cédula / RIF *</label>
+            </div>
+            <div class="form-group floating">
+              <input type="text" id="edit-nombre" name="nombre" placeholder=" " required />
+              <label for="edit-nombre">Nombre / Razón Social *</label>
+            </div>
+            <div class="form-group floating">
+              <input type="tel" id="edit-telefono" name="telefono" placeholder=" " required />
+              <label for="edit-telefono">Teléfono *</label>
+            </div>
+            <div class="form-group floating">
+              <input type="email" id="edit-email" name="email" placeholder=" " />
+              <label for="edit-email">Email (Opcional)</label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit"><i class="fas fa-sync-alt"></i> Actualizar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
       <div class="spinner"></div>
       <p>Procesando...</p>
     </div>
 
-    <!-- Scripts de Firebase (¡AÑADIDOS!) -->
+    <!-- Scripts -->
     <script src="/__/firebase/8.10.1/firebase-app.js"></script>
     <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
     <script src="/__/firebase/init.js"></script>
-
-    <!-- Scripts de la aplicación -->
     <script src="/admin/js/auth.js"></script>
-    <script src="/admin/js/registro-clientes.js"></script>
+    <!-- Cambiado a un nuevo script que manejará la lógica de la tabla y el modal -->
+    <script src="/admin/js/gestion-clientes.js?v=1.0"></script> 
   </body>
 </html>
