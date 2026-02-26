@@ -17,109 +17,6 @@
     <link rel="stylesheet" href="/admin/css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- Estilos Adicionales para la tabla y modal -->
-    <style>
-      .table-container {
-        background-color: var(--background-card);
-        border: 1px solid var(--border-color-soft);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-top: 2rem;
-        overflow-x: auto; /* Para tablas anchas en móviles */
-      }
-      .table-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-      .table-header h3 {
-        margin: 0;
-        color: var(--text-primary);
-      }
-      .search-bar {
-        position: relative;
-      }
-      .search-bar input {
-        padding-left: 2.5rem;
-        border-radius: 8px;
-        background-color: var(--background-main);
-        border: 1px solid var(--border-color-soft);
-        color: var(--text-primary);
-      }
-      .search-bar .fa-search {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-secondary);
-      }
-      .responsive-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .responsive-table th, .responsive-table td {
-        padding: 0.8rem 1rem;
-        text-align: left;
-        border-bottom: 1px solid var(--border-color-soft);
-      }
-      .responsive-table th {
-        background-color: var(--background-main);
-        font-weight: 600;
-        color: var(--text-secondary);
-      }
-      .responsive-table td .btn-action {
-        background: none;
-        border: none;
-        cursor: pointer;
-        margin-right: 10px;
-        font-size: 1rem;
-        transition: color 0.3s ease;
-      }
-      .responsive-table td .btn-edit { color: var(--primary-color-light); }
-      .responsive-table td .btn-edit:hover { color: var(--primary-color); }
-      .responsive-table td .btn-delete { color: var(--error-color-light); }
-      .responsive-table td .btn-delete:hover { color: var(--error-color); }
-
-      /* Estilos para el Modal de Edición */
-      .modal {
-        display: none; /* Oculto por defecto */
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.6);
-        justify-content: center;
-        align-items: center;
-      }
-      .modal-content {
-        background-color: var(--background-card);
-        padding: 2rem;
-        border-radius: 12px;
-        width: 90%;
-        max-width: 500px;
-        position: relative;
-        animation: slide-down 0.3s ease-out;
-      }
-      @keyframes slide-down {
-        from { transform: translateY(-30px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      .modal-close {
-        position: absolute;
-        top: 1rem;
-        right: 1.5rem;
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: var(--text-secondary);
-        cursor: pointer;
-        transition: color 0.3s ease;
-      }
-      .modal-close:hover { color: var(--text-primary); }
-    </style>
   </head>
   <body class="admin-page">
     <div class="admin-grid-container">
@@ -135,6 +32,7 @@
             <li><a href="costos.html"><i class="fas fa-chart-pie fa-fw"></i> Costos</a></li>
             <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
             <li><a href="analisis.html"><i class="fas fa-brain fa-fw"></i> Análisis</a></li>
+            <li><a href="configuracion.html"><i class="fas fa-cogs fa-fw"></i> Configuración</a></li>
           </ul>
         </nav>
         <div class="sidebar-footer">
@@ -181,11 +79,10 @@
           <div class="table-container">
             <div class="table-header">
               <h3>Clientes Registrados</h3>
-              <div class="search-bar">
+              <div class="table-search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" id="search-input" placeholder="Buscar cliente...">
               </div>
-            </div>
             <table class="responsive-table" id="clientes-table">
               <thead>
                 <tr>
@@ -206,7 +103,7 @@
     </div>
 
     <!-- Modal para Editar Cliente -->
-    <div id="edit-client-modal" class="modal">
+    <div id="edit-client-modal" class="admin-modal">
       <div class="modal-content">
         <span class="modal-close" id="modal-close-btn">&times;</span>
         <h3>Editar Cliente</h3>

@@ -212,6 +212,11 @@ app.post("/api/ventas", async (req, res) => {
 
     // Si no hay ID de producto (ej. venta manual sin item), guardamos normal
     if (!ventaData.id_producto) {
+      // Asegurar tipos numéricos para que las queries de reportes funcionen
+      ventaData.venta_bruta = parseFloat(ventaData.venta_bruta) || 0;
+      ventaData.saldo_pendiente = parseFloat(ventaData.saldo_pendiente) || 0;
+      ventaData.abono_recibido = parseFloat(ventaData.abono_recibido) || 0;
+
       const docRef = await db.collection("ventas").add(ventaData);
       return res.status(201).json({
         status: "success",
@@ -224,6 +229,14 @@ app.post("/api/ventas", async (req, res) => {
     const cantidad = parseFloat(ventaData.cantidad) || 0;
     const saldoPendienteInput = parseFloat(ventaData.saldo_pendiente) || 0;
     const idCliente = ventaData.id_cliente;
+
+    // CORRECCIÓN CRÍTICA: Convertir explícitamente a números antes de guardar.
+    // Si se guardan como texto (ej: "100.00"), las consultas de Firestore (where > 0) fallan.
+    ventaData.cantidad = cantidad;
+    ventaData.saldo_pendiente = saldoPendienteInput;
+    ventaData.venta_bruta = parseFloat(ventaData.venta_bruta) || 0;
+    ventaData.abono_recibido = parseFloat(ventaData.abono_recibido) || 0;
+    ventaData.precio_unitario = parseFloat(ventaData.precio_unitario) || 0;
 
     // Asegurar que el estado del pedido esté definido antes de procesar
     if (!ventaData.estado_pedido) {
@@ -904,6 +917,67 @@ app.post("/api/admin/recalcular-totales", async (req, res) => {
 
     res.json({ status: "success", message: "Totales recalculados correctamente", data: { totalIngresos, totalGastos } });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Endpoint de Mantenimiento: Migrar datos de ventas a números (Corrección de tipos)
+app.post("/api/admin/migrar-ventas-numeros", async (req, res) => {
+  try {
+    const snapshot = await db.collection("ventas").get();
+    let batch = db.batch();
+    let count = 0;
+    let totalUpdated = 0;
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      const updates = {};
+      let needsUpdate = false;
+
+      // Campos numéricos a corregir
+      const numericFields = [
+        "venta_bruta",
+        "saldo_pendiente",
+        "abono_recibido",
+        "precio_unitario",
+        "cantidad",
+      ];
+
+      numericFields.forEach((field) => {
+        // Si existe y es string, lo convertimos
+        if (data[field] !== undefined && typeof data[field] === "string") {
+          const num = parseFloat(data[field]);
+          if (!isNaN(num)) {
+            updates[field] = num;
+            needsUpdate = true;
+          }
+        }
+      });
+
+      if (needsUpdate) {
+        batch.update(doc.ref, updates);
+        count++;
+        totalUpdated++;
+      }
+
+      // Firestore batches limit is 500
+      if (count >= 400) {
+        await batch.commit();
+        batch = db.batch();
+        count = 0;
+      }
+    }
+
+    if (count > 0) {
+      await batch.commit();
+    }
+
+    res.json({
+      status: "success",
+      message: `Migración finalizada. Se corrigieron ${totalUpdated} ventas.`,
+    });
+  } catch (error) {
+    console.error("Error en migración:", error);
     res.status(500).json({ error: error.message });
   }
 });

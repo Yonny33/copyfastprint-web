@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuración - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para tareas de mantenimiento." />
+
+    <!-- Favicons, CSS, etc. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="/favicons/manifest.json" />
+    <link rel="stylesheet" href="/admin/css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <aside class="admin-sidebar">
+        <div class="sidebar-header"><h3>COPY<span>FAST&</span>PRINT</h3></div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li><a href="admin.html"><i class="fas fa-tachometer-alt fa-fw"></i> Dashboard</a></li>
+            <li><a href="ventas.html"><i class="fas fa-dollar-sign fa-fw"></i> Ventas</a></li>
+            <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
+            <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
+            <li><a href="inventario.html"><i class="fas fa-box-open fa-fw"></i> Inventario</a></li>
+            <li><a href="costos.html"><i class="fas fa-chart-pie fa-fw"></i> Costos</a></li>
+            <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
+            <li><a href="analisis.html"><i class="fas fa-brain fa-fw"></i> Análisis</a></li>
+            <li class="active"><a href="configuracion.html"><i class="fas fa-cogs fa-fw"></i> Configuración</a></li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <button id="btnCerrarSesion" class="logout-btn"><i class="fas fa-sign-out-alt fa-fw"></i> Cerrar Sesión</button>
+        </div>
+      </aside>
+
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2>Configuración y Mantenimiento</h2>
+          <div class="divider"></div>
+          <p>Ejecuta tareas administrativas para mantener la base de datos.</p>
+        </div>
+
+        <div class="card">
+          <h3>Mantenimiento de Datos</h3>
+          <div class="info-box" style="margin-bottom: 1.5rem; border-left-color: var(--warning-color);">
+            <h4 style="color: var(--warning-color);"><i class="fas fa-database"></i> Corregir Tipos de Datos en Ventas</h4>
+            <p>
+              Esta acción recorre todas las ventas antiguas y convierte campos como 'saldo_pendiente' o 'venta_bruta' de texto a número.
+              Es útil si los reportes del Dashboard no suman correctamente. Es seguro ejecutarlo varias veces.
+            </p>
+          </div>
+          <button id="btn-migrar-ventas" class="btn-primary" style="background: linear-gradient(135deg, var(--warning-color), #b45309);">
+            <i class="fas fa-sync-alt"></i> Ejecutar Corrección de Datos
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/__/firebase/8.10.1/firebase-app.js"></script>
+    <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/configuracion.js"></script> 
+  </body>
+</html>
