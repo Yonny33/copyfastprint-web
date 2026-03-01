@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Formulario de Registro
   const registroForm = document.getElementById("registro-clientes-form");
-
+ 
   // Modal de Edición
   const editModal = document.getElementById("edit-client-modal");
   const editForm = document.getElementById("edit-client-form");
@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {Array} clients - El array de clientes a mostrar.
    */
   const renderTable = (clients) => {
+    if (!clientesTableBody) return;
     clientesTableBody.innerHTML = ""; // Limpiar tabla
     if (clients.length === 0) {
       clientesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay clientes registrados.</td></tr>`;
@@ -137,12 +138,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const formData = new FormData(registroForm);
     const data = Object.fromEntries(formData.entries());
 
+    // Combinar tipo de documento con cédula si ambos existen
+    if (data.tipo_documento && data.cedula) {
+      data.cedula = `${data.tipo_documento}${data.cedula}`;
+    }
+    delete data.tipo_documento;
+
     try {
       const response = await fetch(`${API_URL}/clientes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status} ${response.statusText}. Si estás en local, asegúrate de usar los emuladores.`);
+      }
+
       const result = await response.json();
       if (result.status === "success") {
         alert("Cliente registrado con éxito.");
@@ -224,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- INICIALIZACIÓN Y EVENT LISTENERS ---
   searchInput.addEventListener("input", handleSearch);
-  clientesTableBody.addEventListener("click", handleTableClick);
+  if (clientesTableBody) clientesTableBody.addEventListener("click", handleTableClick);
   registroForm.addEventListener("submit", handleRegisterSubmit);
   editForm.addEventListener("submit", handleEditSubmit);
   closeModalBtn.addEventListener("click", () => showModal(false));

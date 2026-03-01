@@ -19,6 +19,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const metodoPagoSelect = document.getElementById("metodo_pago");
 
   // --- FUNCIONES ---
+ 
+  // Establece la fecha del input al día actual usando la hora LOCAL del sistema
+  const setFechaActual = () => {
+    if (!fechaInput) return;
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    fechaInput.value = `${year}-${month}-${day}`;
+  };
 
   // Muestra u oculta el overlay de "Procesando..."
   const showLoading = (show) => {
@@ -182,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (result.status === "success") {
         alert("¡Venta registrada con éxito!");
         form.reset();
-        if (fechaInput) fechaInput.valueAsDate = new Date();
+        setFechaActual();
         actualizarCalculos();
       } else {
         throw new Error(
@@ -218,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", handleFormSubmit);
 
     // Carga inicial
-    if (fechaInput) fechaInput.valueAsDate = new Date();
+    setFechaActual();
     cargarClientes();
     cargarProductos(); // <-- NUEVO: Cargar los productos al iniciar
     actualizarCalculos();

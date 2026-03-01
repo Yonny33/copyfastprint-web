@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     showLoading(true);
-
+ 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 

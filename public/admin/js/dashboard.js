@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("ingresos-gastos-chart");
     if (!canvas) return;
     if (ingresosGastosChart) ingresosGastosChart.destroy();
-
+ 
     // Crear degradados para efecto "Luminoso/Neón"
     const ctx = canvas.getContext("2d");
     

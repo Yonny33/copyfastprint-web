@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Si el usuario está en una página de admin (y no es la de login), todo está bien.
       // Agregamos los controles de la interfaz (logout, ir arriba, etc.).
       addAdminUIControls();
+      iniciarDetectorInactividad(); // Iniciar contador de auto-logout
     } else {
       // --- El usuario NO está autenticado ---
       console.log("Estado de autenticación: Desconectado");
@@ -44,6 +45,30 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error al cerrar sesión:", error);
     });
     // onAuthStateChanged se encargará de la redirección automáticamente.
+  };
+
+  // Función para detectar inactividad y cerrar sesión automáticamente
+  const iniciarDetectorInactividad = () => {
+    let timeout;
+    // Configuración: 30 minutos de inactividad (30 * 60 * 1000 ms)
+    const TIEMPO_LIMITE = 30 * 60 * 1000; 
+
+    const reiniciarTemporizador = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        alert("Tu sesión se ha cerrado automáticamente por inactividad.");
+        logout();
+      }, TIEMPO_LIMITE);
+    };
+
+    // Escuchar eventos de actividad del usuario para reiniciar el contador
+    const eventos = ['mousemove', 'keypress', 'click', 'scroll', 'touchstart'];
+    eventos.forEach(evento => {
+      document.addEventListener(evento, reiniciarTemporizador, { passive: true });
+    });
+
+    // Iniciar temporizador al cargar
+    reiniciarTemporizador();
   };
 
   // Función para agregar los botones flotantes y otros elementos de la interfaz de admin
