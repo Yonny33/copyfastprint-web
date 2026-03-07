@@ -1,13 +1,11 @@
 let canvas;
-const PIXELS_PER_CM = 15; // Factor de escala para visualización en pantalla (aprox 38 DPI)
-let currentWidthCm = 58; // Ancho actual seleccionado
-let currentHeightCm = 100; // Altura actual (inicia en 1 metro)
-// NOTA: Para impresión real se necesita más calidad, pero para armar el layout en web
-// usamos una escala manejable y al exportar podemos multiplicar.
+const PIXELS_PER_CM = 15;
+let currentWidthCm = 58;
+let currentHeightCm = 100;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Adjuntar eventos a las tarjetas de selección de forma moderna
-    document.querySelectorAll('.option-card').forEach(card => {
+    // --- EVENTOS DE SELECCIÓN DE ANCHO INICIAL ---
+    document.querySelectorAll('.option-card[data-width]').forEach(card => {
         card.addEventListener('click', () => {
             const width = card.dataset.width;
             if (width) {
@@ -15,509 +13,352 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // --- EVENTOS DEL MODAL DE AJUSTE DE ANCHO ---
+    const modal = document.getElementById('modal-adjust-width');
+    const newWidthInput = document.getElementById('new-width-input');
+
+    // Abrir modal
+    document.getElementById('btn-adjust-width').addEventListener('click', () => {
+        newWidthInput.value = currentWidthCm; // Mostrar el ancho actual en el input
+        modal.style.display = 'flex';
+        newWidthInput.focus();
+    });
+
+    // Cerrar modal con botón Cancelar
+    document.getElementById('btn-cancel-width').addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Aplicar cambio de ancho
+    document.getElementById('btn-apply-width').addEventListener('click', () => {
+        const newWidth = parseInt(newWidthInput.value, 10);
+        if (newWidth && newWidth >= 10 && newWidth <= 100) {
+            adjustCanvasWidth(newWidth);
+            modal.style.display = 'none';
+        } else {
+            alert("Por favor, introduce un ancho válido entre 10 y 100 cm.");
+        }
+    });
+    
+    // Permitir Enter en el input del modal
+    newWidthInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            document.getElementById('btn-apply-width').click();
+        }
+    });
 });
 
-// Aseguramos que la función sea accesible globalmente
-window.selectWorkspace = function (widthCm) {
-  if (typeof fabric === "undefined") {
-    alert(
-      "Error: La librería gráfica no cargó correctamente. Por favor recarga la página.",
-    );
-    return;
-  }
-
-  // 1. Ocultar selector, mostrar área de trabajo
-  document.querySelector(".workspace-selector").style.display = "none";
-  document.getElementById("dtf-workspace").style.display = "block";
-
-  // 2. Actualizar info
-  currentWidthCm = widthCm;
-  currentHeightCm = 100; // Reiniciar a 1 metro
-  document.getElementById("workspace-info").textContent =
-    `Mesa: ${currentWidthCm}cm x ${currentHeightCm}cm`;
-
-  // 3. Inicializar Fabric Canvas
-  initFabricCanvas(widthCm, currentHeightCm);
-  drawRulers(widthCm, currentHeightCm);
-  initGuideListeners(); // Activar listeners para sacar guías
-};
-
-function initFabricCanvas(widthCm, heightCm) {
-  const widthPx = widthCm * PIXELS_PER_CM;
-  const heightPx = heightCm * PIXELS_PER_CM;
-
-  // Crear el canvas de Fabric
-  canvas = new fabric.Canvas("c", {
-    width: widthPx,
-    height: heightPx,
-    backgroundColor: null, // Transparente
-  });
-
-  // Configurar controles visuales de los objetos
-  fabric.Object.prototype.set({
-    transparentCorners: false,
-    cornerColor: "#ffffff",
-    cornerStrokeColor: "#000000",
-    borderColor: "#000000",
-    cornerSize: 12,
-    padding: 5,
-    cornerStyle: "circle",
-  });
-
-  // Evento para eliminar con tecla Supr/Delete
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Delete" || e.key === "Backspace") {
-      deleteSelected();
+function selectWorkspace(widthCm) {
+    if (typeof fabric === "undefined") {
+        alert("Error: La librería gráfica no cargó correctamente. Por favor recarga la página.");
+        return;
     }
-  });
 
-  // --- BORDES INTELIGENTES ---
-  // Creamos 4 líneas rojas invisibles en los bordes
-  const borderOpts = { fill: '#8b0000', selectable: false, evented: false, visible: false, isBorder: true };
-  const t = 5; // Grosor del borde visual
-  
-  canvas.borders = {
-      top: new fabric.Rect({ ...borderOpts, top: 0, left: 0, width: widthPx, height: t }),
-      bottom: new fabric.Rect({ ...borderOpts, top: heightPx - t, left: 0, width: widthPx, height: t }),
-      left: new fabric.Rect({ ...borderOpts, top: 0, left: 0, width: t, height: heightPx }),
-      right: new fabric.Rect({ ...borderOpts, top: 0, left: widthPx - t, width: t, height: heightPx })
-  };
-  canvas.add(canvas.borders.top, canvas.borders.bottom, canvas.borders.left, canvas.borders.right);
+    document.querySelector(".workspace-selector").style.display = "none";
+    document.getElementById("dtf-workspace").style.display = "block";
 
-  // Evento al mover objetos: Detectar colisión con bordes
-  canvas.on("object:moving", function (e) {
-    const obj = e.target;
-    const rect = obj.getBoundingRect();
-    const limit = 2; // Sensibilidad en píxeles
+    currentWidthCm = widthCm;
+    currentHeightCm = 100;
+    document.getElementById("workspace-info").textContent = `Mesa: ${currentWidthCm}cm x ${currentHeightCm}cm`;
 
-    canvas.borders.top.visible = rect.top <= limit;
-    canvas.borders.left.visible = rect.left <= limit;
-    canvas.borders.bottom.visible = rect.top + rect.height >= canvas.height - limit;
-    canvas.borders.right.visible = rect.left + rect.width >= canvas.width - limit;
-  });
-
-  canvas.on("mouse:up", function() {
-      // Ocultar bordes al soltar
-      Object.values(canvas.borders).forEach(b => b.visible = false);
-  });
-
-  // Eventos para mostrar dimensiones al escalar
-  canvas.on("object:scaling", function (e) {
-    updateDimTooltip(e.target);
-  });
-  canvas.on("object:rotating", function (e) {
-    updateDimTooltip(e.target, false, true);
-  });
-  canvas.on("object:modified", function () {
-    document.getElementById("dim-tooltip").style.display = "none";
-  });
-  canvas.on("selection:created", function (e) {
-    if (e.selected.length === 1) updateDimTooltip(e.selected[0], true);
-  });
-  canvas.on("selection:updated", function (e) {
-    if (e.selected.length === 1) updateDimTooltip(e.selected[0], true);
-  });
-  canvas.on("selection:cleared", function () {
-    document.getElementById("dim-tooltip").style.display = "none";
-  });
+    initFabricCanvas(widthCm, currentHeightCm);
+    drawRulers(widthCm, currentHeightCm);
+    initGuideListeners();
 }
 
-// --- DIBUJAR REGLAS ---
+function initFabricCanvas(widthCm, heightCm) {
+    const widthPx = widthCm * PIXELS_PER_CM;
+    const heightPx = heightCm * PIXELS_PER_CM;
+
+    canvas = new fabric.Canvas("c", { width: widthPx, height: heightPx, backgroundColor: null });
+
+    fabric.Object.prototype.set({
+        transparentCorners: false, cornerColor: "#ffffff", cornerStrokeColor: "#000000",
+        borderColor: "#000000", cornerSize: 12, padding: 5, cornerStyle: "circle",
+    });
+
+    document.addEventListener("keydown", (e) => { if (e.key === "Delete" || e.key === "Backspace") deleteSelected(); });
+
+    // Configuración de bordes inteligentes
+    setupBorders(widthPx, heightPx);
+    
+    // Configuración de eventos del lienzo
+    setupCanvasEvents();
+}
+
+function setupBorders(widthPx, heightPx) {
+    const borderOpts = { fill: '#8b0000', selectable: false, evented: false, visible: false, isBorder: true };
+    const t = 5; // Grosor del borde
+    canvas.borders = {
+        top: new fabric.Rect({ ...borderOpts, top: 0, left: 0, width: widthPx, height: t }),
+        bottom: new fabric.Rect({ ...borderOpts, top: heightPx - t, left: 0, width: widthPx, height: t }),
+        left: new fabric.Rect({ ...borderOpts, top: 0, left: 0, width: t, height: heightPx }),
+        right: new fabric.Rect({ ...borderOpts, top: 0, left: widthPx - t, width: t, height: heightPx })
+    };
+    canvas.add(...Object.values(canvas.borders));
+}
+
+function setupCanvasEvents() {
+    canvas.on({
+        'object:moving': (e) => {
+            const obj = e.target;
+            const rect = obj.getBoundingRect();
+            const limit = 2;
+            canvas.borders.top.visible = rect.top <= limit;
+            canvas.borders.left.visible = rect.left <= limit;
+            canvas.borders.bottom.visible = rect.top + rect.height >= canvas.height - limit;
+            canvas.borders.right.visible = rect.left + rect.width >= canvas.width - limit;
+            updateDimTooltip(obj);
+        },
+        'mouse:up': () => {
+            Object.values(canvas.borders).forEach(b => b.visible = false);
+            if (!canvas.getActiveObject()) document.getElementById("dim-tooltip").style.display = "none";
+        },
+        'object:scaling': (e) => updateDimTooltip(e.target),
+        'object:rotating': (e) => updateDimTooltip(e.target, true),
+        'selection:created': (e) => { if (e.selected.length === 1) updateDimTooltip(e.selected[0]); },
+        'selection:updated': (e) => { if (e.selected.length === 1) updateDimTooltip(e.selected[0]); },
+        'selection:cleared': () => document.getElementById("dim-tooltip").style.display = "none",
+        'object:modified': () => { if (!canvas.getActiveObject()) document.getElementById("dim-tooltip").style.display = "none"; }
+    });
+}
+
+// --- NUEVA FUNCIÓN CENTRALIZADA PARA AJUSTAR ANCHO ---
+function adjustCanvasWidth(newWidthCm) {
+    currentWidthCm = newWidthCm;
+    const newWidthPx = newWidthCm * PIXELS_PER_CM;
+
+    // Redimensionar el canvas
+    canvas.setWidth(newWidthPx);
+
+    // Re-dibujar las reglas
+    drawRulers(currentWidthCm, currentHeightCm);
+
+    // Re-posicionar los bordes
+    canvas.borders.top.set('width', newWidthPx);
+    canvas.borders.bottom.set('width', newWidthPx);
+    canvas.borders.right.set('left', newWidthPx - 5);
+
+    // Re-posicionar las guías verticales
+    canvas.getObjects('line').forEach(line => {
+        if (line.isGuide && line.lockMovementY) { // Es una guía vertical
+            line.set({ x1: 50, x2: 50 }); // Simplemente la reposiciona si se salió
+        }
+    });
+    
+    // Actualizar texto informativo
+    document.getElementById("workspace-info").textContent = `Mesa: ${currentWidthCm}cm x ${currentHeightCm}cm`;
+
+    canvas.renderAll();
+}
+
 function drawRulers(widthCm, heightCm) {
   const rulerTop = document.getElementById("ruler-top");
   const rulerLeft = document.getElementById("ruler-left");
-
-  // Limpiar reglas anteriores
   rulerTop.innerHTML = "";
   rulerLeft.innerHTML = "";
-
-  // Ajustar tamaños de contenedores
   rulerTop.style.width = widthCm * PIXELS_PER_CM + "px";
   rulerLeft.style.height = heightCm * PIXELS_PER_CM + "px";
 
-  // Regla Horizontal (Top)
   for (let i = 0; i <= widthCm; i++) {
     const tick = document.createElement("div");
     tick.className = "ruler-tick";
     tick.style.left = i * PIXELS_PER_CM + "px";
-    // Marcas grandes cada 5cm, pequeñas cada 1cm
-    if (i % 5 === 0) {
-      tick.style.height = "100%";
-      tick.textContent = i;
-      tick.style.paddingLeft = "2px";
-    } else {
-      tick.style.height = "25%";
-    }
+    if (i % 5 === 0) { tick.style.height = "100%"; tick.textContent = i; tick.style.paddingLeft = "2px"; } 
+    else { tick.style.height = "25%"; }
     rulerTop.appendChild(tick);
   }
-
-  // Regla Vertical (Left)
   for (let i = 0; i <= heightCm; i++) {
     const tick = document.createElement("div");
     tick.className = "ruler-tick";
     tick.style.top = i * PIXELS_PER_CM + "px";
-    if (i % 5 === 0) {
-      tick.style.width = "100%";
-      tick.textContent = i;
-      tick.style.paddingTop = "0px";
-    } else {
-      tick.style.width = "25%";
-    }
+    if (i % 5 === 0) { tick.style.width = "100%"; tick.textContent = i; tick.style.paddingTop = "0px"; } 
+    else { tick.style.width = "25%"; }
     rulerLeft.appendChild(tick);
   }
 }
 
-// --- GUÍAS INTERACTIVAS ---
 function initGuideListeners() {
-    const rTop = document.getElementById('ruler-top');
-    const rLeft = document.getElementById('ruler-left');
-    
-    // Al hacer clic en la regla, crea una guía
-    rTop.onmousedown = (e) => createGuide('horizontal');
-    rLeft.onmousedown = (e) => createGuide('vertical');
+    document.getElementById('ruler-top').onmousedown = () => createGuide('horizontal');
+    document.getElementById('ruler-left').onmousedown = () => createGuide('vertical');
 }
 
 function createGuide(orientation) {
     if(!canvas) return;
-    let line;
-    const props = {
-        stroke: '#8b0000', strokeWidth: 1, selectable: true, evented: true, 
-        hasControls: false, isGuide: true, hoverCursor: 'move'
-    };
-
-    if(orientation === 'horizontal') {
-        // Línea horizontal que cruza todo el ancho
-        line = new fabric.Line([0, 50, canvas.width, 50], {
-            ...props, lockMovementX: true, lockRotation: true
-        });
-    } else {
-        // Línea vertical que cruza todo el alto
-        line = new fabric.Line([50, 0, 50, canvas.height], {
-            ...props, lockMovementY: true, lockRotation: true
-        });
-    }
-    canvas.add(line);
-    canvas.setActiveObject(line);
-    canvas.renderAll();
+    const props = { stroke: '#8b0000', strokeWidth: 1, selectable: true, evented: true, hasControls: false, isGuide: true, hoverCursor: 'move' };
+    const line = orientation === 'horizontal' ? 
+        new fabric.Line([0, 50, canvas.width, 50], { ...props, lockMovementX: true, lockRotation: true }) :
+        new fabric.Line([50, 0, 50, canvas.height], { ...props, lockMovementY: true, lockRotation: true });
+    canvas.add(line); canvas.setActiveObject(line); canvas.renderAll();
 }
 
-function updateDimTooltip(obj, showStatic, isRotating) {
+function updateDimTooltip(obj, isRotating) {
   const tooltip = document.getElementById("dim-tooltip");
-  
-  if (isRotating) {
-      tooltip.textContent = `${Math.round(obj.angle % 360)}°`;
-  } else {
-      const wCm = (obj.getScaledWidth() / PIXELS_PER_CM).toFixed(1);
-      const hCm = (obj.getScaledHeight() / PIXELS_PER_CM).toFixed(1);
-      tooltip.textContent = `${wCm} cm x ${hCm} cm`;
-  }
-  
+  tooltip.textContent = isRotating ? `${Math.round(obj.angle % 360)}°` : `${(obj.getScaledWidth() / PIXELS_PER_CM).toFixed(1)} cm x ${(obj.getScaledHeight() / PIXELS_PER_CM).toFixed(1)} cm`;
   tooltip.style.display = "block";
-
-  // Posicionar cerca del objeto
   const canvasRect = document.querySelector(".canvas-container").getBoundingClientRect();
   const objCenter = obj.getCenterPoint();
-  
-  // Posición absoluta en pantalla
-  const top = canvasRect.top + objCenter.y + window.scrollY - 40; 
-  const left = canvasRect.left + objCenter.x + window.scrollX;
-
-  tooltip.style.top = top + "px";
-  tooltip.style.left = left + "px";
-  
-  if(showStatic) {
-      setTimeout(() => { tooltip.style.display = 'none'; }, 2000);
-  }
+  tooltip.style.top = (canvasRect.top + objCenter.y + window.scrollY - 40) + "px";
+  tooltip.style.left = (canvasRect.left + objCenter.x + window.scrollX) + "px";
 }
 
-// --- ORGANIZACIÓN AUTOMÁTICA (AUTO-ARRANGE) ---
 function findNextPosition(imgWidth, imgHeight) {
-    // Filtrar solo imágenes (ignorar guías y bordes)
     const objs = canvas.getObjects().filter(o => !o.isGuide && !o.isBorder);
-    
     if (objs.length === 0) return { left: 0, top: 0 };
-
-    // Ordenar objetos por posición vertical (top) y luego horizontal (left)
     objs.sort((a, b) => (a.top - b.top) || (a.left - b.left));
-    
     const lastObj = objs[objs.length - 1];
     const lastRight = lastObj.left + lastObj.getScaledWidth();
-    const lastTop = lastObj.top;
-    
-    // Margen entre imágenes
-    const padding = 5; 
-
-    // Estrategia: Intentar poner a la derecha del último objeto
-    if (lastRight + imgWidth + padding <= canvas.width) {
-        return { left: lastRight + padding, top: lastTop };
-    } else {
-        // Si no cabe, buscar el punto más bajo de toda la mesa para empezar nueva fila
-        let maxBottom = 0;
-        objs.forEach(o => {
-            const b = o.top + o.getScaledHeight();
-            if(b > maxBottom) maxBottom = b;
-        });
-        return { left: 0, top: maxBottom + padding };
-    }
+    const padding = 5;
+    if (lastRight + imgWidth + padding <= canvas.width) return { left: lastRight + padding, top: lastObj.top };
+    let maxBottom = objs.reduce((max, o) => Math.max(max, o.top + o.getScaledHeight()), 0);
+    return { left: 0, top: maxBottom + padding };
 }
 
-// --- SUBIR IMÁGENES ---
 document.getElementById("img-upload").addEventListener("change", function (e) {
   const files = e.target.files;
-  // Validación de seguridad: si no hay canvas (por error previo), no hacer nada
   if (!files || !canvas) return;
-
-  for (let i = 0; i < files.length; i++) {
+  for (const file of files) {
     const reader = new FileReader();
-    reader.onload = function (f) {
-      const data = f.target.result;
-
-      // Crear imagen temporal para procesar recorte de transparencia
+    reader.onload = (f) => {
       const tempImg = new Image();
-      tempImg.onload = function () {
-        // Recortar bordes transparentes
-        const trimmedDataUrl = trimTransparentPixels(tempImg) || data;
-
-        fabric.Image.fromURL(trimmedDataUrl, function (img) {
-          // Escalar imagen si es muy grande para el lienzo (usando el tamaño recortado)
-          const scaleFactor = Math.min(
-            (canvas.width * 0.5) / img.width,
-            (canvas.height * 0.5) / img.height,
-            1,
-          );
-
-          // Usar la nueva lógica de posicionamiento
+      tempImg.onload = () => {
+        const trimmedDataUrl = trimTransparentPixels(tempImg) || tempImg.src;
+        fabric.Image.fromURL(trimmedDataUrl, (img) => {
+          const scaleFactor = Math.min((canvas.width * 0.5) / img.width, (canvas.height * 0.5) / img.height, 1);
           const pos = findNextPosition(img.width * scaleFactor, img.height * scaleFactor);
-          img.scale(scaleFactor);
-          img.set({ left: pos.left, top: pos.top });
-
-          canvas.add(img);
-          canvas.setActiveObject(img);
+          img.scale(scaleFactor).set(pos);
+          canvas.add(img).setActiveObject(img);
         });
       };
-      tempImg.src = data;
+      tempImg.src = f.target.result;
     };
-    reader.readAsDataURL(files[i]);
+    reader.readAsDataURL(file);
   }
-  // Limpiar input para permitir subir la misma imagen de nuevo si se borró
   this.value = "";
 });
 
-// --- FUNCIÓN PARA RECORTAR TRANSPARENCIA (TRIM) ---
 function trimTransparentPixels(image) {
-  const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext("2d");
+  const trimCanvas = document.createElement("canvas");
+  trimCanvas.width = image.width; trimCanvas.height = image.height;
+  const ctx = trimCanvas.getContext("2d");
   ctx.drawImage(image, 0, 0);
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const imageData = ctx.getImageData(0, 0, w, h);
-  const data = imageData.data;
-
-  let minX = w,
-    minY = h,
-    maxX = 0,
-    maxY = 0;
+  const data = ctx.getImageData(0, 0, image.width, image.height).data;
+  let minX = image.width, minY = image.height, maxX = 0, maxY = 0;
   let found = false;
-
-  // Escanear píxeles para encontrar los límites del contenido visible
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const alpha = data[(y * w + x) * 4 + 3]; // Canal Alpha
-      if (alpha > 0) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
+  for (let y = 0; y < image.height; y++) {
+    for (let x = 0; x < image.width; x++) {
+      if (data[(y * image.width + x) * 4 + 3] > 0) {
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
         found = true;
       }
     }
   }
-
-  if (!found) return null; // Imagen vacía o totalmente transparente
-
-  // Añadir un pequeño margen de seguridad (1px)
+  if (!found) return null;
   const padding = 1;
-  const cropX = Math.max(0, minX - padding);
-  const cropY = Math.max(0, minY - padding);
-  const cropW = Math.min(w, maxX + padding) - cropX + 1;
-  const cropH = Math.min(h, maxY + padding) - cropY + 1;
-
-  // Si no se recortó nada sustancial, devolver null para usar la original
-  if (cropW >= w && cropH >= h) return null;
-
+  const cropX = Math.max(0, minX - padding), cropY = Math.max(0, minY - padding);
+  const cropW = Math.min(image.width, maxX + padding) - cropX + 1, cropH = Math.min(image.height, maxY + padding) - cropY + 1;
+  if (cropW >= image.width && cropH >= image.height) return null;
   const cutCanvas = document.createElement("canvas");
-  cutCanvas.width = cropW;
-  cutCanvas.height = cropH;
-  const cutCtx = cutCanvas.getContext("2d");
-  cutCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-
+  cutCanvas.width = cropW; cutCanvas.height = cropH;
+  cutCanvas.getContext("2d").drawImage(trimCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
   return cutCanvas.toDataURL();
 }
 
-// --- ELIMINAR OBJETO ---
+// --- ACCIONES DE LA BARRA DE HERRAMIENTAS ---
 document.getElementById("btn-delete").addEventListener("click", deleteSelected);
-
 function deleteSelected() {
-  const activeObjects = canvas.getActiveObjects();
-  if (activeObjects.length) {
-    canvas.discardActiveObject();
-    activeObjects.forEach(function (obj) {
-      canvas.remove(obj);
-    });
-  }
+    const activeObjects = canvas.getActiveObjects();
+    if (activeObjects.length) canvas.remove(...activeObjects); canvas.discardActiveObject().renderAll();
 }
 
-// --- LIMPIAR TODO ---
-document.getElementById("btn-clear").addEventListener("click", function () {
+document.getElementById("btn-clear").addEventListener("click", () => {
   if (confirm("¿Estás seguro de borrar todas las imágenes del lienzo?")) {
-    // Filtra y elimina todos los objetos que NO son bordes ni guías
-    const objectsToRemove = canvas.getObjects().filter(obj => !obj.isBorder && !obj.isGuide);
-    objectsToRemove.forEach(obj => canvas.remove(obj));
-    
-    // Limpia la selección activa y renderiza los cambios
-    canvas.discardActiveObject();
-    canvas.renderAll();
+    canvas.remove(...canvas.getObjects().filter(obj => !obj.isBorder && !obj.isGuide));
+    canvas.discardActiveObject().renderAll();
   }
 });
 
-// --- AGREGAR METRO (EXTENDER LIENZO) ---
-document.getElementById("btn-add-meter").addEventListener("click", function () {
-  if (!canvas) return; // Seguridad
-  currentHeightCm += 100; // Sumar 100cm
-  const newHeightPx = currentHeightCm * PIXELS_PER_CM;
+document.getElementById('btn-duplicate').addEventListener('click', () => {
+    const activeObject = canvas.getActiveObject();
+    if (!activeObject) { alert("Por favor, selecciona una imagen para duplicar."); return; }
+    activeObject.clone((cloned) => {
+        canvas.discardActiveObject();
+        cloned.set({ left: cloned.left + 20, top: cloned.top + 20, evented: true });
+        canvas.add(cloned).setActiveObject(cloned).requestRenderAll();
+    });
+});
 
+document.getElementById("btn-add-meter").addEventListener("click", () => {
+  if (!canvas) return;
+  currentHeightCm += 100;
+  const newHeightPx = currentHeightCm * PIXELS_PER_CM;
   canvas.setHeight(newHeightPx);
-  
-  // Actualizar bordes y guías verticales
   if(canvas.borders) {
       canvas.borders.bottom.top = newHeightPx - 5;
       canvas.borders.left.height = newHeightPx;
       canvas.borders.right.height = newHeightPx;
   }
-  
   canvas.renderAll();
-
-  document.getElementById("workspace-info").textContent =
-    `Mesa: ${currentWidthCm}cm x ${currentHeightCm}cm`;
-  drawRulers(currentWidthCm, currentHeightCm); // Redibujar regla vertical
+  document.getElementById("workspace-info").textContent = `Mesa: ${currentWidthCm}cm x ${currentHeightCm}cm`;
+  drawRulers(currentWidthCm, currentHeightCm);
 });
 
-// --- CENTRAR VISTA / IR ARRIBA ---
-document.getElementById("btn-center-view").addEventListener("click", function () {
-  // Hacemos scroll suave hacia el inicio del área de trabajo
-  const workspace = document.getElementById("dtf-workspace");
-  workspace.scrollIntoView({ behavior: "smooth", block: "start" });
+document.getElementById("btn-center-view").addEventListener("click", () => {
+  document.getElementById("dtf-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
-// --- DESCARGAR ---
-document.getElementById("btn-download").addEventListener("click", function () {
-  // 1. Mostrar Overlay de Carga
-  showLoading("Generando Alta Calidad (8x)...");
-
-  // Usamos setTimeout para permitir que el navegador renderice el overlay antes de bloquearse
+document.getElementById("btn-download").addEventListener("click", () => {
+  showLoading("Generando Alta Calidad...");
   setTimeout(() => {
-  // Deseleccionar objetos para que no salgan los bordes de selección en la imagen
-  canvas.discardActiveObject();
-  canvas.renderAll();
+    canvas.discardActiveObject().renderAll();
+    const hiddenObjects = canvas.getObjects().filter(o => o.isGuide || o.isBorder);
+    hiddenObjects.forEach(o => o.visible = false);
+    canvas.renderAll();
 
-  // Ocultar guías y bordes antes de exportar
-  const guidesAndBorders = canvas.getObjects().filter(o => o.isGuide || o.isBorder);
-  guidesAndBorders.forEach(o => o.visible = false);
-  canvas.renderAll();
+    let maxBottom = canvas.getObjects().filter(o => o.visible).reduce((max, obj) => Math.max(max, obj.getBoundingRect().top + obj.getBoundingRect().height), 0);
+    const originalHeight = canvas.getHeight();
+    if (maxBottom > 0) canvas.setHeight(Math.min(originalHeight, maxBottom + PIXELS_PER_CM));
+    canvas.renderAll();
 
-  // 1. Calcular altura real utilizada (Trim vacío)
-  let maxBottom = 0;
-  canvas.getObjects().forEach((obj) => {
-    if (!obj.visible) return; // Ignorar objetos ocultos (guías, bordes)
-    const bound = obj.getBoundingRect();
-    const bottom = bound.top + bound.height;
-    if (bottom > maxBottom) maxBottom = bottom;
-  });
+    let multiplier = 8, dataURL = "";
+    try {
+        try { dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier }); }
+        catch (e) { multiplier = 4; dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier }); }
+    } catch (e) { multiplier = 2; dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier }); }
 
-  // Añadir un pequeño margen (1cm) si hay objetos, si no, dejar como está
-  const originalHeight = canvas.getHeight();
-  if (maxBottom > 0) {
-      const newHeight = Math.min(originalHeight, maxBottom + PIXELS_PER_CM);
-      canvas.setHeight(newHeight);
-      canvas.renderAll();
-  }
+    if (!dataURL) { alert("Error: La imagen es demasiado grande. Intenta reducir el tamaño."); hideLoading(); return; }
+    
+    if (maxBottom > 0) canvas.setHeight(originalHeight);
+    hiddenObjects.forEach(o => { if(o.isGuide) o.visible = true; });
+    canvas.renderAll();
 
-  // Multiplicador para mejorar calidad (exportar a mayor resolución que la pantalla)
-  // Si en pantalla 1cm = 15px, multiplicamos por 4 para tener 60px/cm (~150 DPI)
-  // Para 300 DPI necesitaríamos multiplicar por ~8, pero puede ser muy pesado para el navegador.
-  let multiplier = 8;
-  let dataURL = "";
+    const link = document.createElement("a");
+    link.download = `metro-dtf-${Date.now()}.png`;
+    link.href = dataURL;
+    link.click();
 
-  // Intento de exportación con degradación elegante (Fallback)
-  try {
-      try {
-          dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
-      } catch (e) {
-          console.warn("Error exportando a 8x (posible falta de memoria). Reintentando a 4x...");
-          multiplier = 4;
-          dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
-      }
-  } catch (e) {
-      console.warn("Error exportando a 4x. Reintentando a 2x...");
-      multiplier = 2;
-      dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: multiplier });
-  }
-
-  if (!dataURL) {
-      alert("Error: La imagen es demasiado grande para la memoria de este dispositivo. Intenta reducir el tamaño de la mesa.");
-      hideLoading();
-      return;
-  }
-
-  // Restaurar altura original
-  if (maxBottom > 0) {
-      canvas.setHeight(originalHeight);
-      canvas.renderAll();
-  }
-  
-  // Restaurar visibilidad de guías (opcional, por si el usuario sigue editando)
-  guidesAndBorders.forEach(o => { if(o.isGuide) o.visible = true; }); // Solo restaurar guías, bordes siguen ocultos
-  canvas.renderAll();
-
-  // Crear enlace temporal para descargar
-  const link = document.createElement("a");
-  link.download = `metro-dtf-${Date.now()}.png`;
-  link.href = dataURL;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  // 2. Ocultar Overlay
-  hideLoading();
+    hideLoading();
   }, 100);
 });
 
-// --- RESTAURAR IMAGEN (RESET) ---
-document.getElementById("btn-reset-img").addEventListener("click", function () {
+document.getElementById("btn-reset-img").addEventListener("click", () => {
   const activeObject = canvas.getActiveObject();
   if (activeObject && activeObject.type === "image") {
-    activeObject.scale(1); // Volver al tamaño original (100%)
-    activeObject.rotate(0); // Enderezar
-    activeObject.set({ flipX: false, flipY: false });
+    activeObject.scale(1).rotate(0).set({ flipX: false, flipY: false });
     canvas.requestRenderAll();
-    updateDimTooltip(activeObject, true); // Mostrar dimensiones restauradas
+    updateDimTooltip(activeObject, true);
   }
 });
 
-// --- FUNCIONES DE UI (CARGA) ---
 function showLoading(text) {
     let overlay = document.getElementById('tool-loader');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'tool-loader';
         overlay.className = 'tool-loading-overlay';
-        overlay.innerHTML = `
-            <div class="tool-spinner"></div>
-            <div class="tool-loading-text">${text}</div>
-        `;
+        overlay.innerHTML = `<div class="tool-spinner"></div><div class="tool-loading-text">${text}</div>`;
         document.body.appendChild(overlay);
     } else {
         overlay.querySelector('.tool-loading-text').textContent = text;
@@ -529,8 +370,3 @@ function hideLoading() {
     const overlay = document.getElementById('tool-loader');
     if (overlay) overlay.style.display = 'none';
 }
-
-// --- MANEJO DE RESPONSIVE DEL CANVAS (Opcional) ---
-// FabricJS no es responsive por defecto, pero el contenedor CSS tiene overflow:auto
-// así que en móviles aparecerán barras de desplazamiento, lo cual es correcto
-// para mantener la precisión de las medidas.

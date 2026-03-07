@@ -81,38 +81,34 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================================================
-// ===  FUNCIONALIDAD DEL BOTÓN "IR ARRIBA"  ===
+// ===  FUNCIONALIDAD DEL BOTÓN "IR ARRIBA" UNIVERSAL  ===
 // ==========================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Crear el botón dinámicamente y añadirlo al body
+    const scrollTopBtn = document.createElement('button');
+    scrollTopBtn.id = 'scroll-to-top-btn';
+    scrollTopBtn.title = 'Ir Arriba';
+    scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    document.body.appendChild(scrollTopBtn);
 
-// Obtener el botón del DOM
-const backToTopButton = document.getElementById("back-to-top");
+    // Lógica para mostrar/ocultar el botón
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    });
 
-// Verificar que el botón existe antes de añadir escuchadores
-if (backToTopButton) {
-  // Función para mostrar u ocultar el botón basado en la posición del scroll
-  const scrollFunction = () => {
-    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
-      backToTopButton.style.display = "block";
-    } else {
-      backToTopButton.style.display = "none";
-    }
-  };
+    // Lógica para el clic del botón
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
 
-  // Escuchar el evento de scroll en la ventana
-  window.onscroll = () => {
-    scrollFunction();
-  };
-
-  // Función para volver arriba cuando se hace clic
-  const topFunction = (event) => {
-    event.preventDefault(); // Prevenir el comportamiento por defecto del enlace
-    document.body.scrollTop = 0; // Para Safari
-    document.documentElement.scrollTop = 0; // Para Chrome, Firefox, IE y Opera
-  };
-
-  // Escuchar el evento de clic en el botón
-  backToTopButton.addEventListener("click", topFunction);
-}
 
 // =================== LIGHTBOX CON NAVEGACIÓN (CONDICIONAL) ===================
 

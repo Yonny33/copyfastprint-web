@@ -17,43 +17,13 @@
     
   </head>
   <body>
-    <header class="header">
-      <div class="nav-container container">
-        <div class="logo">
-          <a href="/index.html" class="logo-part">COPYFAST</a>
-          <a href="/admin/login-registro.html" class="logo-ampersand" title="Acceso Admin">&</a>
-          <a href="/index.html" class="logo-part">PRINT</a>
-        </div>
-        <nav>
-          <ul class="nav-links" id="nav-links">
-            <li><a href="/index.html">Inicio</a></li>
-            <li><a href="/diseño.html">Diseños</a></li>
-            <li><a href="/acercade.html">Acerca de</a></li>
-            <li><a href="/cotizacion.html">Cotización</a></li>
-            <li><a href="/conversor-divisas.html">Conversor</a></li>
-            <li><a href="/herramientas.html" class="active">Herramientas <i class="fas fa-chevron-down dropdown-icon"></i></a>
-              <ul class="dropdown-menu">
-                <li><a href="/herramientas.html"><i class="fas fa-ruler-combined"></i> Armar Metro DTF</a></li>
-                <li><a href="/remover-fondo.html"><i class="fas fa-magic"></i> Remover Fondo</a></li>
-                <li><a href="/quitar-bordes.html"><i class="fas fa-crop-alt"></i> Quitar Bordes</a></li>
-                <li><a href="/duplicar-tamano.html"><i class="fas fa-expand-arrows-alt"></i> Duplicar Tamaño</a></li>
-                <li><a href="/vectorizar.html"><i class="fas fa-bezier-curve"></i> Vectorizar</a></li>
-                <li><a href="/dividir-imagen.html"><i class="fas fa-cut"></i> Dividir para A4</a></li>
-                <li><a href="/mejorar-calidad.html"><i class="fas fa-magic-wand-sparkles"></i> Mejorar Calidad (IA)</a></li>
-              </ul>
-              </li>
-            <li><a href="/especificaciones.html">¿Cómo Funciona?</a></li>
-            </li>
-          </ul>
-        </nav>
-        <div class="nav-toggle" id="nav-toggle"><i class="fas fa-bars"></i></div>
-      </div>
-    </header>
+    <div id="header-placeholder"></div>
 
     <main class="main-content">
       <section class="tools-hero">
         <h1>Dividir o Ajustar para A4</h1>
         <p>Sube una imagen, indica su tamaño real y la herramienta la preparará para imprimir en hojas A4.</p>
+        <a href="#instructions" class="btn-instruction-link"><i class="fas fa-info-circle"></i> Ver instrucciones</a>
       </section>
 
       <section class="workspace-area container">
@@ -95,6 +65,18 @@
         <div id="output-container" class="pages-preview">
             <p id="initial-message">1. Sube una imagen<br>2. Ingresa su ancho real</p>
         </div>
+
+        <div class="instructions" id="instructions">
+            <h3><i class="fas fa-lightbulb"></i> Cómo usar la herramienta:</h3>
+            <ul>
+                <li><strong>1. Subir Imagen:</strong> Carga el diseño que quieres imprimir. La herramienta lo optimizará si es necesario.</li>
+                <li><strong>2. Ancho Real (Obligatorio):</strong> Ingresa el ancho final que debe tener tu diseño en milímetros (mm). Esto es crucial para que la escala sea correcta.</li>
+                <li><strong>3. Márgenes y Solapamiento:</strong> Ajusta el margen que deja tu impresora y el área de solapamiento para unir las hojas con facilidad.</li>
+                <li><strong>4. Preparar Páginas:</strong> Haz clic en el botón "Preparar Página(s)". La herramienta calculará cuántas hojas A4 necesitas y cómo se divide el diseño.</li>
+                <li><strong>5. Rotar (Opcional):</strong> Si la división no es óptima, puedes rotar la imagen 90 grados para ver si se aprovecha mejor el espacio.</li>
+                <li><strong>6. Descargar:</strong> Descarga un archivo ZIP que contiene todas las hojas A4 numeradas y listas para imprimir.</li>
+            </ul>
+        </div>
       </section>
 
       <!-- BARRA FLOTANTE (FAB) -->
@@ -127,6 +109,9 @@
       </div>
     </main>
 
+
+    <script src="/js/scripts.js"></script>
     <script src="/js/dividir-imagen.js?v=2.1"></script>
+    <script src="/js/components.js" defer></script>
   </body>
 </html>
