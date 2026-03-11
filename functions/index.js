@@ -205,6 +205,29 @@ app.get("/api/ventas", async (req, res) => {
   }
 });
 
+// Endpoint para OBTENER TODOS los registros de historial de abonos
+app.get("/api/abonos", async (req, res) => {
+  try {
+    const ventasSnapshot = await db.collection("ventas")
+      .where("historial_abonos", "!=", null) // Solo traemos ventas que tengan historial
+      .get();
+
+    let todosLosAbonos = [];
+    ventasSnapshot.forEach(doc => {
+      const venta = doc.data();
+      if (venta.historial_abonos && Array.isArray(venta.historial_abonos)) {
+        // Añadimos los abonos de esta venta a la lista general
+        todosLosAbonos = todosLosAbonos.concat(venta.historial_abonos);
+      }
+    });
+
+    res.status(200).json({ status: "success", data: todosLosAbonos });
+  } catch (error) {
+    console.error("Error al obtener historial de abonos:", error);
+    res.status(500).json({ status: "error", message: "Error al obtener historial de abonos." });
+  }
+});
+
 // Endpoint para AÑADIR una nueva venta
 app.post("/api/ventas", async (req, res) => {
   try {
@@ -370,21 +393,33 @@ app.put("/api/ventas/:id", async (req, res) => {
         }
         const venta = doc.data();
 
-        const nuevoAbono =
-          (parseFloat(venta.abono_recibido) || 0) + parseFloat(monto_abono);
-        const nuevoSaldo = (parseFloat(venta.venta_bruta) || 0) - nuevoAbono;
+        const montoAbonoFloat = parseFloat(monto_abono);
+        const nuevoAbonoTotal =
+          (parseFloat(venta.abono_recibido) || 0) + montoAbonoFloat;
+        const nuevoSaldo = (parseFloat(venta.venta_bruta) || 0) - nuevoAbonoTotal;
         // Si el saldo es 0 o menor (por decimales), marcar como Pagado
         const nuevoEstado = nuevoSaldo <= 0.01 ? "Pagado" : "Pendiente";
 
+        // ¡AQUÍ LA MAGIA! Creamos el objeto para el historial
+        const nuevoRegistroHistorial = {
+          monto: montoAbonoFloat,
+          fecha: new Date().toISOString(), // Guardamos la fecha y hora exactas del abono
+          id_cliente: venta.id_cliente, // Guardamos el ID del cliente para futuras consultas
+          id_venta: id // Guardamos el ID de la venta para referencia cruzada
+        };
+
         t.update(ventaRef, {
-          abono_recibido: nuevoAbono,
+          abono_recibido: nuevoAbonoTotal,
           saldo_pendiente: nuevoSaldo,
           estado_pedido: nuevoEstado,
+          // Usamos arrayUnion para añadir el nuevo registro al historial de forma atómica.
+          // Si el campo 'historial_abonos' no existe, Firestore lo crea automáticamente.
+          historial_abonos: admin.firestore.FieldValue.arrayUnion(nuevoRegistroHistorial)
         });
       });
       res
         .status(200)
-        .json({ status: "success", message: "Abono registrado con éxito" });
+        .json({ status: "success", message: "Abono registrado y añadido al historial" });
     } else {
       // Actualización genérica si no es abono
       await db.collection("ventas").doc(id).update(req.body);
@@ -864,7 +899,7 @@ app.get("/api/exchange-rates", async (req, res) => {
       // Si la respuesta no es 'success', lanzamos un error para que sea capturado por el catch.
       if (data.result !== "success") {
         throw new Error(
-          `Error de la API externa: ${data["error-type"] || "Respuesta inválida"}`,
+          `Error de la API externa: ${data["error-type"] || "Respuesta inválida"}`
         );
       }
 

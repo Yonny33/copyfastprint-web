@@ -1,0 +1,6 @@
+/* Estilos para el icono de advertencia en la tabla de reportes */
+.warning-icon {
+  color: #ffc107; /* Amarillo ámbar, un color estándar para advertencias */
+  margin-left: 8px; /* Espacio para separarlo del nombre */
+  cursor: help;     /* Cambia el cursor para indicar que se puede interactuar (hover) */
+}
