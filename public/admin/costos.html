@@ -5,28 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Costos y Rentabilidad</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="/admin/css/main.css">
 </head>
 <body class="admin-page">
     <div class="admin-grid-container">
-        <!-- Sidebar (Navegación) -->
-        <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <h3>CopyFast<span>Print</span></h3>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="admin.html"><i class="fas fa-home fa-fw"></i> Dashboard</a></li>
-                    <li><a href="ventas.html"><i class="fas fa-shopping-cart fa-fw"></i> Ventas</a></li>
-                    <li><a href="gastos.html"><i class="fas fa-file-invoice-dollar fa-fw"></i> Gastos</a></li>
-                    <li><a href="clientes.html"><i class="fas fa-users fa-fw"></i> Clientes</a></li>
-                    <li><a href="inventario.html"><i class="fas fa-boxes fa-fw"></i> Inventario</a></li>
-                    <li class="active"><a href="costos.html"><i class="fas fa-chart-pie fa-fw"></i> Costos</a></li>
-                    <li><a href="reportes.html"><i class="fas fa-chart-line fa-fw"></i> Reportes</a></li>
-                    <li><a href="analisis.html"><i class="fas fa-brain fa-fw"></i> Análisis</a></li>
-                </ul>
-            </nav>
-        </aside>
+        <div id="header-placeholder"></div>
 
         <!-- Contenido Principal -->
         <main class="admin-main-content">
@@ -113,7 +96,7 @@
                     <button class="tab-btn" data-tab="tab-precio">💲 Definir Precio</button>
                 </div>
 
-                <!-- TAB 1: Compra por Lote (Lo que ya teníamos) -->
+                <!-- TAB 1: Compra por Lote -->
                 <div id="tab-lote" class="tab-content" style="display: block;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                         Ideal para reventa. Divide gastos de transporte entre unidades compradas.
@@ -132,7 +115,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: Producción / Sublimación (NUEVO) -->
+                <!-- TAB 2: Producción / Sublimación -->
                 <div id="tab-prod" class="tab-content" style="display: none;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                         Suma materiales, mano de obra y servicios para obtener el costo real de fabricación.
@@ -159,7 +142,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 3: Definir Precio (NUEVO) -->
+                <!-- TAB 3: Definir Precio -->
                 <div id="tab-precio" class="tab-content" style="display: none;">
                     <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                         Calcula el precio de venta aplicando un porcentaje de ganancia al costo.
@@ -203,7 +186,8 @@
     <script src="/__/firebase/init.js"></script>
 
     <!-- Scripts de la aplicación -->
-    <script src="js/auth.js"></script>
-    <script src="js/costos.js"></script>
+    <script src="/admin/js/auth.js"></script>
+    <script src="/admin/js/costos.js"></script>
+    <script src="/admin/js/components.js"></script>
 </body>
 </html>
