@@ -44,8 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const formatDate = (dateString) => {
       if (!dateString) return "N/A";
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return dateString;
-      return date.toLocaleDateString("es-VE", { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+      if (isNaN(date.getTime())) { // Si la fecha es inválida
+          // Intenta procesar solo la parte antes de un espacio (formato AAAA-MM-DD HH:MM...)
+          const datePart = dateString.split(" ")[0];
+          const newDate = new Date(datePart);
+          if(isNaN(newDate.getTime())) return dateString; // Si sigue siendo inválida, devuelve el original
+          return newDate.toLocaleDateString("es-VE", { timeZone: 'UTC' }); // Muestra la fecha en formato local
+      }
+      return date.toLocaleDateString("es-VE", { timeZone: 'UTC' });
   };
 
   const parseDate = (dateString) => {
@@ -103,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         row.innerHTML = `
-          <td>${v.fecha ? v.fecha.split(" ")[0] : "N/A"}</td>
+          <td>${formatDate(v.fecha)}</td>
           <td>${v.nombre_cliente || "Cliente General"} ${alertaAbono}</td>
           <td>${v.cedula_cliente || "N/A"}</td>
           <td class="saldo-pendiente">${formatCurrency(v.saldo_pendiente)}</td>

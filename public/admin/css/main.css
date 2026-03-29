@@ -59,7 +59,9 @@ body.login-page-body {
 .admin-main-content {
   margin-left: 260px; /* Empuja el contenido principal para que no se superponga al sidebar */
   flex-grow: 1; /* Permite que el contenido principal ocupe el espacio restante */
-  padding: 2.5rem;
+  display: flex; 
+  flex-direction: column;
+  padding: 0.5rem 2.5rem 1.5rem; /* Reducido el padding superior de 1.5rem a 0.5rem */
   overflow-y: auto; /* Permite el scroll en el contenido principal */
   background-color: var(--background-dark);
 }
@@ -133,18 +135,20 @@ body.login-page-body {
   display: none; /* OCULTADO: El botón ahora es flotante */
 }
 .section-heading {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1rem; /* Reducido para ganar espacio vertical */
+  order: 1; /* El título siempre va primero */
 }
 .section-heading h2 {
   font-size: 2.2rem;
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0; /* Eliminados márgenes por defecto del navegador para control total */
 }
 .section-heading .divider {
   width: 50px;
   height: 3px;
   background-color: var(--primary-color);
-  margin: 0.5rem 0 1rem;
+  margin: 0 0 0.5rem; /* Eliminado el margen superior (0.15rem -> 0) para pegar la línea al título */
   border-radius: 1.5px;
 }
 .section-heading p {
@@ -158,8 +162,10 @@ body.login-page-body {
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Rejilla 3x3 */
-  gap: 1.25rem; /* Espaciado reducido */
+  gap: 1rem; 
+  margin-top: 2rem; /* Separación de los formularios */
   margin-bottom: 2.5rem;
+  order: 3; /* Se posiciona debajo de los formularios */
 }
 .kpi-card {
   background: linear-gradient(145deg, #252525, #1e1e1e);
@@ -385,16 +391,17 @@ tbody tr:hover {
    ============================================================================= */
 .form-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 1fr 1fr; /* Ventas a la izq, Gastos a la der */
+  gap: 1.5rem; /* Espacio entre los dos bloques de formularios */
   align-items: start;
+  order: 2; /* Los formularios aparecen inmediatamente después del título */
 }
 .form-container,
 .report-filters {
   background-color: var(--background-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1.25rem; /* Padding interno reducido para compactar el formulario */
 }
 .form-grid {
   display: grid;
@@ -1200,13 +1207,13 @@ input:checked + .slider:before {
    ============================================================================= */
 .form-group.floating {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem; /* Reducido drásticamente el espacio entre campos */
 }
 
 .form-group.floating input,
 .form-group.floating select {
-  height: 56px; /* Altura fija para inputs y selects */
-  padding: 24px 16px 8px; /* Espacio superior para la etiqueta */
+  height: 48px; /* Reducido de 56px a 48px */
+  padding: 20px 12px 4px; /* Ajustado el espacio interno */
   border: 1px solid var(--border-color);
   background-color: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
@@ -1251,7 +1258,7 @@ input:checked + .slider:before {
 .form-group.floating label {
   position: absolute;
   left: 16px;
-  top: 18px;
+  top: 14px; /* Ajustado para la nueva altura del input */
   color: var(--text-secondary);
   font-size: 1rem;
   pointer-events: none;
@@ -1264,7 +1271,7 @@ input:checked + .slider:before {
 .form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
 .form-group.floating textarea:focus ~ label,
 .form-group.floating textarea:not(:placeholder-shown) ~ label {
-  top: 8px;
+  top: 4px; /* La etiqueta flota más cerca del borde superior */
   font-size: 0.75rem;
   color: var(--primary-color);
   font-weight: 600;
