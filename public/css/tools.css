@@ -86,13 +86,12 @@
 .canvas-container-wrapper {
     background-color: var(--background-card);
     padding: 20px;
-    overflow: auto;
     display: flex;
     justify-content: center;
-    align-items: center; 
+    align-items: flex-start; /* CORREGIDO: De 'center' a 'flex-start' para alinear arriba */
     border: 1px solid var(--border-color-soft);
     border-radius: 12px;
-    max-height: 70vh;
+    /* max-height y overflow eliminados para permitir el crecimiento del lienzo */
 }
 
 #c, .canvas-container {
@@ -105,6 +104,49 @@
     height: auto;
     border-radius: 8px;
 }
+
+/* Paleta de Colores del Lienzo */
+.canvas-bg-palette {
+    background: var(--background-card);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color-soft);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.palette-title {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.palette-colors {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.palette-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.palette-btn:hover {
+    transform: scale(1.1);
+}
+
+.palette-btn.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+}
+
 
 .tool-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .tool-loading-overlay {

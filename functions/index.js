@@ -84,6 +84,23 @@ app.post("/api/clientes", async (req, res) => {
   }
 });
 
+// Endpoint para ACTUALIZAR un cliente existente
+app.put("/api/clientes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    await db.collection("clientes").doc(id).update(data);
+    res
+      .status(200)
+      .json({ status: "success", message: "Cliente actualizado con éxito" });
+  } catch (error) {
+    console.error("Error al actualizar cliente:", error);
+    res
+      .status(500)
+      .json({ status: "error", message: "Error al actualizar cliente." });
+  }
+});
+
 // Endpoint para OBTENER inventario (para el select de productos)
 app.get("/api/inventario", async (req, res) => {
   try {

@@ -47,6 +47,32 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btn-apply-width').click();
         }
     });
+
+    // --- EVENTOS DE LA PALETA DE COLORES DEL LIENZO ---
+    const palette = document.getElementById('canvas-bg-palette');
+    palette.addEventListener('click', (e) => {
+        if (e.target.classList.contains('palette-btn')) {
+            const button = e.target;
+            const color = button.dataset.color;
+
+            // Actualizar el botón activo
+            const currentActive = palette.querySelector('.palette-btn.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+            }
+            button.classList.add('active');
+
+            // Cambiar el fondo del lienzo
+            if (color === 'checker') {
+                canvas.backgroundColor = null; // Dejar que el CSS de fondo (checker) se muestre
+                canvas.set('backgroundImage', null);
+            } else {
+                canvas.backgroundImage = null;
+                canvas.backgroundColor = color;
+            }
+            canvas.renderAll();
+        }
+    });
 });
 
 function selectWorkspace(widthCm) {
