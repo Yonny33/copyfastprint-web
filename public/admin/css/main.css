@@ -252,27 +252,21 @@ body.login-page-body {
 /* =============================================================================
    6. ADMIN - GRÁFICOS Y TABLAS
    ============================================================================= */
-.card,
-.card-table,
-.card-form {
+.card, .card-table, .card-form {
   background: linear-gradient(145deg, #252525, #1e1e1e);
   border-radius: 12px;
   padding: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   margin-bottom: 2rem;
-  max-width: 1100px !important; /* Forzamos el mismo ancho para todos */
-  margin-left: auto !important; /* Centrado exacto izquierda */
-  margin-right: auto !important; /* Centrado exacto derecha */
-  width: calc(100% - 40px); /* Asegura margen en pantallas medianas */
+  width: 100%;
+  max-width: 1100px !important;
+  margin: 0 auto 2rem !important; /* Centrado horizontal y margen inferior */
+  box-sizing: border-box;
 }
 
 .card-form {
-  order: 2 !important; /* Formulario arriba */
-}
-
-.card-table {
-  order: 3 !important; /* Tabla abajo del formulario */
+  order: 2 !important; /* Asegura que el formulario esté arriba */
 }
 
 .card h3,
