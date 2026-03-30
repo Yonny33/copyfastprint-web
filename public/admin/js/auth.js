@@ -2,7 +2,8 @@
 document.documentElement.style.visibility = "hidden";
 
 document.addEventListener("DOMContentLoaded", function () {
-  const auth = firebase.auth();
+  // Hacemos auth global para que otros scripts (como components.js) puedan usarlo
+  window.auth = firebase.auth();
   const currentPath = window.location.pathname.toLowerCase();
   const isLoginPage = currentPath.includes("login-registro.html");
 

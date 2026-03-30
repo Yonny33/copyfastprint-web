@@ -1,38 +1,70 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- URLs Y CONSTANTES ---
   const API_URL = "/api";
 
   // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
-  const clientesTableBody = document.querySelector("#clientes-table tbody");
   const searchInput = document.getElementById("search-input");
 
-  // Formulario de Registro
-  const registroForm = document.getElementById("registro-clientes-form");
- 
-  // Modal de Edición
-  const editModal = document.getElementById("edit-client-modal");
-  const editForm = document.getElementById("edit-client-form");
-  const closeModalBtn = document.getElementById("modal-close-btn");
-  const editClientId = document.getElementById("edit-client-id");
+  // Formulario Unificado
+  const form = document.getElementById("gestion-clientes-form");
+  const editClientIdInput = document.getElementById("edit-client-id");
+  const submitButton = document.getElementById("submit-button");
+  const cancelEditButton = document.getElementById("cancel-edit-button");
+  
+  // Campos del formulario
+  const tipoDocumentoSelect = document.getElementById("tipo_documento");
+  const cedulaInput = document.getElementById("cedula");
+  const nombreInput = document.getElementById("nombre");
+  const telefonoInput = document.getElementById("telefono");
+  const emailInput = document.getElementById("email");
+
+  // Tabla
+  const clientesTableBody = document.getElementById("clientes-tbody");
 
   // --- ESTADO DE LA APLICACIÓN ---
-  let allClients = []; // Caché local para los clientes
+  let allClients = [];
 
   // --- FUNCIONES AUXILIARES ---
-  const showLoading = (show) => {
-    loadingOverlay.style.display = show ? "flex" : "none";
+  const showLoading = (show) => { loadingOverlay.style.display = show ? "flex" : "none"; };
+
+  const splitCedula = (fullCedula) => {
+      if (!fullCedula) return { tipo: 'V', numero: '' };
+      const match = fullCedula.match(/^([VEJPvejp])(.*)$/);
+      if (match) return { tipo: match[1].toUpperCase(), numero: match[2] };
+      return { tipo: 'V', numero: fullCedula }; // Si no tiene prefijo, asume V
   };
 
-  const showModal = (show) => {
-    editModal.style.display = show ? "flex" : "none";
+  // --- LÓGICA DE FORMULARIO ---
+  const resetFormToRegisterMode = () => {
+      form.reset();
+      editClientIdInput.value = "";
+      submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Cliente';
+      cancelEditButton.style.display = 'none';
+      tipoDocumentoSelect.value = 'V';
   };
 
-  // --- FUNCIONES PRINCIPALES ---
+  const populateFormForEdit = (clientId) => {
+      const client = allClients.find(c => c.id_cliente == clientId);
+      if (!client) {
+          alert("Error: No se encontró el cliente para editar.");
+          return;
+      }
 
-  /**
-   * Carga todos los clientes desde la API y los guarda en el estado local.
-   */
+      const { tipo, numero } = splitCedula(client.cedula);
+
+      editClientIdInput.value = client.id_cliente;
+      tipoDocumentoSelect.value = tipo;
+      cedulaInput.value = numero;
+      nombreInput.value = client.nombre || '';
+      telefonoInput.value = client.telefono || '';
+      emailInput.value = client.email || '';
+
+      submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar Cliente';
+      cancelEditButton.style.display = 'inline-block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- LÓGICA DE DATOS Y TABLA ---
   const fetchClients = async () => {
     showLoading(true);
     try {
@@ -40,212 +72,118 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error("Error al cargar clientes.");
       const result = await response.json();
       if (result.status === "success") {
-        allClients = result.data;
+        allClients = result.data.map(client => {
+            // Fix para inconsistencia de ID
+            if (client.id && !client.id_cliente) client.id_cliente = client.id; 
+            return client;
+        });
         renderTable(allClients);
       } else {
         throw new Error(result.message || "No se pudieron cargar los clientes.");
       }
     } catch (error) {
-      console.error("Error fetching clients:", error);
-      alert(`Error: ${error.message}`);
-      clientesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error-color);">Error al cargar datos.</td></tr>`;
+      clientesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error-color);">${error.message}</td></tr>`;
     } finally {
       showLoading(false);
     }
   };
 
-  /**
-   * Renderiza las filas de la tabla de clientes.
-   * @param {Array} clients - El array de clientes a mostrar.
-   */
   const renderTable = (clients) => {
-    if (!clientesTableBody) return;
-    clientesTableBody.innerHTML = ""; // Limpiar tabla
+    clientesTableBody.innerHTML = "";
     if (clients.length === 0) {
       clientesTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay clientes registrados.</td></tr>`;
       return;
     }
-
     clients.forEach((client) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td data-label="Nombre">${client.nombre || "N/A"}</td>
-        <td data-label="Cédula/RIF">${client.cedula || "N/A"}</td>
-        <td data-label="Teléfono">${client.telefono || "N/A"}</td>
-        <td data-label="Email">${client.email || "N/A"}</td>
-        <td data-label="Acciones">
-          <button class="btn-action btn-edit" data-id="${client.id_cliente}" title="Editar Cliente">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="btn-action btn-delete" data-id="${client.id_cliente}" title="Eliminar Cliente">
-            <i class="fas fa-trash"></i>
-          </button>
+        <td>${client.nombre || "N/A"}</td>
+        <td>${client.cedula || "N/A"}</td>
+        <td>${client.telefono || "N/A"}</td>
+        <td>${client.email || "N/A"}</td>
+        <td class="actions">
+          <button class="btn-accion btn-edit" data-id="${client.id_cliente}" title="Editar Cliente"><i class="fas fa-edit"></i></button>
+          <button class="btn-accion btn-delete" data-id="${client.id_cliente}" title="Eliminar Cliente"><i class="fas fa-trash-alt"></i></button>
         </td>
       `;
       clientesTableBody.appendChild(tr);
     });
   };
 
-  /**
-   * Filtra la tabla de clientes basado en el texto de búsqueda.
-   */
-  const handleSearch = () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    const filteredClients = allClients.filter(client => {
-      return (
-        client.nombre?.toLowerCase().includes(searchTerm) ||
-        client.cedula?.toLowerCase().includes(searchTerm) ||
-        client.telefono?.toLowerCase().includes(searchTerm) ||
-        client.email?.toLowerCase().includes(searchTerm)
-      );
-    });
-    renderTable(filteredClients);
-  };
-
-  /**
-   * Maneja el clic en los botones de la tabla (Editar, Eliminar).
-   * @param {Event} e - El objeto del evento.
-   */
-  const handleTableClick = (e) => {
-    const target = e.target;
-    const editBtn = target.closest(".btn-edit");
-    const deleteBtn = target.closest(".btn-delete");
-
-    if (editBtn) {
-      const clientId = editBtn.dataset.id;
-      const client = allClients.find(c => c.id_cliente === clientId);
-      if (client) {
-        // Poblar el formulario del modal
-        editClientId.value = client.id_cliente;
-        editForm.querySelector("#edit-nombre").value = client.nombre || "";
-        editForm.querySelector("#edit-cedula").value = client.cedula || "";
-        editForm.querySelector("#edit-telefono").value = client.telefono || "";
-        editForm.querySelector("#edit-email").value = client.email || "";
-        showModal(true);
-      }
-    } else if (deleteBtn) {
-      const clientId = deleteBtn.dataset.id;
-      handleDeleteClient(clientId);
-    }
-  };
-
-  /**
-   * Envía la petición para registrar un nuevo cliente.
-   */
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    showLoading(true);
-    const formData = new FormData(registroForm);
-    const data = Object.fromEntries(formData.entries());
-
-    // Combinar tipo de documento con cédula si ambos existen
-    if (data.tipo_documento && data.cedula) {
-      data.cedula = `${data.tipo_documento}${data.cedula}`;
-    }
-    delete data.tipo_documento;
-
-    try {
-      const response = await fetch(`${API_URL}/clientes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error del servidor: ${response.status} ${response.statusText}. Si estás en local, asegúrate de usar los emuladores.`);
-      }
-
-      const result = await response.json();
-      if (result.status === "success") {
-        alert("Cliente registrado con éxito.");
-        registroForm.reset();
-        fetchClients(); // Recargar la tabla
-      } else {
-        throw new Error(result.message || "Error desconocido al registrar.");
-      }
-    } catch (error) {
-      console.error("Error al registrar cliente:", error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      showLoading(false);
-    }
-  };
-
-  /**
-   * Envía la petición para actualizar un cliente existente.
-   */
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    const clientId = editClientId.value;
-    if (!clientId) return;
-
-    showLoading(true);
-    const formData = new FormData(editForm);
-    const data = Object.fromEntries(formData.entries());
-
-    try {
-      const response = await fetch(`${API_URL}/clientes/${clientId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (result.status === "success") {
-        alert("Cliente actualizado con éxito.");
-        showModal(false);
-        fetchClients(); // Recargar la tabla
-      } else {
-        throw new Error(result.message || "Error desconocido al actualizar.");
-      }
-    } catch (error) {
-      console.error("Error al actualizar cliente:", error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      showLoading(false);
-    }
-  };
-
-  /**
-   * Envía la petición para eliminar un cliente.
-   */
   const handleDeleteClient = async (clientId) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.")) {
-      return;
-    }
-
+    if (!confirm("¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.")) return;
     showLoading(true);
     try {
-      const response = await fetch(`${API_URL}/clientes/${clientId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`${API_URL}/clientes/${clientId}`, { method: "DELETE" });
       const result = await response.json();
       if (result.status === "success") {
         alert("Cliente eliminado con éxito.");
-        fetchClients(); // Recargar la tabla
-      } else {
-        throw new Error(result.message || "Error desconocido al eliminar.");
-      }
+        fetchClients();
+      } else throw new Error(result.message);
     } catch (error) {
-      console.error("Error al eliminar cliente:", error);
-      alert(`Error: ${error.message}`);
+      alert(`Error al eliminar cliente: ${error.message}`);
     } finally {
       showLoading(false);
     }
   };
 
+  // --- MANEJADORES DE EVENTOS ---
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    showLoading(true);
 
-  // --- INICIALIZACIÓN Y EVENT LISTENERS ---
-  searchInput.addEventListener("input", handleSearch);
-  if (clientesTableBody) clientesTableBody.addEventListener("click", handleTableClick);
-  registroForm.addEventListener("submit", handleRegisterSubmit);
-  editForm.addEventListener("submit", handleEditSubmit);
-  closeModalBtn.addEventListener("click", () => showModal(false));
-  editModal.addEventListener("click", (e) => { // Cerrar si se hace clic fuera del contenido
-    if (e.target === editModal) {
-      showModal(false);
+    const clientId = editClientIdInput.value;
+    const isEditing = !!clientId;
+
+    const formData = new FormData(form);
+    let data = Object.fromEntries(formData.entries());
+
+    data.cedula = `${data.tipo_documento}${data.cedula}`;
+    delete data.tipo_documento;
+
+    const url = isEditing ? `${API_URL}/clientes/${clientId}` : `${API_URL}/clientes`;
+    const method = isEditing ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (result.status === "success") {
+        alert(`Cliente ${isEditing ? 'actualizado' : 'registrado'} con éxito.`);
+        resetFormToRegisterMode();
+        fetchClients();
+      } else throw new Error(result.message);
+    } catch (error) {
+      alert(`Error al guardar cliente: ${error.message}`);
+    } finally {
+      showLoading(false);
     }
+  };
+
+  const handleSearch = () => {
+    const searchTerm = searchInput.value.toLowerCase();
+    const filteredClients = allClients.filter(client => 
+      Object.values(client).some(val => 
+        String(val).toLowerCase().includes(searchTerm)
+      )
+    );
+    renderTable(filteredClients);
+  };
+
+  // --- INICIALIZACIÓN ---
+  form.addEventListener("submit", handleFormSubmit);
+  cancelEditButton.addEventListener("click", resetFormToRegisterMode);
+  searchInput.addEventListener("input", handleSearch);
+  clientesTableBody.addEventListener("click", (event) => {
+      const target = event.target.closest("button.btn-accion");
+      if (!target) return;
+      const id = target.dataset.id;
+      if (target.classList.contains('btn-edit')) populateFormForEdit(id);
+      if (target.classList.contains('btn-delete')) handleDeleteClient(id);
   });
 
-  // Carga inicial de datos
   fetchClients();
 });

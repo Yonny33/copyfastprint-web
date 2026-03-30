@@ -1,150 +1,100 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5Q94FLN3");
-    </script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Clientes - Admin COPYFAST&PRINT</title>
-    <meta
-      name="description"
-      content="Panel de administración para la gestión de clientes."
-    />
+    <title>Gestión de Clientes - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de clientes." />
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
-    <link rel="stylesheet" href="/admin/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="/admin/css/main.css?v=1.3" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
   <body class="admin-page">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
-
     <div class="admin-grid-container">
       <div id="header-placeholder"></div>
 
       <main class="admin-main-content">
         <div class="section-heading">
-          <h2>Gestión de Clientes</h2>
+          <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
           <div class="divider"></div>
-          <p>
-            Añade nuevos clientes. El sistema asignará un ID único
-            automáticamente.
-          </p>
+          <p>Añade nuevos clientes o edita la información de uno existente.</p>
         </div>
-        <div>
-          <div class="form-container">
-            <form id="registro-clientes-form">
-              <div class="form-grid">
-                <div class="form-group">
+
+        <!-- Formulario Unificado de Clientes -->
+        <div class="card-form">
+          <form id="gestion-clientes-form">
+            <input type="hidden" id="edit-client-id" name="editClientId">
+            <div class="form-grid-2-col">
+              <!-- Fila 1 -->
+              <div class="form-group floating">
                   <div class="form-inline-group">
-                    <select
-                      name="tipo_documento"
-                      id="tipo_documento"
-                      style="width: 80px; min-width: 80px"
-                    >
-                      <option value="V">V-</option>
-                      <option value="E">E-</option>
-                      <option value="J">J-</option>
-                      <option value="P">P-</option>
-                    </select>
-                    <input
-                      type="number"
-                      id="cedula"
-                      name="cedula"
-                      placeholder="Ej: 12345678"
-                      required
-                      style="flex-grow: 1"
-                    />
+                      <select title="Tipo de documento" name="tipo_documento" id="tipo_documento" style="flex: 0 0 75px;">
+                          <option value="V" selected>V-</option>
+                          <option value="E">E-</option>
+                          <option value="J">J-</option>
+                          <option value="P">P-</option>
+                      </select>
+                      <input type="text" id="cedula" name="cedula" placeholder="Número de Cédula/RIF" required />
                   </div>
-                </div>
-                <div class="form-group floating">
+                  <label for="cedula">Cédula / RIF *</label>
+              </div>
+              <div class="form-group floating">
                   <input type="text" id="nombre" name="nombre" placeholder=" " required />
                   <label for="nombre">Nombre / Razón Social *</label>
-                </div>
-                <div class="form-group floating">
+              </div>
+
+              <!-- Fila 2 -->
+              <div class="form-group floating">
                   <input type="tel" id="telefono" name="telefono" placeholder=" " required />
                   <label for="telefono">Teléfono *</label>
-                </div>
-                <div class="form-group floating">
+              </div>
+              <div class="form-group floating">
                   <input type="email" id="email" name="email" placeholder=" " />
                   <label for="email">Email (Opcional)</label>
-                </div>
               </div>
-              <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                  <i class="fas fa-save"></i> Guardar Cliente
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" id="submit-button" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar Cliente
+              </button>
+              <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none;">
+                <i class="fas fa-times"></i> Cancelar Edición
+              </button>
+            </div>
+          </form>
+        </div>
 
-          <!-- Tabla de Clientes -->
-          <div class="card-table modern-table" style="margin-top: 2rem;">
-            <div class="toolbar">
-              <h3><i class="fas fa-list"></i> Clientes Registrados</h3>
-              <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Buscar cliente...">
-                <i class="fas fa-search"></i>
-              </div>
+        <!-- Tabla de Clientes -->
+        <div class="card-table modern-table" style="margin-top: 2rem;">
+          <div class="toolbar">
+            <h3><i class="fas fa-list"></i> Clientes Registrados</h3>
+            <div class="search-bar">
+              <input type="text" id="search-input" placeholder="Buscar por nombre, cédula o teléfono...">
+              <i class="fas fa-search"></i>
             </div>
-            <div class="table-responsive">
-              <table id="clientes-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Cédula/RIF</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Filas de clientes se cargarán aquí dinámicamente -->
-                </tbody>
-              </table>
-            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="clientes-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Cédula/RIF</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="clientes-tbody">
+                <!-- Filas se cargarán aquí -->
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
@@ -155,50 +105,12 @@
       <p>Procesando...</p>
     </div>
 
-    <!-- Modal para Editar Cliente -->
-    <div id="edit-client-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Editar Cliente</h3>
-          <span class="close-button" id="modal-close-btn">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="edit-client-form">
-            <input type="hidden" id="edit-client-id">
-            <div class="form-grid">
-              <div class="form-group floating">
-                <input type="text" id="edit-cedula" name="cedula" placeholder=" " required />
-                <label for="edit-cedula">Cédula / RIF *</label>
-              </div>
-              <div class="form-group floating">
-                <input type="text" id="edit-nombre" name="nombre" placeholder=" " required />
-                <label for="edit-nombre">Nombre / Razón Social *</label>
-              </div>
-              <div class="form-group floating">
-                <input type="tel" id="edit-telefono" name="telefono" placeholder=" " required />
-                <label for="edit-telefono">Teléfono *</label>
-              </div>
-              <div class="form-group floating">
-                <input type="email" id="edit-email" name="email" placeholder=" " />
-                <label for="edit-email">Email (Opcional)</label>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-submit"><i class="fas fa-sync-alt"></i> Actualizar Cliente</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scripts de Firebase (¡AÑADIDOS!) -->
     <script src="/__/firebase/8.10.1/firebase-app.js"></script>
     <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
     <script src="/__/firebase/init.js"></script>
 
-    <!-- Scripts de la aplicación -->
     <script src="/admin/js/auth.js"></script>
-    <script src="/admin/js/gestion-clientes.js"></script>
+    <script src="/admin/js/gestion-clientes.js?v=1.1"></script> <!-- version bump -->
     <script src="/admin/js/components.js"></script>
   </body>
 </html>

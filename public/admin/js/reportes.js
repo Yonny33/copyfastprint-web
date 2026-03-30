@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
 
-  const ventasTableBody = document.querySelector("#ventas-table tbody");
+  const ventasTableBody = document.querySelector("#deudores-tbody");
   const ventasTableTitle = document.getElementById("ventas-table-title");
   const summaryVentas = document.getElementById("summary-ventas");
 
@@ -17,24 +17,22 @@ document.addEventListener("DOMContentLoaded", function () {
   const abonoTransaccionIdInput = document.getElementById("abono-transaccion-id");
   const montoAbonoInput = document.getElementById("monto-abono");
   
-  // Modal de Detalles
+  // Modal de Detalles Unificado
   const detallesModal = document.getElementById("detalles-modal");
   const closeDetallesModalBtn = document.getElementById("close-detalles-modal");
-  const detallesClienteInfo = document.getElementById("detalles-cliente-info");
+  const detallesVentaInfo = document.getElementById("detalles-venta-info");
   const detallesAbonosList = document.getElementById("detalles-abonos-list");
 
   // --- ALMACÉN DE DATOS ---
   let originalVentas = [];
-  let todosLosAbonos = []; // ¡NUEVO! Para guardar el historial de abonos.
+  let todosLosAbonos = [];
   let currentVentas = [];
 
   const cedulaSearchInput = document.getElementById("cedula-search");
 
   // --- FUNCIONES AUXILIARES ---
   const showLoading = (show, element = loadingOverlay) => {
-      if (element) {
-        element.style.display = show ? "flex" : "none";
-      }
+      if (element) element.style.display = show ? "flex" : "none";
   };
 
   const formatCurrency = (amount) => {
@@ -44,14 +42,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const formatDate = (dateString) => {
       if (!dateString) return "N/A";
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) { // Si la fecha es inválida
-          // Intenta procesar solo la parte antes de un espacio (formato AAAA-MM-DD HH:MM...)
+      if (isNaN(date.getTime())) { 
           const datePart = dateString.split(" ")[0];
-          const newDate = new Date(datePart);
-          if(isNaN(newDate.getTime())) return dateString; // Si sigue siendo inválida, devuelve el original
-          return newDate.toLocaleDateString("es-VE", { timeZone: 'UTC' }); // Muestra la fecha en formato local
+          const newDate = new Date(datePart + "T00:00:00");
+          if(isNaN(newDate.getTime())) return dateString;
+          return newDate.toLocaleDateString("es-VE");
       }
-      return date.toLocaleDateString("es-VE", { timeZone: 'UTC' });
+      return date.toLocaleDateString("es-VE");
   };
 
   const parseDate = (dateString) => {
@@ -67,8 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let totalPeriodo = 0;
 
     if (!ventas || ventas.length === 0) {
-      ventasTableBody.innerHTML =
-        '<tr><td colspan="6" style="text-align: center;">No hay clientes con saldo pendiente.</td></tr>';
+      ventasTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay clientes con saldo pendiente.</td></tr>';
     } else {
       const unaSemanaEnMilisegundos = 7 * 24 * 60 * 60 * 1000;
       const ahora = new Date();
@@ -78,16 +74,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = document.createElement("tr");
         
         let alertaAbono = '';
-        // Buscamos el último abono para este cliente
         const abonosDelCliente = todosLosAbonos.filter(abono => abono.id_cliente === v.id_cliente);
-        let fechaUltimaActividad;
+        let fechaUltimaActividad = parseDate(v.fecha);
 
         if (abonosDelCliente.length > 0) {
-            // Si hay abonos, encontramos el más reciente
             fechaUltimaActividad = abonosDelCliente.reduce((max, abono) => new Date(abono.fecha) > max ? new Date(abono.fecha) : max, new Date(0));
-        } else {
-            // Si no hay abonos, usamos la fecha de la venta
-            fechaUltimaActividad = parseDate(v.fecha);
         }
 
         if (fechaUltimaActividad && (ahora - fechaUltimaActividad > unaSemanaEnMilisegundos)) {
@@ -95,10 +86,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         let accionesHtml = '-';
-        if (v.id_cliente && (parseFloat(v.saldo_pendiente) || 0) > 0) {
+        if ((parseFloat(v.saldo_pendiente) || 0) > 0) {
           accionesHtml = `
             <div class="action-buttons">
-              <button class="btn-accion btn-details" data-cliente-id="${v.id_cliente}" title="Ver Detalles de Abonos">
+              <button class="btn-accion btn-details" data-venta-id="${v.id}" title="Ver Detalles Completos">
                 <i class="fas fa-eye"></i>
               </button>
               <button class="btn-accion btn-abono" data-id="${v.id}" data-cliente="${v.nombre_cliente}" data-saldo="${v.saldo_pendiente}" title="Registrar Abono">
@@ -119,8 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ventasTableBody.appendChild(row);
       });
     }
-    if (summaryVentas)
-      summaryVentas.textContent = `Total por Cobrar: ${formatCurrency(totalPeriodo)}`;
+    if (summaryVentas) summaryVentas.textContent = `Total por Cobrar: ${formatCurrency(totalPeriodo)}`;
 
     addEventListenersToButtons();
   };
@@ -151,17 +141,34 @@ document.addEventListener("DOMContentLoaded", function () {
   
   const openDetallesModal = async (event) => {
       const button = event.currentTarget;
-      const clienteId = button.dataset.clienteId;
+      const ventaId = button.dataset.ventaId;
       
-      const clienteData = originalVentas.find(v => v.id_cliente === clienteId);
-      const nombreCliente = clienteData ? clienteData.nombre_cliente : "Cliente no encontrado";
-      const cedulaCliente = clienteData ? clienteData.cedula_cliente : "N/A";
+      const ventaData = originalVentas.find(v => v.id === ventaId);
+      
+      if (!ventaData) {
+          alert("No se encontraron los detalles para esta venta.");
+          return;
+      }
+      
+      const clienteId = ventaData.id_cliente;
 
-      detallesClienteInfo.innerHTML = `
-        <p><strong>Cliente:</strong> ${nombreCliente}</p>
-        <p><strong>Cédula/RIF:</strong> ${cedulaCliente}</p>
+      // FIX: Calcular cantidad de items de forma segura
+      let totalItems = 0;
+      if (ventaData.items && Array.isArray(ventaData.items)) {
+          totalItems = ventaData.items.reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
+      }
+
+      // 1. Popular la sección de detalles de la venta
+      detallesVentaInfo.innerHTML = `
+        <p><strong>Cliente:</strong> ${ventaData.nombre_cliente || "N/A"}</p>
+        <p><strong>Fecha de Venta:</strong> ${formatDate(ventaData.fecha)}</p>
+        <p><strong>Monto Total:</strong> ${formatCurrency(ventaData.monto_total)}</p>
+        <p><strong>Cantidad de Items:</strong> ${totalItems}</p>
+        <p><strong>Detalles del Pedido:</strong><br>${ventaData.detalles_pedido || "Sin detalles adicionales."}</p>
       `;
-      detallesAbonosList.innerHTML = '<div class="loading-spinner"></div>';
+      
+      // 2. Popular la sección de abonos
+      detallesAbonosList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Cargando abonos...</p>';
       detallesModal.style.display = "flex";
 
       try {
@@ -175,14 +182,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 <thead>
                   <tr>
                     <th>Fecha y Hora</th>
-                    <th>Venta ID</th>
+                    <th>ID Venta</th>
                     <th style="text-align: right;">Monto Abonado</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${abonosDelCliente.map(abono => `
                     <tr>
-                      <td>${formatDate(abono.fecha)}</td>
+                      <td>${new Date(abono.fecha).toLocaleString('es-VE')}</td>
                       <td><small>${abono.id_venta || 'N/A'}</small></td>
                       <td style="text-align: right;">${formatCurrency(abono.monto)}</td>
                     </tr>
@@ -200,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   };
 
-  
   const closeDetallesModal = () => {
       detallesModal.style.display = "none";
   }
@@ -226,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (result.status === "success") {
         alert(result.message);
         closeAbonoModal();
-        loadReportData();
+        loadReportData(); // Recarga todo para ver los cambios
       } else {
         throw new Error(result.message || "Error al procesar el abono.");
       }
@@ -240,26 +246,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- LÓGICA DE FILTRADO Y CARGA ---
   const applyAndRenderFilters = () => {
-    const searchTerm = cedulaSearchInput
-      ? cedulaSearchInput.value.trim().toLowerCase()
-      : "";
+    const searchTerm = cedulaSearchInput ? cedulaSearchInput.value.trim().toLowerCase() : "";
 
-    let filteredVentas = originalVentas.filter(
-      (v) => (parseFloat(v.saldo_pendiente) || 0) > 0.01,
-    );
+    let filteredVentas = originalVentas.filter((v) => (parseFloat(v.saldo_pendiente) || 0) > 0.01);
 
     if (searchTerm) {
-      filteredVentas = filteredVentas.filter(
-        (v) =>
-          v.cedula_cliente &&
-          String(v.cedula_cliente).toLowerCase().includes(searchTerm),
-      );
+      filteredVentas = filteredVentas.filter((v) => v.cedula_cliente && String(v.cedula_cliente).toLowerCase().includes(searchTerm));
     }
 
     filteredVentas.sort((a, b) => parseDate(b.fecha) - parseDate(a.fecha));
 
-    if (ventasTableTitle)
-      ventasTableTitle.textContent = "Lista de Clientes con Deuda";
+    if (ventasTableTitle) ventasTableTitle.textContent = "Lista de Clientes con Deuda";
 
     currentVentas = filteredVentas;
     renderVentasTable(currentVentas);
@@ -268,7 +265,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const loadReportData = async () => {
     showLoading(true, loadingOverlay);
     try {
-      // ¡NUEVO! Carga de ventas y abonos en paralelo para mayor eficiencia.
       const [ventasResponse, abonosResponse] = await Promise.all([
         fetch(`${API_URL}/ventas`),
         fetch(`${API_URL}/abonos`)
@@ -289,7 +285,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (abonosResult.status === "success" && abonosResult.data) {
         todosLosAbonos = abonosResult.data || [];
       } else {
-        throw new Error(abonosResult.message || "La respuesta de abonos no contiene datos.");
+        console.warn(abonosResult.message || "La respuesta de abonos no contiene datos, se continuará sin historial de abonos.");
+        todosLosAbonos = []; // Asegurarse de que sea un array vacío si falla
       }
 
       applyAndRenderFilters();
@@ -297,16 +294,14 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
       console.error("Error fatal al cargar los reportes:", error);
       alert(`No se pudieron cargar los datos de los reportes: ${error.message}`);
-      if (ventasTableBody)
-        ventasTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Error al cargar datos.</td></tr>';
+      if (ventasTableBody) ventasTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Error al cargar datos.</td></tr>';
     } finally {
       showLoading(false, loadingOverlay);
     }
   };
 
   // --- ASIGNACIÓN DE EVENTOS ---
-  if (cedulaSearchInput)
-    cedulaSearchInput.addEventListener("input", applyAndRenderFilters);
+  if (cedulaSearchInput) cedulaSearchInput.addEventListener("input", applyAndRenderFilters);
   if (closeModalBtn) closeModalBtn.addEventListener("click", closeAbonoModal);
   if (closeDetallesModalBtn) closeDetallesModalBtn.addEventListener("click", closeDetallesModal);
   if (abonoForm) abonoForm.addEventListener("submit", handleAbonoSubmit);
@@ -315,6 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (ventasTableBody) {
     loadReportData();
   } else {
-    console.error("El cuerpo de la tabla de ventas no se encontró en el DOM.");
+    console.error("El cuerpo de la tabla de deudores no se encontró en el DOM.");
   }
 });

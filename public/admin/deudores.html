@@ -109,24 +109,28 @@
       </div>
     </div>
     
-    <!-- ¡NUEVO! Modal de Detalles de Abonos -->
+    <!-- MODAL UNIFICADO: Detalles de Deuda y Abonos -->
     <div id="detalles-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-list-ul"></i> Historial de Abonos</h3>
+                <h3><i class="fas fa-list-ul"></i> Detalles de Deuda y Abonos</h3>
                 <span class="close-button" id="close-detalles-modal">&times;</span>
             </div>
             <div class="modal-body">
-                <div id="detalles-cliente-info" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
-                    <!-- La información del cliente se cargará aquí vía JS -->
+                <!-- Sección para Detalles de la Venta -->
+                <div id="detalles-venta-info" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                    <!-- La información de la venta se cargará aquí -->
                 </div>
+                
+                <!-- Sección para Historial de Abonos -->
                 <h4 style="margin-bottom: 1rem;">Abonos Registrados:</h4>
                 <div id="detalles-abonos-list" style="max-height: 300px; overflow-y: auto;">
-                    <!-- La lista de abonos se cargará aquí vía JS -->
+                    <!-- La lista de abonos se cargará aquí -->
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Scripts de Firebase -->
     <script src="/__/firebase/8.10.1/firebase-app.js"></script>

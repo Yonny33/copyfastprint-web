@@ -1,230 +1,149 @@
 <!doctype html>
 <html lang="es">
   <head>
-    <!-- Google Tag Manager -->
-    <script>
-      (function(w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5Q94FLN3");
-    </script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gastos - Admin COPYFAST&PRINT</title>
-    <meta
-      name="description"
-      content="Panel de administración para el registro y consulta de gastos operativos."
-    />
+    <meta name="description" content="Panel de administración para el registro y consulta de gastos operativos." />
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
-    <link rel="stylesheet" href="/admin/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="/admin/css/main.css?v=1.3" /> <!-- version bump -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
   <body class="admin-page">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-5Q94FLN3"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
-
-    <!-- Contenedor principal del panel de administración -->
     <div class="admin-grid-container">
       <div id="header-placeholder"></div>
 
-      <!-- Contenido principal -->
       <main class="admin-main-content">
-        <!-- ENCABEZADO DE SECCIÓN CORREGIDO -->
         <div class="section-heading">
-          <h2>Gastos</h2>
+          <h2><i class="fas fa-file-invoice-dollar"></i> Registro de Gastos</h2>
           <div class="divider"></div>
-          <p>
-            Gestiona, registra y consulta el historial de gastos operativos.
-          </p>
+          <p>Añade nuevos gastos operativos o edita uno existente.</p>
         </div>
 
-        <!-- Formulario y columna de información -->
-        <div class="form-layout">
-          <!-- Columna del formulario -->
-          <div class="form-container">
+        <div class="card-form">
             <form id="registro-gastos-form">
-              <div class="form-grid">
-                <div class="form-group floating">
-                  <input type="date" id="fecha" name="fecha" placeholder=" " required />
-                  <label for="fecha">Fecha del Gasto *</label>
-                </div>
-                <div class="form-group floating">
-                  <input type="text"
-                    id="proveedor"
-                    name="proveedor"
-                    placeholder=" "
-                    required
-                  />
-                  <label for="proveedor">Concepto / Proveedor *</label>
-                </div>
-                <div class="form-group">
-                  <div class="form-inline-group">
-                    <select title="Tipo de documento"
-                      name="tipo_documento"
-                      id="tipo_documento"
-                      style="width: 80px; min-width: 80px"
-                    >
-                      <option value="V">V-</option>
-                      <option value="E">E-</option>
-                      <option value="J" selected>J-</option>
-                      <option value="P">P-</option>
-                    </select>
-                    <input type="number"
-                      id="rit"
-                      name="rit"
-                      placeholder="Ej: 12345678"
-                      style="flex-grow: 1"
-                    />
-                  </div>
-                </div>
-                <div class="form-group floating">
-                  <input type="number"
-                    id="monto"
-                    name="monto"
-                    step="0.01"
-                    min="0.01"
-                    placeholder=" "
-                    required
-                  />
-                  <label for="monto">Monto Total (Bs.) *</label>
-                </div>
-                <div class="form-group full-width floating">
-                  <textarea id="descripcion"
-                    name="descripcion"
-                    rows="3"
-                    placeholder=" "
-                    required
-                  ></textarea>
-                  <label for="descripcion">Descripción del Gasto *</label>
-                </div>
-                <div class="form-group floating">
-                  <select id="categoria" name="categoria" required placeholder=" ">
-                    <option value="">Selecciona una categoría</option>
-                    <option value="Servicios Publicos">
-                      Servicios Públicos (Agua, Luz, Teléfono)
-                    </option>
-                    <option value="Materiales y Suministros">
-                      Materiales y Suministros
-                    </option>
-                    <option value="Alquiler">Alquiler</option>
-                    <option value="Salarios">Salarios</n                    <option value="Mantenimiento y Reparaciones">
-                      Mantenimiento y Reparaciones
-                    </option>
-                    <option value="Marketing y Publicidad">
-                      Marketing y Publicidad
-                    </option>
-                    <option value="Transporte">Transporte</option>
-                    <option value="Impuestos">Impuestos</option>
-                    <option value="Alimentación">Alimentación y Viáticos</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  <label for="categoria">Categoría *</label>
-                </div>
-                <div class="form-group floating">
-                  <select id="metodo_pago" name="metodo_pago" required placeholder=" ">
-                    <option value="">Selecciona uno</option>
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Pago-Movil">Pago Móvil</option>
-                    <option value="Zelle">Zelle</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                  <label for="metodo_pago">Método de Pago *</label>
-                </div>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                  <i class="fas fa-save"></i> Registrar Gasto
-                </button>
-              </div>
-            </form>
-          </div>
+                <input type="hidden" id="edit-gasto-id" name="editGastoId">
+                <div class="form-grid-3-col">
+                    <!-- Fila 1 -->
+                    <div class="form-group floating">
+                        <input type="date" id="fecha" name="fecha" placeholder=" " required />
+                        <label for="fecha">Fecha del Gasto *</label>
+                    </div>
+                    <div class="form-group floating">
+                        <input type="text" id="proveedor" name="proveedor" placeholder=" " required />
+                        <label for="proveedor">Concepto / Proveedor *</label>
+                    </div>
+                    <div class="form-group floating">
+                        <div class="form-inline-group">
+                            <select title="Tipo de documento" name="tipo_documento" id="tipo_documento" style="flex: 0 0 75px;">
+                                <option value="V">V-</option>
+                                <option value="E">E-</option>
+                                <option value="J" selected>J-</option>
+                                <option value="P">P-</option>
+                            </select>
+                            <input type="text" id="rif" name="rif" placeholder="Número" />
+                        </div>
+                        <label for="rif">RIF</label>
+                    </div>
 
-          <!-- Columna de información -->
-          <aside class="form-sidebar">
-            <div class="info-box">
-              <h3><i class="fas fa-clipboard-check"></i> Control Financiero</h3>
-              <p>
-                Registrar cada gasto es fundamental para mantener un control
-                preciso de la salud financiera del negocio.
-              </p>
+                    <!-- Fila 2 -->
+                    <div class="form-group floating span-3">
+                        <textarea id="descripcion" name="descripcion" rows="3" placeholder=" " required></textarea>
+                        <label for="descripcion">Descripción del Gasto *</label>
+                    </div>
+
+                    <!-- Fila 3 -->
+                    <div class="form-group floating">
+                        <input type="number" id="monto" name="monto" step="0.01" min="0.01" placeholder=" " required />
+                        <label for="monto">Monto Total (Bs.) *</label>
+                    </div>
+                    <div class="form-group floating">
+                        <select id="categoria" name="categoria" required placeholder=" ">
+                            <option value="" disabled selected>Selecciona una categoría</option>
+                            <option value="Servicios Publicos">Servicios Públicos</option>
+                            <option value="Materiales y Suministros">Materiales y Suministros</option>
+                            <option value="Alquiler">Alquiler</option>
+                            <option value="Salarios">Salarios</option>
+                            <option value="Mantenimiento y Reparaciones">Mantenimiento y Reparaciones</option>
+                            <option value="Marketing y Publicidad">Marketing y Publicidad</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Impuestos">Impuestos</option>
+                            <option value="Alimentación">Alimentación y Viáticos</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <label for="categoria">Categoría *</label>
+                    </div>
+                    <div class="form-group floating">
+                        <select id="metodo_pago" name="metodo_pago" required placeholder=" ">
+                            <option value="">Selecciona uno</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Pago-Movil">Pago Móvil</option>
+                            <option value="Zelle">Zelle</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <label for="metodo_pago">Método de Pago *</label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="submit-button" class="btn-submit">
+                        <i class="fas fa-save"></i> Registrar Gasto
+                    </button>
+                    <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none;">
+                        <i class="fas fa-times"></i> Cancelar Edición
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de Gastos Recientes -->
+        <div class="card-table modern-table" style="margin-top: 2rem;">
+          <div class="toolbar">
+            <h3><i class="fas fa-history"></i> Gastos Recientes</h3>
+            <div class="search-bar">
+              <input type="text" id="search-gastos-input" placeholder="Buscar por concepto o RIF...">
+              <i class="fas fa-search"></i>
             </div>
-            <div class="info-box">
-              <h3><i class="fas fa-lightbulb"></i> ¿Cómo registrar?</h3>
-              <p>
-                <strong>Para compras:</strong> Usa el nombre del proveedor (Ej:
-                "Proveedor de Tinta XYZ").<br />
-                <strong>Para servicios:</strong> Usa el concepto (Ej: "Pago de
-                Internet - Junio").<br />
-                <strong>Para gastos varios:</strong> Usa una descripción corta (Ej:
-                "Almuerzo del equipo").
-              </p>
-            </div>
-            <div class="info-box">
-              <h3><i class="fas fa-info-circle"></i> ¿Qué es RIF?</h3>
-              <p>
-                Es el Registro de Información Fiscal, el número de
-                identificación tributaria en Venezuela. Puedes dejarlo en blanco
-                si no aplica.
-              </p>
-            </div>
-          </aside>
+          </div>
+          <div class="table-responsive">
+            <table id="gastos-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Concepto/Proveedor</th>
+                  <th>RIF</th>
+                  <th>Monto</th>
+                  <th>Categoría</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="gastos-tbody">
+                <!-- Las filas de gastos se cargarán aquí dinámicamente -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
 
-    <!-- Overlay de carga -->
     <div id="loading-overlay" class="loading-overlay" style="display: none">
       <div class="spinner"></div>
       <p>Procesando...</p>
     </div>
 
-    <!-- Scripts de Firebase (¡AÑADIDOS!) -->
     <script src="/__/firebase/8.10.1/firebase-app.js"></script>
     <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
     <script src="/__/firebase/init.js"></script>
 
-    <!-- Scripts -->
     <script src="/admin/js/auth.js"></script>
-    <script src="/admin/js/registro-gastos.js"></script>
+    <script src="/admin/js/registro-gastos.js?v=1.2"></script> <!-- version bump -->
     <script src="/admin/js/components.js"></script>
   </body>
 </html>

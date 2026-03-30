@@ -59,7 +59,9 @@ body.login-page-body {
 .admin-main-content {
   margin-left: 260px; /* Empuja el contenido principal para que no se superponga al sidebar */
   flex-grow: 1; /* Permite que el contenido principal ocupe el espacio restante */
-  padding: 0.5rem 2.5rem 1.5rem; /* Reducido el padding superior de 1.5rem a 0.5rem */
+  display: flex; 
+  flex-direction: column;
+  padding: 0.25rem 2.5rem 1rem; /* Reducción extrema de padding superior e inferior */
   overflow-y: auto; /* Permite el scroll en el contenido principal */
   background-color: var(--background-dark);
 }
@@ -133,7 +135,8 @@ body.login-page-body {
   display: none; /* OCULTADO: El botón ahora es flotante */
 }
 .section-heading {
-  margin-bottom: 2rem; /* Reducido el margen inferior de la sección */
+  margin-bottom: 0.75rem; /* Espacio mínimo para el título */
+  order: 1 !important; /* Forzamos que sea el primer elemento arriba */
 }
 .section-heading h2 {
   font-size: 2.2rem;
@@ -158,9 +161,11 @@ body.login-page-body {
    ============================================================================= */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Rejilla 3x3 */
-  gap: 1.25rem; /* Espaciado reducido */
+  grid-template-columns: repeat(3, 1fr) !important; /* Forzamos 3 columnas horizontales */
+  gap: 0.75rem; /* Gap más compacto */
+  margin-top: 1.5rem; /* Separación moderada de los formularios */
   margin-bottom: 2.5rem;
+  order: 3 !important; /* Se posiciona estrictamente debajo del formulario */
 }
 .kpi-card {
   background: linear-gradient(145deg, #252525, #1e1e1e);
@@ -256,6 +261,11 @@ body.login-page-body {
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   margin-bottom: 2rem;
+  order: 5 !important; /* Tablas y gráficos al final */
+  max-width: 1100px; /* Ancho máximo unificado */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100%;
 }
 .card h3,
 .card-table h3,
@@ -272,6 +282,7 @@ body.login-page-body {
   width: 100%;
   aspect-ratio: 16 / 9;
   max-height: 450px;
+  order: 4; /* El gráfico principal del Dashboard */
 }
 .report-grid-bottom,
 .charts-container {
@@ -279,6 +290,7 @@ body.login-page-body {
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
+  order: 4;
 }
 
 /* CAMBIO: Listas de actividad reciente en una sola columna (Ventas arriba, Gastos abajo) */
@@ -287,6 +299,7 @@ body.login-page-body {
   grid-template-columns: 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
+  order: 5; /* Las listas de actividad siempre al final */
 }
 
 /* Ajuste para limitar altura y asegurar alineación en Dashboard */
@@ -386,20 +399,32 @@ tbody tr:hover {
    ============================================================================= */
 .form-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 1fr; /* Mantiene el bloque del formulario como una sola columna principal */
+  max-width: 900px; /* Limita el ancho máximo del formulario */
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  gap: 1.25rem; /* Espacio optimizado entre formularios */
   align-items: start;
+  order: 2 !important; /* El formulario va inmediatamente después del título */
 }
 .form-container,
 .report-filters {
   background-color: var(--background-card);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 2rem;
+  padding: 1rem; /* Padding interno mínimo */
+  width: 100%; /* Asegura que el formulario use todo el ancho */
+}
+
+/* Si en alguna sección quieres mantener dos formularios juntos (ej. Ventas y Gastos)
+   puedes usar esta clase auxiliar en el HTML para que sigan siendo horizontales */
+.form-grid-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
 }
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajustado para 3 columnas en escritorio */
   gap: 1.5rem;
 }
 .form-group {
@@ -489,6 +514,7 @@ tbody tr:hover {
   align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap; /* Permite que se adapte si falta espacio */
+  order: 2; /* Aparece después del título (order 1) */
 }
 .search-bar {
   position: relative;
@@ -745,15 +771,7 @@ td.actions {
    12. ADMIN - ESTILOS RESPONSIVE
    ============================================================================= */
 @media (max-width: 1200px) {
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .recent-activity-grid,
-  .form-layout,
-  .charts-container,
-  .report-grid-bottom {
-    grid-template-columns: 1fr;
-  }
+  .recent-activity-grid, .form-layout, .charts-container, .report-grid-bottom { grid-template-columns: 1fr; }
 }
 @media (max-width: 992px) {
   .admin-grid-container {
@@ -831,10 +849,10 @@ td.actions {
   .sidebar-header {
     display: none; /* Ocultar el logo en pantallas muy pequeñas */
     display: none;
-  }
-  .kpi-grid {
-    grid-template-columns: 1fr;
-  } /* MODIFICADO: 1 columna en móvil */
+  } 
+  
+  .kpi-grid { grid-template-columns: 1fr !important; } /* Solo en celulares muy pequeños permitimos 1 columna */
+
   .form-grid,
   .form-row {
     grid-template-columns: 1fr;
@@ -1088,6 +1106,7 @@ input:checked + .slider:before {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  order: 3 !important; /* Ahora va después de las tarjetas */
 }
 .current-year-display {
   font-size: 3rem;
@@ -1102,6 +1121,7 @@ input:checked + .slider:before {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
+  order: 4 !important; /* Debajo del encabezado de análisis */
 }
 
 .month-card {
@@ -1201,13 +1221,13 @@ input:checked + .slider:before {
    ============================================================================= */
 .form-group.floating {
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem; /* Reducido drásticamente el espacio entre campos */
 }
 
 .form-group.floating input,
 .form-group.floating select {
-  height: 56px; /* Altura fija para inputs y selects */
-  padding: 24px 16px 8px; /* Espacio superior para la etiqueta */
+  height: 48px; /* Reducido de 56px a 48px */
+  padding: 20px 12px 4px; /* Ajustado el espacio interno */
   border: 1px solid var(--border-color);
   background-color: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
@@ -1252,7 +1272,7 @@ input:checked + .slider:before {
 .form-group.floating label {
   position: absolute;
   left: 16px;
-  top: 18px;
+  top: 14px; /* Ajustado para la nueva altura del input */
   color: var(--text-secondary);
   font-size: 1rem;
   pointer-events: none;
@@ -1265,7 +1285,7 @@ input:checked + .slider:before {
 .form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
 .form-group.floating textarea:focus ~ label,
 .form-group.floating textarea:not(:placeholder-shown) ~ label {
-  top: 8px;
+  top: 4px; /* La etiqueta flota más cerca del borde superior */
   font-size: 0.75rem;
   color: var(--primary-color);
   font-weight: 600;

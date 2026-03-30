@@ -1,17 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Autenticación
-  if (typeof setupAuth === "function") {
-    setupAuth();
-  }
-
-  // --- ELEMENTOS DEL DOM --- 
+  // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
 
   // --- ESTADO Y CONFIGURACIÓN ---
-  const API_URL = "/api"; // <-- URL Relativa para usar el rewrite de Firebase
+  const API_URL = "/api";
   let ingresosGastosChart = null;
-  let recentVentas = [];
-  let recentGastos = [];
 
   // --- HELPERS ---
   const safeSetText = (id, text) => {
@@ -19,8 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (element) element.textContent = text;
   };
   const formatCurrency = (value) =>
-    `Bs. ${parseFloat(value || 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const formatNumber = (value) => (value || 0).toLocaleString("de-DE");
+    `Bs. ${parseFloat(value || 0).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formatNumber = (value) => (value || 0).toLocaleString("es-VE");
   const showLoading = (show) => {
     if (loadingOverlay) loadingOverlay.style.display = show ? "flex" : "none";
   };
@@ -35,41 +28,31 @@ document.addEventListener("DOMContentLoaded", () => {
     safeSetText("kpi-alertas-inventario", formatNumber(kpis.alertasInventario));
     safeSetText("kpi-balance-general", formatCurrency(kpis.balanceGeneral));
     safeSetText("kpi-items-stock", formatNumber(kpis.totalItemsStock));
-    safeSetText(
-      "kpi-saldo-pendiente",
-      formatCurrency(kpis.totalSaldoPendiente),
-    );
+    safeSetText("kpi-saldo-pendiente", formatCurrency(kpis.totalSaldoPendiente));
 
     const balanceNetoEl = document.getElementById("kpi-balance-neto");
-    if (balanceNetoEl)
-      balanceNetoEl.style.color =
-        kpis.balanceNeto < 0 ? "var(--error-color)" : "var(--success-color)";
+    if (balanceNetoEl) balanceNetoEl.style.color = kpis.balanceNeto < 0 ? "var(--error-color)" : "var(--success-color)";
+    
     const balanceGeneralEl = document.getElementById("kpi-balance-general");
-    if (balanceGeneralEl)
-      balanceGeneralEl.style.color =
-        kpis.balanceGeneral < 0 ? "var(--error-color)" : "var(--success-color)";
+    if (balanceGeneralEl) balanceGeneralEl.style.color = kpis.balanceGeneral < 0 ? "var(--error-color)" : "var(--success-color)";
   };
 
-  const renderChart = (
-    chartData = { labels: [], ingresos: [], gastos: [] },
-  ) => {
+  const renderChart = (chartData = { labels: [], ingresos: [], gastos: [] }) => {
     const canvas = document.getElementById("ingresos-gastos-chart");
     if (!canvas) return;
     if (ingresosGastosChart) ingresosGastosChart.destroy();
  
-    // Crear degradados para efecto "Luminoso/Neón"
     const ctx = canvas.getContext("2d");
-    
     const gradientIngresos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientIngresos.addColorStop(0, 'rgba(16, 185, 129, 0.6)'); // Verde brillante arriba
-    gradientIngresos.addColorStop(1, 'rgba(16, 185, 129, 0.0)'); // Transparente abajo
+    gradientIngresos.addColorStop(0, 'rgba(16, 185, 129, 0.6)');
+    gradientIngresos.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
     const gradientGastos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientGastos.addColorStop(0, 'rgba(239, 68, 68, 0.6)'); // Rojo brillante arriba
-    gradientGastos.addColorStop(1, 'rgba(239, 68, 68, 0.0)'); // Transparente abajo
+    gradientGastos.addColorStop(0, 'rgba(239, 68, 68, 0.6)');
+    gradientGastos.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
 
     ingresosGastosChart = new Chart(canvas.getContext("2d"), {
-      type: "line", // Cambiamos a 'line' para un look más fluido (o 'bar' si prefieres barras)
+      type: "line",
       data: {
         labels: chartData.labels,
         datasets: [
@@ -77,25 +60,19 @@ document.addEventListener("DOMContentLoaded", () => {
             label: "Ingresos",
             data: chartData.ingresos,
             backgroundColor: gradientIngresos,
-            borderColor: "#10b981", // Verde Neón
+            borderColor: "#10b981",
             borderWidth: 3,
             pointBackgroundColor: "#10b981",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "#10b981",
-            fill: true, // Rellenar el área bajo la línea
-            tension: 0.4 // Curvas suaves
+            fill: true,
+            tension: 0.4
           },
           {
             label: "Gastos",
             data: chartData.gastos,
             backgroundColor: gradientGastos,
-            borderColor: "#ef4444", // Rojo Neón
+            borderColor: "#ef4444",
             borderWidth: 3,
             pointBackgroundColor: "#ef4444",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "#ef4444",
             fill: true,
             tension: 0.4
           },
@@ -104,173 +81,37 @@ document.addEventListener("DOMContentLoaded", () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)', // Líneas de guía muy sutiles
-              drawBorder: false
-            },
-            ticks: {
-              color: "#a0a0a0",
-              font: { family: "'Segoe UI', sans-serif" },
-              callback: (v) => formatCurrency(v),
-            },
-          },
-          x: {
-            grid: {
-              display: false // Ocultar líneas verticales para limpieza
-            },
-            ticks: {
-              color: "#a0a0a0",
-              autoSkip: true,
-              maxTicksLimit: 20,
-            },
-          },
+          y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
+          x: { grid: { display: false } },
         },
         plugins: {
-          legend: { 
-            position: "top", 
-            labels: { 
-              color: "#eaeaea",
-              font: { size: 12, family: "'Segoe UI', sans-serif" },
-              usePointStyle: true
-            } 
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderWidth: 1,
-            padding: 10,
-            displayColors: true
-          }
+          legend: { position: "top", labels: { color: "#eaeaea" } },
         },
       },
     });
   };
 
-  const renderTable = (tableId, data, columns, type) => {
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${columns.length + 1}" style="text-align: center;">No hay datos recientes.</td></tr>`;
-      return;
-    }
-
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-      columns.forEach((col) => {
-        const td = document.createElement("td");
-        let value = item[col.key];
-        if (col.format === "currency")
-          value = formatCurrency(item[col.moneyKey]);
-        else if (col.format === "date") {
-          const date = value ? new Date(value) : null; // Firebase devuelve fechas ISO
-          value = date && !isNaN(date) ? date.toLocaleDateString("es-CO") : "-";
-        }
-        td.textContent = value || "-";
-        tr.appendChild(td);
-      });
-
-      const actionsTd = document.createElement("td");
-      actionsTd.className = "actions";
-      // Botón de eliminar con estilo rojo
-      actionsTd.innerHTML = `<button class="btn-delete" data-id="${item.id}" data-type="${type}" title="Eliminar" style="background-color: var(--error-color); color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: background 0.3s;"><i class="fas fa-trash"></i></button>`;
-      tr.appendChild(actionsTd);
-      tbody.appendChild(tr);
-    });
-
-    tbody.addEventListener("click", (event) => {
-      const button = event.target.closest(".btn-delete");
-      if (button) {
-        handleDeleteClick(button.dataset.id, button.dataset.type);
-      }
-    });
-  };
-
-  // --- LÓGICA DE ELIMINACIÓN ---
-  const handleDeleteClick = async (id, type) => {
-    if (
-      !confirm(
-        `¿Estás seguro de que deseas eliminar este registro de ${type}? Esta acción no se puede deshacer.`,
-      )
-    ) {
-      return;
-    }
-
-    showLoading(true);
-    try {
-      const endpoint = type === "venta" ? "ventas" : "gastos";
-      const response = await fetch(`${API_URL}/${endpoint}/${id}`, {
-        method: "DELETE",
-      });
-      const result = await response.json();
-
-      if (result.status === "success") {
-        alert(result.message);
-        loadDashboardData(); // Recargar la tabla
-      } else {
-        throw new Error(result.message || "Error al eliminar.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error: " + error.message);
-    } finally {
-      showLoading(false);
-    }
-  };
-
-  // --- FUNCIÓN PRINCIPAL DE CARGA (CONECTADA A FIREBASE) ---
+  // --- FUNCIÓN PRINCIPAL DE CARGA ---
   const loadDashboardData = async () => {
     showLoading(true);
     try {
-      const response = await fetch(`${API_URL}/dashboard`); // <-- PETICIÓN AL NUEVO BACKEND
+      const response = await fetch(`${API_URL}/dashboard`);
       if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
 
       const result = await response.json();
 
       if (result.status === "success" && result.data) {
-        const { kpis, ultimasVentas, ultimosGastos, chartData } = result.data;
-        recentVentas = ultimasVentas || [];
-        recentGastos = ultimosGastos || [];
-
+        const { kpis, chartData } = result.data;
         renderKpis(kpis);
         if (chartData) renderChart(chartData);
-        renderTable(
-          "tabla-ultimas-ventas",
-          recentVentas,
-          [
-            { key: "fecha", format: "date" },
-            { key: "nombre_cliente", format: "text" },
-            { key: "venta_bruta", format: "currency", moneyKey: "venta_bruta" },
-          ],
-          "venta",
-        );
-        renderTable(
-          "tabla-ultimos-gastos",
-          recentGastos,
-          [
-            { key: "fecha", format: "date" },
-            { key: "descripcion", format: "text" },
-            { key: "monto", format: "currency", moneyKey: "monto" },
-          ],
-          "gasto",
-        );
       } else {
-        throw new Error(
-          result.message || "La API no devolvió el formato esperado.",
-        );
+        throw new Error(result.message || "La API no devolvió el formato esperado.");
       }
     } catch (error) {
       console.error("Error al cargar datos del dashboard:", error.message);
-      // Aquí podrías mostrar un error en la UI
+      // Opcional: mostrar un error en la UI
+      document.querySelector(".admin-main-content").innerHTML = `<p style="color: var(--error-color); text-align: center;">No se pudieron cargar los datos del dashboard. ${error.message}</p>`;
     } finally {
       showLoading(false);
     }
