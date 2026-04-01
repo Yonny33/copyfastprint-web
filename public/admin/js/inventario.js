@@ -1,122 +1,91 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // --- CONSTANTES Y URL DE TU API FIREBASE ---
   const API_URL = "/api";
 
   // --- Elementos del DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
-  const btnAddProducto = document.getElementById("btn-add-producto");
-  const productModal = document.getElementById("product-modal");
-  const closeModalButtons = document.querySelectorAll(".close-button");
   const inventarioForm = document.getElementById("inventario-form");
-  const formTitle = document.getElementById("form-title");
-  const tablaInventarioBody = document.querySelector("#tabla-inventario tbody");
-  const searchInput = document.getElementById("search-input");
+  const tablaInventarioBody = document.getElementById("inventario-tbody");
+  const searchInput = document.getElementById("search-inventario-input");
+  const cancelEditButton = document.getElementById("cancel-edit-button");
   const stockChartCanvas = document.getElementById("stock-chart");
-
+  
   let allProducts = [];
   let stockChart = null;
 
-  // --- HELPERS DE FORMATO ---
-  const formatDateForDisplay = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    const day = String(date.getUTCDate()).padStart(2, "0");
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    const year = date.getUTCFullYear();
-    return `${day}/${month}/${year}`;
+  const showLoading = (show) => {
+    if (loadingOverlay) loadingOverlay.style.display = show ? "flex" : "none";
   };
 
-  fetchInventoryData();
-
-  // --- MANEJADORES DE EVENTOS ---
-  btnAddProducto.addEventListener("click", () => openModal());
-  closeModalButtons.forEach((button) =>
-    button.addEventListener("click", () => closeModal()),
-  );
-  window.addEventListener("click", (event) => {
-    if (event.target == productModal) closeModal();
-  });
-  inventarioForm.addEventListener("submit", handleFormSubmit);
-  searchInput.addEventListener("input", handleSearch);
-
-  // Listener para detectar si es servicio y bloquear stock visualmente
-  const categoriaInput = inventarioForm.elements["categoria"];
-  if (categoriaInput) {
-    categoriaInput.addEventListener("input", toggleStockInputs);
-    categoriaInput.addEventListener("change", toggleStockInputs);
-  }
-
-  // --- FUNCIONES PRINCIPALES ---
-
-  function fetchInventoryData() {
+  const fetchInventoryData = async () => {
     showLoading(true);
-    fetch(`${API_URL}/inventario`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error de red: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.status === "success") {
-          allProducts = data.data
-            ? data.data.sort((a, b) =>
-                (a.nombre || "").localeCompare(b.nombre || ""),
-              )
-            : [];
-          renderInventoryTable(allProducts);
-          renderStockChart(allProducts);
-        } else {
-          throw new Error(
-            data.message || "Error al obtener los datos del inventario.",
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error en fetchInventoryData:", error);
-        alert("Error al cargar el inventario: " + error.message);
-        tablaInventarioBody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Error al cargar el inventario. Revise la consola para más detalles.</td></tr>`;
-      })
-      .finally(() => showLoading(false));
-  }
+    try {
+      const response = await fetch(`${API_URL}/inventario`);
+      if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+      const data = await response.json();
 
-  function renderInventoryTable(products) {
+      if (data.status === "success") {
+        allProducts = data.data ? data.data.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "")) : [];
+        renderInventoryTable(allProducts);
+        renderStockChart(allProducts); // Renderizar el gráfico con los datos iniciales
+      } else {
+        throw new Error(data.message || "Error al obtener los datos del inventario.");
+      }
+    } catch (error) {
+      console.error("Error en fetchInventoryData:", error);
+      if (tablaInventarioBody) {
+        tablaInventarioBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--error-color);">Error al cargar el inventario: ${error.message}</td></tr>`;
+      }
+    } finally {
+      showLoading(false);
+    }
+  };
+
+  const renderInventoryTable = (products) => {
+    if (!tablaInventarioBody) return;
     tablaInventarioBody.innerHTML = "";
     if (!products || products.length === 0) {
-      tablaInventarioBody.innerHTML =
-        '<tr><td colspan="9" style="text-align:center;">No se encontraron productos.</td></tr>';
+      tablaInventarioBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No se encontraron productos.</td></tr>`;
       return;
     }
-    products.forEach((product) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-                <td>${product.nombre || ""}</td>
-                <td>${product.categoria || ""}</td>
-                <td>${product.tipo === "servicio" || (product.categoria && product.categoria.toLowerCase() === "servicios") ? "∞" : product.stock_actual !== null ? product.stock_actual : ""}</td>
-                <td>${product.unidad_medida || ""}</td>
-                <td>${product.stock_minimo !== null ? product.stock_minimo : ""}</td>
-                <td>${product.proveedor || ""}</td>
-                <td>${formatDateForDisplay(product.fecha_ingreso)}</td>
-                <td class="actions">
-                    <button class="btn-edit" data-id="${product.id_producto}"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" data-id="${product.id_producto}"><i class="fas fa-trash-alt"></i></button>
-                </td>
-            `;
-      tablaInventarioBody.appendChild(row);
-    });
-    document
-      .querySelectorAll(".btn-edit")
-      .forEach((btn) => btn.addEventListener("click", handleEditClick));
-    document
-      .querySelectorAll(".btn-delete")
-      .forEach((btn) => btn.addEventListener("click", handleDeleteClick));
-  }
 
-  function renderStockChart(products) {
-    if (!products) return;
-    const productsToShow = products.slice(0, 20);
-    const labels = productsToShow.map((p) => p.nombre);
-    const data = productsToShow.map((p) => parseFloat(p.stock_actual) || 0);
+    products.forEach((product) => {
+        const stock = parseFloat(product.stock_actual) || 0;
+        const minStock = parseFloat(product.stock_minimo) || 0;
+        let estado = '<span class="status status-ok">OK</span>';
+        if (product.tipo !== 'servicio' && stock <= minStock) {
+            estado = stock === 0 
+                ? '<span class="status status-error">Agotado</span>' 
+                : '<span class="status status-warn">Bajo Stock</span>';
+        }
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${product.nombre_producto || product.nombre || "N/A"}</td>
+            <td>${product.categoria || "N/A"}</td>
+            <td>${product.tipo === "servicio" ? "N/A" : stock}</td>
+            <td>${estado}</td>
+            <td class="actions">
+                <button class="btn-edit" data-id="${product.id_producto}" title="Editar"><i class="fas fa-edit"></i></button>
+                <button class="btn-delete" data-id="${product.id_producto}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        `;
+        tablaInventarioBody.appendChild(row);
+    });
+
+    tablaInventarioBody.querySelectorAll(".btn-edit").forEach((btn) => btn.addEventListener("click", handleEditClick));
+    tablaInventarioBody.querySelectorAll(".btn-delete").forEach((btn) => btn.addEventListener("click", handleDeleteClick));
+  };
+
+  const renderStockChart = (products) => {
+    if (!stockChartCanvas || !products) return;
+
+    const productsForChart = products
+      .filter(p => p.tipo !== 'servicio' && p.stock_actual > 0)
+      .sort((a, b) => (b.stock_actual || 0) - (a.stock_actual || 0))
+      .slice(0, 15);
+
+    const labels = productsForChart.map(p => p.nombre_producto || p.nombre || 'Sin Nombre');
+    const data = productsForChart.map(p => parseFloat(p.stock_actual) || 0);
 
     if (stockChart) stockChart.destroy();
 
@@ -124,204 +93,121 @@ document.addEventListener("DOMContentLoaded", function () {
       type: "bar",
       data: {
         labels: labels,
-        datasets: [
-          {
-            label: "Stock Actual",
-            data: data,
-            borderWidth: 1,
-          },
-        ],
+        datasets: [{
+          label: "Stock Actual",
+          data: data,
+          backgroundColor: 'rgba(139, 0, 0, 0.6)', // Rojo corporativo con transparencia
+          borderColor: 'rgba(139, 0, 0, 1)',
+          borderWidth: 1,
+        }],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        indexAxis: 'y', // Refuerzo para barras horizontales
+        indexAxis: 'y',
         scales: {
-          x: { beginAtZero: true, grid: { color: "rgba(255, 255, 255, 0.05)" } }
+          x: { beginAtZero: true, grid: { color: "rgba(255, 255, 255, 0.1)" } },
+          y: { grid: { color: "rgba(255, 255, 255, 0.05)" } }
         },
         plugins: { legend: { display: false } },
       },
     });
   }
-
-  function handleFormSubmit(event) {
+  
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
     showLoading(true);
+    
     const formData = new FormData(inventarioForm);
     const productData = Object.fromEntries(formData.entries());
+    const idProducto = productData.editProductId;
 
-    // Determinar si es Crear (POST) o Editar (PUT)
-    const idProducto = productData.id_producto;
-    const isEdit = !!idProducto;
-
-    const url = isEdit
-      ? `${API_URL}/inventario/${idProducto}`
-      : `${API_URL}/inventario`;
-    const method = isEdit ? "PUT" : "POST";
-
-    // Agregar usuario actual para auditoría (opcional, pero recomendado)
-    const user = firebase.auth().currentUser;
-    if (user) {
-      productData.usuario_modificacion = user.email;
+    delete productData.editProductId;
+    if (productData.tipo === 'servicio') {
+      delete productData.stock_actual;
+      delete productData.stock_minimo;
     }
 
-    fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error de red: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then((result) => {
-        if (result.status === "success") {
-          alert(result.message || "Producto guardado con éxito.");
-          closeModal();
-          fetchInventoryData();
-        } else {
-          throw new Error(
-            result.message || "Error desconocido al guardar el producto.",
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error al guardar producto:", error);
-        alert("Error al guardar: " + error.message);
-      })
-      .finally(() => showLoading(false));
-  }
+    const url = idProducto ? `${API_URL}/inventario/${idProducto}` : `${API_URL}/inventario`;
+    const method = idProducto ? "PUT" : "POST";
 
-  function handleEditClick(event) {
-    const id = event.currentTarget.dataset.id;
-    const product = allProducts.find(
-      (p) => String(p.id_producto) === String(id),
-    );
-    if (product) openModal(true, product);
-  }
+    try {
+      const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(productData) });
+      const result = await response.json();
+      if (!response.ok || result.status !== 'success') throw new Error(result.message || "Error en la respuesta");
+      alert(result.message || "Producto guardado.");
+      resetForm();
+      fetchInventoryData();
+    } catch (error) {
+      console.error("Error al guardar producto:", error);
+      alert("Error al guardar: " + error.message);
+    } finally {
+      showLoading(false);
+    }
+  };
 
-  function handleDeleteClick(event) {
+  const handleEditClick = (event) => {
     const id = event.currentTarget.dataset.id;
-    const product = allProducts.find(
-      (p) => String(p.id_producto) === String(id),
-    );
+    const product = allProducts.find((p) => String(p.id_producto) === String(id));
     if (!product) return;
 
-    if (confirm(`¿Seguro que quieres eliminar "${product.nombre}"?`)) {
-      showLoading(true);
+    Object.keys(product).forEach((key) => {
+      const fieldName = (key === 'nombre') ? 'nombre_producto' : key;
+      const field = inventarioForm.elements[fieldName];
+      if (field) field.value = product[key] === null ? '' : product[key];
+    });
+    if (inventarioForm.elements.editProductId) inventarioForm.elements.editProductId.value = product.id_producto;
+    
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) submitButton.innerHTML = '<i class="fas fa-save"></i> Actualizar Producto';
+    if (cancelEditButton) cancelEditButton.style.display = 'inline-block';
 
-      fetch(`${API_URL}/inventario/${id}`, {
-        method: "DELETE",
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Error de red: ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then((result) => {
-          if (result.status === "success") {
-            alert(result.message || "Producto eliminado con éxito.");
-            fetchInventoryData();
-          } else {
-            throw new Error(result.message || "Error desconocido al eliminar.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error al eliminar producto:", error);
-          alert("Error al eliminar: " + error.message);
-        })
-        .finally(() => showLoading(false));
+    inventarioForm.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleDeleteClick = async (event) => {
+    const id = event.currentTarget.dataset.id;
+    const product = allProducts.find((p) => String(p.id_producto) === String(id));
+    if (!product || !confirm(`¿Seguro que quieres eliminar "${product.nombre || product.nombre_producto}"?`)) return;
+
+    showLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/inventario/${id}`, { method: "DELETE" });
+      const result = await response.json();
+      if (!response.ok || result.status !== 'success') throw new Error(result.message || "Error al eliminar");
+      alert(result.message || "Producto eliminado.");
+      fetchInventoryData();
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+      alert("Error al eliminar: " + error.message);
+    } finally {
+      showLoading(false);
     }
-  }
+  };
+  
+  const resetForm = () => {
+    inventarioForm.reset();
+    if (inventarioForm.elements.editProductId) inventarioForm.elements.editProductId.value = '';
+    const submitButton = document.getElementById('submit-button');
+    if (submitButton) submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
+    if (cancelEditButton) cancelEditButton.style.display = 'none';
+  };
 
-  function handleSearch() {
+  const handleSearch = () => {
     if (!allProducts) return;
     const searchTerm = searchInput.value.toLowerCase();
-    const filteredProducts = allProducts.filter(
-      (p) =>
-        (p.nombre || "").toLowerCase().includes(searchTerm) ||
-        (p.categoria || "").toLowerCase().includes(searchTerm),
+    const filteredProducts = allProducts.filter(p =>
+        (p.nombre_producto || p.nombre || "").toLowerCase().includes(searchTerm) ||
+        (p.codigo_sku || "").toLowerCase().includes(searchTerm)
     );
     renderInventoryTable(filteredProducts);
-    renderStockChart(filteredProducts);
-  }
+    renderStockChart(filteredProducts); // Actualizar gráfico con el resultado de la búsqueda
+  };
 
-  // --- LÓGICA DE UI PARA SERVICIOS ---
-  function toggleStockInputs() {
-    const categoriaInput = inventarioForm.elements["categoria"];
-    const stockInput = inventarioForm.elements["stock_actual"];
-    const stockMinInput = inventarioForm.elements["stock_minimo"];
-
-    if (!categoriaInput || !stockInput) return;
-
-    const isService = categoriaInput.value.trim().toLowerCase() === "servicios";
-
-    if (isService) {
-      stockInput.disabled = true;
-      stockInput.value = "";
-      stockInput.placeholder = "Infinito (∞)";
-      if (stockMinInput) {
-        stockMinInput.disabled = true;
-        stockMinInput.value = "";
-      }
-    } else {
-      stockInput.disabled = false;
-      stockInput.placeholder = "";
-      if (stockMinInput) stockMinInput.disabled = false;
-    }
-  }
-
-  // --- FUNCIONES UTILITARIAS ---
-
-  function openModal(isEdit = false, product = null) {
-    inventarioForm.reset();
-    if (isEdit && product) {
-      formTitle.textContent = "Editar Producto";
-      Object.keys(product).forEach((key) => {
-        const field = inventarioForm.elements[key];
-        if (field) {
-          if (key === "fecha_ingreso" && product[key]) {
-            const date = new Date(product[key]);
-            if (!isNaN(date)) {
-              field.value = date.toISOString().split("T")[0];
-            }
-          } else {
-            field.value = product[key];
-          }
-        }
-      });
-      if (inventarioForm.elements["id_producto"]) {
-        inventarioForm.elements["id_producto"].value =
-          product.id_producto || "";
-      }
-    } else {
-      formTitle.textContent = "Añadir Nuevo Producto";
-      if (inventarioForm.elements["id_producto"]) {
-        inventarioForm.elements["id_producto"].value = "";
-      }
-      if (inventarioForm.elements["fecha_ingreso"]) {
-        inventarioForm.elements["fecha_ingreso"].value = new Date()
-          .toISOString()
-          .split("T")[0];
-      }
-    }
-    toggleStockInputs(); // Aplicar estado inicial de los inputs
-    productModal.style.display = "block";
-  }
-
-  function closeModal() {
-    productModal.style.display = "none";
-    inventarioForm.reset();
-  }
-
-  function showLoading(show) {
-    if (loadingOverlay) {
-      loadingOverlay.style.display = show ? "flex" : "none";
-    }
-  }
+  // --- INICIALIZACIÓN ---
+  fetchInventoryData();
+  
+  if (inventarioForm) inventarioForm.addEventListener("submit", handleFormSubmit);
+  if (searchInput) searchInput.addEventListener("input", handleSearch);
+  if (cancelEditButton) cancelEditButton.addEventListener("click", resetForm);
 });

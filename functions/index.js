@@ -15,9 +15,10 @@ app.use(cors({ origin: true })); // Permite peticiones desde tu frontend
 app.use(express.json()); // Permite al servidor entender JSON en las peticiones
 
 // --- RUTAS DE LA API REALES ---
+// Las rutas ya no necesitan el prefijo /api, ya que la función se llama 'api'.
 
 // Endpoint para OBTENER clientes (para el select de ventas)
-app.get("/api/clientes", async (req, res) => {
+app.get("/clientes", async (req, res) => {
   try {
     const snapshot = await db.collection("clientes").get();
     const clientes = snapshot.docs.map((doc) => ({
@@ -34,11 +35,11 @@ app.get("/api/clientes", async (req, res) => {
 });
 
 // Endpoint para AÑADIR un nuevo cliente
-app.post("/api/clientes", async (req, res) => {
+app.post("/clientes", async (req, res) => {
   try {
     // LOGGING: Ver qué datos llegan para depurar
     console.log(
-      "Petición recibida en /api/clientes. Body:",
+      "Petición recibida en /clientes. Body:",
       JSON.stringify(req.body),
     );
 
@@ -85,7 +86,7 @@ app.post("/api/clientes", async (req, res) => {
 });
 
 // Endpoint para ACTUALIZAR un cliente existente
-app.put("/api/clientes/:id", async (req, res) => {
+app.put("/clientes/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -102,7 +103,7 @@ app.put("/api/clientes/:id", async (req, res) => {
 });
 
 // Endpoint para OBTENER inventario (para el select de productos)
-app.get("/api/inventario", async (req, res) => {
+app.get("/inventario", async (req, res) => {
   try {
     const snapshot = await db.collection("inventario").get();
     const productos = snapshot.docs.map((doc) => ({
@@ -119,7 +120,7 @@ app.get("/api/inventario", async (req, res) => {
 });
 
 // Endpoint para AÑADIR un nuevo producto al inventario
-app.post("/api/inventario", async (req, res) => {
+app.post("/inventario", async (req, res) => {
   try {
     const productoData = req.body;
     // Eliminar id_producto del cuerpo si viene vacío para que Firestore genere uno
@@ -140,7 +141,7 @@ app.post("/api/inventario", async (req, res) => {
 });
 
 // Endpoint para ACTUALIZAR un producto existente
-app.put("/api/inventario/:id", async (req, res) => {
+app.put("/inventario/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
@@ -160,7 +161,7 @@ app.put("/api/inventario/:id", async (req, res) => {
 });
 
 // Endpoint para ELIMINAR un producto
-app.delete("/api/inventario/:id", async (req, res) => {
+app.delete("/inventario/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await db.collection("inventario").doc(id).delete();
@@ -176,7 +177,7 @@ app.delete("/api/inventario/:id", async (req, res) => {
 });
 
 // Endpoint para OBTENER todas las ventas (para Reportes)
-app.get("/api/ventas", async (req, res) => {
+app.get("/ventas", async (req, res) => {
   try {
     // OPTIMIZACIÓN: Paginación y Límites
     // Si no se especifica límite, traemos solo las últimas 100 para no saturar
@@ -223,7 +224,7 @@ app.get("/api/ventas", async (req, res) => {
 });
 
 // Endpoint para OBTENER TODOS los registros de historial de abonos
-app.get("/api/abonos", async (req, res) => {
+app.get("/abonos", async (req, res) => {
   try {
     const ventasSnapshot = await db.collection("ventas")
       .where("historial_abonos", "!=", null) // Solo traemos ventas que tengan historial
@@ -246,7 +247,7 @@ app.get("/api/abonos", async (req, res) => {
 });
 
 // Endpoint para AÑADIR una nueva venta
-app.post("/api/ventas", async (req, res) => {
+app.post("/ventas", async (req, res) => {
   try {
     const ventaData = req.body;
 
@@ -395,7 +396,7 @@ app.post("/api/ventas", async (req, res) => {
 });
 
 // Endpoint para ACTUALIZAR una venta (ej. registrar abono)
-app.put("/api/ventas/:id", async (req, res) => {
+app.put("/ventas/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { monto_abono } = req.body; // Esperamos que envíen el monto a abonar
@@ -452,7 +453,7 @@ app.put("/api/ventas/:id", async (req, res) => {
 });
 
 // Endpoint para ELIMINAR una venta (y restaurar stock si aplica)
-app.delete("/api/ventas/:id", async (req, res) => {
+app.delete("/ventas/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await db.runTransaction(async (t) => {
@@ -507,7 +508,7 @@ app.delete("/api/ventas/:id", async (req, res) => {
 });
 
 // Endpoint para OBTENER todos los gastos (para Reportes)
-app.get("/api/gastos", async (req, res) => {
+app.get("/gastos", async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit) : 100;
     const snapshot = await db.collection("gastos")
@@ -531,7 +532,7 @@ app.get("/api/gastos", async (req, res) => {
 });
 
 // Endpoint para AÑADIR un nuevo gasto
-app.post("/api/gastos", async (req, res) => {
+app.post("/gastos", async (req, res) => {
   try {
     const gastoData = req.body;
     // Validar datos aquí si es necesario
@@ -550,7 +551,7 @@ app.post("/api/gastos", async (req, res) => {
 });
 
 // Endpoint para ELIMINAR un gasto
-app.delete("/api/gastos/:id", async (req, res) => {
+app.delete("/gastos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await db.collection("gastos").doc(id).delete();
@@ -566,7 +567,7 @@ app.delete("/api/gastos/:id", async (req, res) => {
 });
 
 // Endpoint para OBTENER los datos del dashboard (KPIs, gráficos, etc.)
-app.get("/api/dashboard", async (req, res) => {
+app.get("/dashboard", async (req, res) => {
   try {
     const ahora = new Date();
     // Calcular primer día del mes actual para filtrar
@@ -800,7 +801,7 @@ app.get("/api/dashboard", async (req, res) => {
 });
 
 // Endpoint para ANÁLISIS ANUAL (Datos agregados por año/mes)
-app.get("/api/analisis", async (req, res) => {
+app.get("/analisis", async (req, res) => {
   try {
     const [ventasSnapshot, gastosSnapshot] = await Promise.all([
       db.collection("ventas").get(),
@@ -890,7 +891,7 @@ app.get("/api/analisis", async (req, res) => {
 });
 
 // Endpoint para OBTENER tasas de cambio (Conectado a API externa via .env)
-app.get("/api/exchange-rates", async (req, res) => {
+app.get("/exchange-rates", async (req, res) => {
   try {
     // 1. Intentar usar variables de entorno (.env)
     // El sistema buscará EXCHANGE_API_URL (url completa) o EXCHANGE_API_KEY (para construirla)
@@ -907,7 +908,7 @@ app.get("/api/exchange-rates", async (req, res) => {
       const response = await fetch(urlToFetch);
       if (!response.ok) {
         throw new Error(
-          `Error al consultar API externa: ${response.statusText}`,
+          `Error al consultar API externa: ${response.statusText}`
         );
       }
       const data = await response.json();
@@ -948,7 +949,7 @@ app.get("/api/exchange-rates", async (req, res) => {
 });
 
 // Endpoint de Mantenimiento: Recalcular totales históricos (Ejecutar una sola vez para inicializar)
-app.post("/api/admin/recalcular-totales", async (req, res) => {
+app.post("/admin/recalcular-totales", async (req, res) => {
   try {
     const [ventas, gastos] = await Promise.all([
       db.collection("ventas").select("venta_bruta").get(),
@@ -974,7 +975,7 @@ app.post("/api/admin/recalcular-totales", async (req, res) => {
 });
 
 // Endpoint de Mantenimiento: Migrar datos de ventas a números (Corrección de tipos)
-app.post("/api/admin/migrar-ventas-numeros", async (req, res) => {
+app.post("/admin/migrar-ventas-numeros", async (req, res) => {
   try {
     const snapshot = await db.collection("ventas").get();
     let batch = db.batch();

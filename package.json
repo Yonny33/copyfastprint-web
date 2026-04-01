@@ -1,0 +1,20 @@
+{
+  "name": "copyfastprint-web",
+  "version": "1.0.0",
+  "description": "Frontend para COPYFAST&PRINT modernizado con Vite",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "glob": "^10.4.1",
+    "vite": "^5.3.1"
+  },
+  "dependencies": {
+    "firebase": "^12.11.0"
+  }
+}

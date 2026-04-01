@@ -13,7 +13,7 @@
     <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
-    <link rel="stylesheet" href="/admin/css/main.css?v=1.2" /> <!-- version bump -->
+    <link rel="stylesheet" href="/admin/css/main.css?v=1.2" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   </head>
   <body class="admin-page">
@@ -22,20 +22,17 @@
 
       <main class="admin-main-content">
         
-        <!-- TÍTULO DE LA SECCIÓN (RESTAURADO) -->
         <div class="section-heading">
           <h2><i class="fas fa-cash-register"></i> Registro de Ventas</h2>
           <div class="divider"></div>
           <p>Añade nuevas ventas o edita una existente.</p>
         </div>
 
-        <!-- FORMULARIO DE VENTAS -->
         <div class="card-form">
             <form id="registro-ventas-form">
               <input type="hidden" id="edit-venta-id" name="editVentaId">
               <div class="form-grid-4-col">
                 
-                <!-- Fila 1 -->
                 <div class="form-group floating">
                   <input type="date" id="fecha" name="fecha" placeholder=" " required />
                   <label for="fecha">Fecha de Venta *</label>
@@ -53,13 +50,11 @@
                   <label for="producto">Producto *</label>
                 </div>
 
-                <!-- Fila 2 -->
                 <div class="form-group floating span-4">
                   <textarea id="detalles_pedido" name="detalles_pedido" placeholder=" "></textarea>
                   <label for="detalles_pedido">Detalles del Pedido (Opcional)</label>
                 </div>
 
-                <!-- Fila 3 -->
                 <div class="form-group floating">
                   <input type="number" id="cantidad" name="cantidad" value="1" min="1" placeholder=" " required />
                   <label for="cantidad">Cantidad *</label>
@@ -73,7 +68,6 @@
                   <label for="abono_recibido">Abono Recibido *</label>
                 </div>
                 
-                <!-- Fila 4 -->
                 <div class="form-group floating">
                   <input type="number" id="venta_bruta" name="venta_bruta" placeholder=" " readonly />
                   <label for="venta_bruta">Venta Bruta</label>
@@ -105,7 +99,6 @@
             </form>
         </div>
 
-        <!-- Tabla de Ventas Recientes -->
         <div class="card-table modern-table" style="margin-top: 2rem;">
           <div class="toolbar">
             <h3><i class="fas fa-history"></i> Ventas Recientes</h3>
@@ -128,7 +121,6 @@
                 </tr>
               </thead>
               <tbody id="ventas-tbody">
-                <!-- Las filas de ventas se cargarán aquí dinámicamente -->
               </tbody>
             </table>
           </div>
@@ -141,7 +133,6 @@
       <p>Procesando...</p>
     </div>
     
-    <!-- Modal para Detalles de Venta -->
     <div id="venta-details-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -149,17 +140,13 @@
           <span class="close-button" id="modal-close-btn">&times;</span>
         </div>
         <div class="modal-body" id="venta-details-content">
-          <!-- Los detalles se cargarán aquí dinámicamente -->
         </div>
       </div>
     </div>
 
-    <script src="/__/firebase/8.10.1/firebase-app.js"></script>
-    <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
-    <script src="/__/firebase/init.js"></script>
-
-    <script src="/admin/js/auth.js"></script>
-    <script src="/admin/js/ventas.js?v=2.3"></script>
-    <script src="/admin/js/components.js"></script>
+    <script type="module" src="/admin/js/auth.js"></script>
+    <script type="module" src="/admin/js/components.js"></script>
+    <script type="module" src="/admin/js/ventas.js?v=2.3"></script>
+    
   </body>
 </html>

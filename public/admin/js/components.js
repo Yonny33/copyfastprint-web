@@ -1,3 +1,7 @@
+
+import { auth } from '/src/firebase.js';
+import { signOut } from 'firebase/auth';
+
 document.addEventListener('DOMContentLoaded', function () {
   // Usar una ruta absoluta desde la raíz del sitio para asegurar que funcione en todas partes
   const headerUrl = '/admin/components/header.html';
@@ -20,22 +24,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const navLinks = document.querySelectorAll('.sidebar-nav a');
         
         navLinks.forEach(link => {
+          // Usamos new URL para obtener la ruta de forma segura, incluso con URL completas
           const linkPath = new URL(link.href).pathname;
-          // Comprobar si la ruta actual es exactamente la del enlace
           if (linkPath === currentPage) {
             link.parentElement.classList.add('active');
-          } else {
-            link.parentElement.classList.remove('active');
           }
         });
 
-        // Añadir funcionalidad al botón de cerrar sesión (si existe)
+        // Añadir funcionalidad al botón de cerrar sesión
         const logoutButton = document.getElementById('btnCerrarSesionSidebar');
-        if (logoutButton && typeof auth !== 'undefined' && typeof auth.signOut === 'function') {
+        if (logoutButton) {
           logoutButton.addEventListener('click', () => {
-            auth.signOut().then(() => {
-              window.location.href = '/'; // Redirigir a la página de inicio o login
-            }).catch(error => console.error('Error al cerrar sesión:', error));
+            signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+            // No es necesario redirigir aquí. El script 'auth.js' detectará el cambio
+            // de estado y redirigirá a la página de login automáticamente.
           });
         }
       }

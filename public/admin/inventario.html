@@ -3,278 +3,130 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inventario - COPYFAST&PRINT</title>
-    <meta name="robots" content="noindex, nofollow" />
+    <title>Inventario - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de inventario." />
 
     <!-- Favicons -->
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="/favicons/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="/favicons/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="/favicons/favicon-16x16.png"
-    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
     <link rel="manifest" href="/favicons/manifest.json" />
 
-    <link rel="stylesheet" href="/admin/css/main.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="/admin/css/main.css?v=1.2" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Chart.js para el gráfico de stock -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <script>
-      // Configuración Global de Chart.js - Estilo Corporativo (Rojo)
-      if (typeof Chart !== 'undefined') {
-        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        Chart.defaults.color = "#a0a0a0";
-        // Barras Rojas
-        Chart.defaults.elements.bar.backgroundColor = "rgba(139, 0, 0, 0.8)";
-        Chart.defaults.elements.bar.borderColor = "#8b0000";
-        Chart.defaults.elements.bar.borderWidth = 1;
-        Chart.defaults.elements.bar.borderRadius = 4;
-        Chart.defaults.elements.bar.hoverBackgroundColor = "#ff0000";
-
-        // --- NUEVO: Barras Horizontales y Etiquetas de Valor ---
-        Chart.defaults.indexAxis = 'y'; // Cambia la orientación a horizontal
-        
-        // Configuración de DataLabels (Números en la punta)
-        if (typeof ChartDataLabels !== 'undefined') {
-          Chart.register(ChartDataLabels);
-          Chart.defaults.plugins.datalabels.color = '#eaeaea';
-          Chart.defaults.plugins.datalabels.anchor = 'end';
-          Chart.defaults.plugins.datalabels.align = 'end';
-          Chart.defaults.plugins.datalabels.font = { weight: 'bold' };
-          Chart.defaults.layout.padding = { right: 50 }; // Espacio para los números
-        }
-      }
-    </script>
   </head>
   <body class="admin-page">
-    <div id="loading-overlay" class="loading-overlay" style="display: none">
-      <div class="spinner"></div>
-      <p>Cargando...</p>
-    </div>
-
     <div class="admin-grid-container">
       <div id="header-placeholder"></div>
 
       <main class="admin-main-content">
         <div class="section-heading">
-          <h2>Inventario</h2>
+          <h2><i class="fas fa-boxes"></i> Gestión de Inventario</h2>
           <div class="divider"></div>
-          <p>
-            Administra el stock de productos, proveedores y fechas de ingreso.
-          </p>
+          <p>Añade nuevos productos o actualiza el stock existente.</p>
         </div>
 
-        <div class="toolbar">
-          <button id="btn-add-producto" class="btn-primary">
-            <i class="fas fa-plus"></i> Añadir Nuevo Producto
-          </button>
-          <div class="search-bar">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Buscar por nombre, código o categoría..."
-            />
-            <i class="fas fa-search"></i>
-          </div>
+        <div class="card-form">
+          <form id="inventario-form">
+            <input type="hidden" id="edit-product-id" name="editProductId" />
+            <div class="form-grid-3-col">
+              <div class="form-group floating">
+                <input type="text" id="nombre_producto" name="nombre_producto" placeholder=" " required />
+                <label for="nombre_producto">Nombre del Producto *</label>
+              </div>
+              <div class="form-group floating">
+                <select id="categoria" name="categoria" required>
+                  <option value="" disabled selected>Selecciona una categoría</option>
+                  <option value="Papeleria">Papelería</option>
+                  <option value="Impresiones">Impresiones</option>
+                  <option value="Servicios">Servicios</option>
+                  <option value="Sublimacion">Sublimación</option>
+                  <option value="Material POP">Material POP</option>
+                  <option value="Insumos">Insumos</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <label for="categoria">Categoría *</label>
+              </div>
+              <div class="form-group floating">
+                <select id="tipo" name="tipo" required>
+                  <option value="producto">Producto</option>
+                  <option value="servicio">Servicio</option>
+                </select>
+                <label for="tipo">Tipo *</label>
+              </div>
+              <div class="form-group floating span-3">
+                <textarea id="descripcion" name="descripcion" rows="2" placeholder=" "></textarea>
+                <label for="descripcion">Descripción (Opcional)</label>
+              </div>
+              <div class="form-group floating">
+                <input type="number" id="stock_actual" name="stock_actual" step="1" min="0" placeholder=" " required />
+                <label for="stock_actual">Stock Actual *</label>
+              </div>
+              <div class="form-group floating">
+                <input type="number" id="stock_minimo" name="stock_minimo" step="1" min="0" placeholder=" " />
+                <label for="stock_minimo">Stock Mínimo (Alerta)</label>
+              </div>
+              <div class="form-group floating">
+                <input type="text" id="codigo_sku" name="codigo_sku" placeholder=" " />
+                <label for="codigo_sku">Código/SKU (Opcional)</label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" id="submit-button" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar Producto
+              </button>
+              <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none">
+                <i class="fas fa-times"></i> Cancelar Edición
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div class="card-table">
-          <div class="chart-container-medium">
+        <!-- Gráfico de Stock Restaurado -->
+        <div class="card" style="margin-top: 2rem;">
+          <h3><i class="fas fa-chart-bar"></i> Visualización de Stock</h3>
+          <div class="chart-container" style="height: 300px;">
             <canvas id="stock-chart"></canvas>
           </div>
         </div>
 
-        <div class="card-table modern-table">
-          <h3><i class="fas fa-list-alt"></i> Listado de Productos</h3>
+        <div class="card-table modern-table" style="margin-top: 2rem">
+          <div class="toolbar">
+            <h3><i class="fas fa-list-alt"></i> Productos en Inventario</h3>
+            <div class="search-bar">
+              <input type="text" id="search-inventario-input" placeholder="Buscar por nombre o SKU..." />
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
           <div class="table-responsive">
-            <table id="tabla-inventario">
+            <table id="inventario-table">
               <thead>
                 <tr>
                   <th>Nombre</th>
                   <th>Categoría</th>
-                  <th>Stock</th>
-                  <th>Unidad</th>
-                  <th>Stock Mín.</th>
-                  <th>Proveedor</th>
-                  <th>Fecha Ingreso</th>
+                  <th>Stock Actual</th>
+                  <th>Estado</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody>
-                <!-- Las filas se insertarán dinámicamente con JavaScript -->
-              </tbody>
+              <tbody id="inventario-tbody"></tbody>
             </table>
           </div>
         </div>
       </main>
     </div>
 
-    <!-- Modal para Añadir/Editar Producto -->
-    <div id="product-modal" class="modal" style="display: none">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="form-title">Añadir Nuevo Producto</h3>
-          <span class="close-button">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="inventario-form">
-            <input type="hidden" id="id_producto" name="id_producto" />
-            <div class="form-row">
-              <div class="form-group floating">
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  class="form-control"
-                  placeholder=" "
-                  required
-                />
-                <label for="nombre">Nombre del Producto</label>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group floating">
-                <select id="categoria" name="categoria" class="form-control" required>
-                  <option value="" selected disabled>Seleccione...</option>
-                  <option value="Papelería">Papelería</option>
-                  <option value="Sublimación">Sublimación</option>
-                  <option value="Textiles">Textiles</option>
-                  <option value="Servicios">Servicios</option>
-                  <option value="Insumos">Insumos</option>
-                  <option value="Tecnología">Tecnología</option>
-                  <option value="Otros">Otros</option>
-                </select>
-                <label for="categoria">Categoría</label>
-              </div>
-              <div class="form-group floating">
-                <input
-                  type="text"
-                  id="proveedor"
-                  name="proveedor"
-                  class="form-control"
-                  placeholder=" "
-                />
-                <label for="proveedor">Proveedor</label>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group floating">
-                <input
-                  type="number"
-                  id="stock_actual"
-                  name="stock_actual"
-                  class="form-control"
-                  required
-                  step="any"
-                  placeholder=" "
-                />
-                <label for="stock_actual">Stock Actual</label>
-              </div>
-              <div class="form-group floating">
-                <input
-                  type="number"
-                  id="stock_minimo"
-                  name="stock_minimo"
-                  class="form-control"
-                  step="any"
-                  placeholder=" "
-                />
-                <label for="stock_minimo">Stock Mínimo de Alerta</label>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group floating">
-                <input
-                  type="text"
-                  id="unidad_medida"
-                  name="unidad_medida"
-                  class="form-control"
-                  placeholder=" "
-                />
-                <label for="unidad_medida">Unidad de Medida</label>
-              </div>
-              <div class="form-group floating">
-                <input
-                  type="date"
-                  id="fecha_ingreso"
-                  name="fecha_ingreso"
-                  class="form-control"
-                  placeholder=" "
-                  required
-                />
-                <label for="fecha_ingreso">Fecha de Ingreso</label>
-              </div>
-            </div>
-
-            <!-- NUEVO: Configuración de Producción (Consumo Automático) -->
-            <div class="form-row" style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px dashed var(--border-color); margin-bottom: 1.5rem;">
-              <div class="form-group floating" style="margin-bottom: 0;">
-                <select id="id_insumo" name="id_insumo" class="form-control">
-                    <option value="">Ninguno (No descontar nada extra)</option>
-                </select>
-                <label for="id_insumo">Insumo a Descontar al Vender (Ej: Papel)</label>
-              </div>
-              <div class="form-group floating" style="margin-bottom: 0;">
-                <input type="number" id="cantidad_insumo" name="cantidad_insumo" class="form-control" step="any" placeholder=" ">
-                <label for="cantidad_insumo">Cantidad a Descontar (Ej: 2)</label>
-              </div>
-            </div>
-
-            <div class="form-buttons">
-              <button type="submit" class.btn.btn-primary">
-                Guardar Producto
-              </button>
-              <button type="button" class="btn btn-secondary close-button">
-                Cancelar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
     </div>
 
-    <!-- Scripts de Firebase (¡AÑADIDOS!) -->
-    <script src="/__/firebase/8.10.1/firebase-app.js"></script>
-    <script src="/__/firebase/8.10.1/firebase-auth.js"></script>
-    <script src="/__/firebase/init.js"></script>
+    <script type="module" src="/admin/js/auth.js"></script>
+    <script type="module" src="/admin/js/components.js"></script>
+    <script type="module" src="/admin/js/inventario.js"></script>
 
-    <!-- Scripts de la aplicación -->
-    <script src="/admin/js/auth.js"></script>
-    <script src="/admin/js/inventario.js"></script>
-    <script src="/admin/js/components.js"></script>
-
-    <!-- Script para cargar lista de insumos en el select -->
-    <script>
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          const res = await fetch('/api/inventario');
-          const data = await res.json();
-          const select = document.getElementById('id_insumo');
-          if(data.status === 'success' && select) {
-            // Llenar el select con los productos existentes
-            data.data.forEach(p => {
-              const option = document.createElement('option');
-              option.value = p.id_producto;
-              option.textContent = `${p.nombre} (Stock: ${p.stock_actual})`;
-              select.appendChild(option);
-            });
-          }
-        } catch(e) { console.error("Error cargando insumos:", e); }
-      });
-    </script>
   </body>
 </html>
