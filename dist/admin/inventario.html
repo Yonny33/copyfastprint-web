@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventario - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de inventario." />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="/favicons/manifest.json" />
+
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Chart.js para el gráfico de stock -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script type="module" crossorigin src="/admin/js/inventario-B-QdYBGf.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-COMbAFny.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/auth-D0e3KaCN.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-BXu2cGsF.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/auth-D701PeY8.css">
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <div id="header-placeholder"></div>
+
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2><i class="fas fa-boxes"></i> Gestión de Inventario</h2>
+          <div class="divider"></div>
+          <p>Añade nuevos productos o actualiza el stock existente.</p>
+        </div>
+
+        <div class="card-form">
+          <form id="inventario-form">
+            <input type="hidden" id="edit-product-id" name="editProductId" />
+            <div class="form-grid-3-col">
+              <div class="form-group floating">
+                <input type="text" id="nombre_producto" name="nombre_producto" placeholder=" " required />
+                <label for="nombre_producto">Nombre del Producto *</label>
+              </div>
+              <div class="form-group floating">
+                <select id="categoria" name="categoria" required>
+                  <option value="" disabled selected>Selecciona una categoría</option>
+                  <option value="Papeleria">Papelería</option>
+                  <option value="Impresiones">Impresiones</option>
+                  <option value="Servicios">Servicios</option>
+                  <option value="Sublimacion">Sublimación</option>
+                  <option value="Material POP">Material POP</option>
+                  <option value="Insumos">Insumos</option>
+                  <option value="Otro">Otro</option>
+                </select>
+                <label for="categoria">Categoría *</label>
+              </div>
+              <div class="form-group floating">
+                <select id="tipo" name="tipo" required>
+                  <option value="producto">Producto</option>
+                  <option value="servicio">Servicio</option>
+                </select>
+                <label for="tipo">Tipo *</label>
+              </div>
+              <div class="form-group floating span-3">
+                <textarea id="descripcion" name="descripcion" rows="2" placeholder=" "></textarea>
+                <label for="descripcion">Descripción (Opcional)</label>
+              </div>
+              <div class="form-group floating">
+                <input type="number" id="stock_actual" name="stock_actual" step="1" min="0" placeholder=" " required />
+                <label for="stock_actual">Stock Actual *</label>
+              </div>
+              <div class="form-group floating">
+                <input type="number" id="stock_minimo" name="stock_minimo" step="1" min="0" placeholder=" " />
+                <label for="stock_minimo">Stock Mínimo (Alerta)</label>
+              </div>
+              <div class="form-group floating">
+                <input type="text" id="codigo_sku" name="codigo_sku" placeholder=" " />
+                <label for="codigo_sku">Código/SKU (Opcional)</label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" id="submit-button" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar Producto
+              </button>
+              <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none">
+                <i class="fas fa-times"></i> Cancelar Edición
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Gráfico de Stock Restaurado -->
+        <div class="card" style="margin-top: 2rem;">
+          <h3><i class="fas fa-chart-bar"></i> Visualización de Stock</h3>
+          <div class="chart-container" style="height: 300px;">
+            <canvas id="stock-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="card-table modern-table" style="margin-top: 2rem">
+          <div class="toolbar">
+            <h3><i class="fas fa-list-alt"></i> Productos en Inventario</h3>
+            <div class="search-bar">
+              <input type="text" id="search-inventario-input" placeholder="Buscar por nombre o SKU..." />
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="inventario-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Categoría</th>
+                  <th>Stock Actual</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="inventario-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
+    </div>
+
+
+  </body>
+</html>

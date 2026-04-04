@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reporte de Deudores - Admin COPYFAST&PRINT</title>
+    <meta
+      name="description"
+      content="Panel de administración para la visualización y gestión de deudores."
+    />
+
+    <!-- Favicons -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-icon-180x180.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/favicons/manifest.json" />
+
+    <!-- CSS Principal y Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Flatpickr (Selector de Fechas) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script type="module" crossorigin src="/admin/js/deudores-IreXVJNw.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-COMbAFny.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/auth-D0e3KaCN.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-BXu2cGsF.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/auth-D701PeY8.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/deudores-DqN8LVhb.css">
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <!-- El nuevo encabezado unificado se cargará aquí -->
+      <div id="header-placeholder"></div>
+
+      <!-- Contenido principal -->
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2>Gestión de Deudores</h2>
+          <div class="divider"></div>
+          <p>Busca y gestiona los saldos pendientes de tus clientes.</p>
+        </div>
+
+        <!-- Tabla de Clientes con Deudas -->
+        <div class="card-table modern-table">
+          <div class="toolbar">
+            <h3 id="ventas-table-title">Clientes con Deudas</h3>
+            <div class="search-bar">
+                <input type="text" id="cedula-search" placeholder="Buscar por Cédula o RIF...">
+                <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div id="summary-ventas" class="report-summary"></div>
+          <div class="table-responsive">
+            <table id="ventas-table">
+              <thead>
+                <tr>
+                  <th>Fecha de Última Compra</th>
+                  <th>Cliente</th>
+                  <th>Cédula</th>
+                  <th>Saldo Pendiente</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="deudores-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal de Abono (Clases estandarizadas) -->
+    <div id="abono-modal" class="modal" style="display: none">
+      <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+          <h3><i class="fas fa-hand-holding-usd"></i> Registrar Abono</h3>
+          <span class="close-button" id="close-modal-btn">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="abono-details"></div>
+            <form id="abono-form">
+              <input type="hidden" id="abono-transaccion-id" />
+              <div class="form-group floating">
+                  <input type="number" id="monto-abono" step="0.01" placeholder=" " required />
+                  <label for="monto-abono">Monto del Abono (Bs.)</label>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-submit">Guardar Abono</button>
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- MODAL UNIFICADO: Detalles de Deuda y Abonos -->
+    <div id="detalles-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-list-ul"></i> Detalles de Deuda y Abonos</h3>
+                <span class="close-button" id="close-detalles-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Sección para Detalles de la Venta -->
+                <div id="detalles-venta-info" style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                    <!-- La información de la venta se cargará aquí -->
+                </div>
+                
+                <!-- Sección para Historial de Abonos -->
+                <h4 style="margin-bottom: 1rem;">Abonos Registrados:</h4>
+                <div id="detalles-abonos-list" style="max-height: 300px; overflow-y: auto;">
+                    <!-- La lista de abonos se cargará aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de la aplicación -->
+  </body>
+</html>

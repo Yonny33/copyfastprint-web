@@ -1,6 +1,6 @@
 
 // Importa el objeto auth de nuestro archivo de configuración central
-import { auth } from '/src/firebase.js';
+import { auth } from '/firebase-config.js';
 // Importa las funciones que necesitamos de la librería de autenticación de Firebase
 import { onAuthStateChanged, signOut } from "firebase/auth";
 

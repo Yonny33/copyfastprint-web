@@ -13,7 +13,7 @@ const firebaseConfig = {
   projectId: "copyfast-control-v2",
   storageBucket: "copyfast-control-v2.firebasestorage.app",
   messagingSenderId: "331896837052",
-  appId: "1:331896837052:web:375bab6095e0e39cd651b9"
+  appId: "1:331896837052:web:d4ca4dc73963686bd651b9"
 };
 
 // Initialize Firebase

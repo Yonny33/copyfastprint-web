@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vectorizar Imagen - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/admin/js/vectorizar-BiP3xcF-.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-pqCBDqdT.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/scripts-CPowRrfQ.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/components-C-tRm9LI.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-498SLPPL.css">
+  </head>
+  <body>
+    <div id="header-placeholder"></div>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Vectorizar Imagen (SVG)</h1>
+        <p>Convierte tus imágenes JPG o PNG a vectores editables SVG de alta calidad.</p>
+        <a href="#instructions" class="btn-instruction-link"><i class="fas fa-info-circle"></i> Ver instrucciones</a>
+      </section>
+
+      <section class="workspace-area container">
+        
+        <div class="comparison-grid">
+          <!-- Lado Izquierdo: Original -->
+          <div class="preview-card">
+            <div class="preview-header">Imagen Original (Bitmap)</div>
+            <div class="preview-viewport" id="viewport-original">
+              <div id="placeholder-original" style="color: #555; text-align: center;">
+                <i class="fas fa-image" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                Sin imagen
+              </div>
+              <img id="img-original-preview" style="display: none;" />
+            </div>
+          </div>
+          
+          <!-- Lado Derecho: Vector -->
+          <div class="preview-card">
+            <div class="preview-header">Resultado Vectorizado (SVG)</div>
+            <div class="preview-viewport" id="viewport-vector">
+              <div id="placeholder-vector" style="color: #555; text-align: center;">
+                <i class="fas fa-bezier-curve" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                Esperando procesamiento...
+              </div>
+              <div id="svg-output"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-toolbar">
+          <div class="fab-container">
+            <label for="img-upload-vector" class="fab-btn upload" title="Subir Imagen">
+              <i class="fas fa-upload"></i>
+            </label>
+            <span class="fab-tooltip">Subir Imagen</span>
+            <input type="file" id="img-upload-vector" accept="image/*" hidden />
+          </div>
+          
+          <!-- Botón de Acción Principal -->
+          <div class="fab-container" id="container-process-btn" style="display: none;">
+            <button class="fab-btn" id="btn-process-vector" title="Vectorizar Ahora" style="background: var(--primary-color); color: white; border-color: white;">
+              <i class="fas fa-magic"></i>
+            </button>
+            <span class="fab-tooltip">Vectorizar Ahora</span>
+          </div>
+
+          <div class="fab-container">
+            <button class="fab-btn delete" id="btn-delete-vector" title="Eliminar Imagen">
+              <i class="fas fa-trash"></i>
+            </button>
+            <span class="fab-tooltip">Eliminar</span>
+          </div>
+          
+          <div class="fab-container">
+            <button class="fab-btn download" id="btn-download-vector" title="Descargar SVG">
+              <i class="fas fa-download"></i>
+            </button>
+            <span class="fab-tooltip">Descargar SVG</span>
+          </div>
+        </div>
+
+        <div class="instructions" id="instructions">
+          <h3><i class="fas fa-lightbulb"></i> Cómo usar y Recomendaciones:</h3>
+          <ul>
+            <li><strong>1. Subir:</strong> Carga tu imagen (JPG, PNG). El sistema la mostrará en el panel izquierdo.</li>
+            <li><strong>2. Vectorizar:</strong> Haz clic en el botón mágico <i class="fas fa-magic"></i> que aparecerá en la barra de herramientas.</li>
+            <li><strong>3. Comparar:</strong> El resultado vectorizado (SVG) aparecerá a la derecha. Compara la nitidez con la imagen original.</li>
+            <li><strong>4. Descargar:</strong> Si estás conforme, descarga el archivo .SVG, listo para usar en programas de diseño o para impresión.</li>
+            <li style="margin-top: 1rem; color: var(--text-primary);"><strong>Mejor resultado:</strong> Funciona a la perfección con logos, iconos y dibujos de colores planos.</li>
+            <li><strong>Fotografías:</strong> Se convertirán en un estilo artístico de "capas de colores", no en un vector fotorrealista.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+
+    <!-- Librería ImageTracer (Motor de vectorización) -->
+    <script src="https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"></script>
+
+  </body>
+</html>

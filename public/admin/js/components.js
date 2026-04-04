@@ -1,5 +1,5 @@
 
-import { auth } from '/src/firebase.js';
+import { auth } from '/firebase-config.js';
 import { signOut } from 'firebase/auth';
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -1,5 +1,7 @@
+import { API_BASE_URL } from '/firebase-config.js';
+
 document.addEventListener("DOMContentLoaded", function () {
-  const API_URL = "/api";
+  const API_URL = API_BASE_URL;
 
   // --- ELEMENTOS DEL DOM ---
   const form = document.getElementById("registro-ventas-form");
@@ -64,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <dt>Saldo Pendiente:</dt><dd>${formatCurrency(venta.saldo_pendiente)}</dd>
           <dt>Estado:</dt><dd>${venta.estado_pedido || 'N/A'}</dd>
           <dt>Método de Pago:</dt><dd>${venta.metodo_pago || 'N/A'}</dd>
+          <dt>Notas/Detalles:</dt><dd>${venta.detalles_pedido || 'Sin detalles adicionales.'}</dd>
         </dl>`;
       modalContent.innerHTML = detailsHtml;
     }

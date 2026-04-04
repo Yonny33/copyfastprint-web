@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remover Fondo - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/admin/js/remover-fondo-HFY-aC8b.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-pqCBDqdT.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/scripts-CPowRrfQ.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/components-C-tRm9LI.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-498SLPPL.css">
+  </head>
+  <body>
+    
+    <div id="header-placeholder"></div>
+
+    <main>
+      <section class="tools-hero">
+        <h1>Remover Fondo de Imagen</h1>
+        <p>Usa la IA para un borrado automático o las herramientas manuales para un ajuste preciso.</p>
+        <a href="#instructions" class="btn-instruction-link">
+          <i class="fas fa-info-circle"></i> Ver instrucciones
+        </a>
+      </section>
+
+      <section class="workspace-area container animate-up">
+        <!-- PANEL DE CONTROL -->
+        <div class="tool-controls">
+          <div class="tools-selection">
+            <button class="tool-btn" id="btn-ai" title="Quitar fondo con Inteligencia Artificial">
+              <i class="fas fa-robot"></i> Remover con IA
+            </button>
+            <button class="tool-btn active" id="tool-wand" title="Varita Mágica para quitar por color">
+              <i class="fas fa-magic"></i> Varita Mágica
+            </button>
+            <button class="tool-btn" id="tool-eraser" title="Borrador Manual">
+              <i class="fas fa-eraser"></i> Borrador
+            </button>
+          </div>
+          <div class="control-group group-wand">
+            <label for="tolerance"><i class="fas fa-sliders-h"></i> Tolerancia:</label>
+            <input type="range" id="tolerance" min="0" max="100" value="20" />
+            <span id="tolerance-val">20</span>
+          </div>
+          <div class="control-group group-wand">
+            <label for="feather"><i class="fas fa-feather-alt"></i> Suavizado:</label>
+            <input type="range" id="feather" min="0" max="10" value="0" />
+            <span id="feather-val">0</span>
+          </div>
+          <div class="control-group group-wand">
+            <label class="checkbox-label">
+              <input type="checkbox" id="contiguous" checked />
+              <span class="checkmark"></span>
+              Contiguo (solo áreas conectadas)
+            </label>
+          </div>
+          <div class="control-group">
+            <label><i class="fas fa-fill-drip"></i> Fondo:</label>
+            <div class="bg-selector">
+              <button class="bg-btn checker active" data-bg="checker" title="Transparente"></button>
+              <button class="bg-btn white" data-bg="#ffffff" title="Blanco"></button>
+              <button class="bg-btn black" data-bg="#000000" title="Negro"></button>
+              <button class="bg-btn red" data-bg="#ff0000" title="Rojo (Contraste)"></button>
+              <button class="bg-btn plus" id="btn-add-color" title="Más colores"><i class="fas fa-plus"></i></button>
+              <input type="color" id="custom-bg-color" style="visibility: hidden; position: absolute; width: 0; height: 0;">
+            </div>
+          </div>
+          <div class="control-group group-brush" style="display: none;">
+            <label for="brush-size"><i class="fas fa-circle"></i> Tamaño Pincel:</label>
+            <input type="range" id="brush-size" min="1" max="100" value="20" />
+            <span id="brush-size-val">20px</span>
+          </div>
+        </div>
+
+        <!-- ÁREA DE TRABAJO -->
+        <div class="canvas-container-wrapper" id="canvas-wrapper" style="cursor: crosshair; min-height: 400px; align-items: center; justify-content: center;">
+          <div id="placeholder-text" style="color: #666; text-align: center;">
+            <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+            Sube una imagen para comenzar
+          </div>
+          <canvas id="c" style="display: none;"></canvas>
+        </div>
+
+        <div class="instructions" id="instructions">
+            <h3><i class="fas fa-lightbulb"></i> Cómo usar:</h3>
+            <ul>
+                <li><strong>1. Subir:</strong> Carga tu imagen (JPG o PNG) usando el botón de la barra flotante.</li>
+                <li>
+                    <strong>2. Elegir Método:</strong>
+                    <ul>
+                        <li><strong>Remover con IA:</strong> La forma más rápida y precisa. Haz clic en el botón y deja que la IA haga el trabajo.</li>
+                        <li><strong>Varita Mágica:</strong> Ideal para fondos de color sólido. Haz clic en el color que quieres eliminar.</li>
+                        <li><strong>Borrador:</strong> Para retoques manuales y eliminar pequeños detalles.</li>
+                    </ul>
+                </li>
+                <li><strong>3. Descargar:</strong> Guarda tu imagen como un PNG con fondo transparente, ¡lista para usar!</li>
+            </ul>
+        </div>
+      </section>
+
+      <!-- BARRA FLOTANTE (FAB) -->
+      <div class="floating-toolbar">
+        <div class="fab-container">
+          <label for="img-upload" class="fab-btn upload" title="Subir Imagen">
+            <i class="fas fa-upload"></i>
+          </label>
+          <span class="fab-tooltip">Subir Imagen</span>
+          <input type="file" id="img-upload" accept="image/*" hidden />
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn clear" id="btn-undo" title="Deshacer">
+            <i class="fas fa-undo"></i>
+          </button>
+          <span class="fab-tooltip">Deshacer</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn delete" id="btn-reset" title="Restaurar Original">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <span class="fab-tooltip">Restaurar</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn download" id="btn-download" title="Descargar PNG">
+            <i class="fas fa-download"></i>
+          </button>
+          <span class="fab-tooltip">Descargar</span>
+        </div>
+      </div>
+    </main>
+
+    
+    <div id="brush-cursor" class="brush-cursor"></div>
+
+    <!-- Scripts -->
+  </body>
+</html>

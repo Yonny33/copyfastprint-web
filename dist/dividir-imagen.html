@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dividir Imagen (A4) - COPYFAST&PRINT</title>
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <script type="module" crossorigin src="/admin/js/dividir-imagen-C7wfo8av.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-pqCBDqdT.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/scripts-CPowRrfQ.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/components-C-tRm9LI.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-498SLPPL.css">
+  </head>
+  <body>
+    <div id="header-placeholder"></div>
+
+    <main class="main-content">
+      <section class="tools-hero">
+        <h1>Dividir o Ajustar para A4</h1>
+        <p>Sube una imagen, indica su tamaño real y la herramienta la preparará para imprimir en hojas A4.</p>
+        <a href="#instructions" class="btn-instruction-link"><i class="fas fa-info-circle"></i> Ver instrucciones</a>
+      </section>
+
+      <section class="workspace-area container">
+        <!-- CONTROLES -->
+        <div class="split-controls">
+            <div class="control-group input-required">
+                <label for="design-width-mm">Ancho Real del Diseño (mm)</label>
+                <input type="number" id="design-width-mm" placeholder="Ej: 280">
+            </div>
+            <div class="control-group">
+                <label for="print-margin-mm" title="El borde (en mm) que tu impresora no puede imprimir.">Margen de Impresión (mm)</label>
+                <input type="number" id="print-margin-mm" value="5">
+            </div>
+            <div class="control-group">
+                <label>Solapamiento (mm)</label>
+                <input type="number" id="overlap" value="15">
+            </div>
+             <div class="control-group">
+                 <label for="auto-trim" class="checkbox-label" title="Elimina el espacio transparente/blanco innecesario alrededor del diseño.">
+                    <input type="checkbox" id="auto-trim" checked>
+                    Optimizar bordes
+                </label>
+            </div>
+            <div class="control-group" style="display: none;"> 
+                <label>Ancho Papel (mm)</label>
+                <input type="number" id="paper-width" value="210" readonly>
+                <label>Alto Papel (mm)</label>
+                <input type="number" id="paper-height" value="297" readonly>
+            </div>
+        </div>
+
+        <!-- BOTÓN DE ACCIÓN -->
+        <div class="split-actions">
+          <div id="split-info" class="split-info"></div>
+          <button class="btn-split-action" id="btn-process-action" disabled>Preparar Página(s)</button>
+        </div>
+
+        <!-- VISTA PREVIA -->
+        <div id="output-container" class="pages-preview">
+            <p id="initial-message">1. Sube una imagen<br>2. Ingresa su ancho real</p>
+        </div>
+
+        <div class="instructions" id="instructions">
+            <h3><i class="fas fa-lightbulb"></i> Cómo usar la herramienta:</h3>
+            <ul>
+                <li><strong>1. Subir Imagen:</strong> Carga el diseño que quieres imprimir. La herramienta lo optimizará si es necesario.</li>
+                <li><strong>2. Ancho Real (Obligatorio):</strong> Ingresa el ancho final que debe tener tu diseño en milímetros (mm). Esto es crucial para que la escala sea correcta.</li>
+                <li><strong>3. Márgenes y Solapamiento:</strong> Ajusta el margen que deja tu impresora y el área de solapamiento para unir las hojas con facilidad.</li>
+                <li><strong>4. Preparar Páginas:</strong> Haz clic en el botón "Preparar Página(s)". La herramienta calculará cuántas hojas A4 necesitas y cómo se divide el diseño.</li>
+                <li><strong>5. Rotar (Opcional):</strong> Si la división no es óptima, puedes rotar la imagen 90 grados para ver si se aprovecha mejor el espacio.</li>
+                <li><strong>6. Descargar:</strong> Descarga un archivo ZIP que contiene todas las hojas A4 numeradas y listas para imprimir.</li>
+            </ul>
+        </div>
+      </section>
+
+      <!-- BARRA FLOTANTE (FAB) -->
+      <div class="floating-toolbar">
+        <div class="fab-container">
+          <label for="img-upload-split" class="fab-btn upload" title="Paso 1: Subir Imagen">
+            <i class="fas fa-upload"></i>
+          </label>
+          <span class="fab-tooltip">Subir Imagen</span>
+          <input type="file" id="img-upload-split" accept="image/*" hidden />
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn restore" id="btn-rotate" title="Rotar 90° (recalcula la cuadrícula)">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <span class="fab-tooltip">Rotar 90°</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn download" id="btn-download-all" title="Descargar Todo">
+            <i class="fas fa-download"></i>
+          </button>
+          <span class="fab-tooltip">Descargar Todo</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn delete" id="btn-clear-split" title="Limpiar">
+            <i class="fas fa-trash"></i>
+          </button>
+          <span class="fab-tooltip">Limpiar</span>
+        </div>
+      </div>
+    </main>
+
+
+  </body>
+</html>

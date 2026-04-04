@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de Clientes - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de clientes." />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="/favicons/manifest.json" />
+
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/admin/js/clientes-DjcGPACr.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-COMbAFny.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/auth-D0e3KaCN.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-BXu2cGsF.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/auth-D701PeY8.css">
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <div id="header-placeholder"></div>
+
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2><i class="fas fa-users"></i> Gestión de Clientes</h2>
+          <div class="divider"></div>
+          <p>Añade nuevos clientes o edita la información de uno existente.</p>
+        </div>
+
+        <!-- Formulario Unificado de Clientes -->
+        <div class="card-form">
+          <form id="gestion-clientes-form">
+            <input type="hidden" id="edit-client-id" name="editClientId">
+            <div class="form-grid-4-col">
+              <!-- Fila 1 -->
+              <div class="form-group floating">
+                  <div class="form-inline-group">
+                      <select title="Tipo de documento" name="tipo_documento" id="tipo_documento" style="flex: 0 0 75px;">
+                          <option value="V" selected>V-</option>
+                          <option value="E">E-</option>
+                          <option value="J">J-</option>
+                          <option value="P">P-</option>
+                      </select>
+                      <input type="text" id="cedula" name="cedula" placeholder="Número de Cédula/RIF" required />
+                  </div>
+                  <label for="cedula">Cédula / RIF *</label>
+              </div>
+              <div class="form-group floating">
+                  <input type="text" id="nombre" name="nombre" placeholder=" " required />
+                  <label for="nombre">Nombre / Razón Social *</label>
+              </div>
+
+              <!-- Fila 2 -->
+              <div class="form-group floating">
+                  <input type="tel" id="telefono" name="telefono" placeholder=" " required />
+                  <label for="telefono">Teléfono *</label>
+              </div>
+              <div class="form-group floating">
+                  <input type="email" id="email" name="email" placeholder=" " />
+                  <label for="email">Email (Opcional)</label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" id="submit-button" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar Cliente
+              </button>
+              <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none;">
+                <i class="fas fa-times"></i> Cancelar Edición
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla de Clientes -->
+        <div class="card-table modern-table" style="margin-top: 2rem;">
+          <div class="toolbar">
+            <h3><i class="fas fa-list"></i> Clientes Registrados</h3>
+            <div class="search-bar">
+              <input type="text" id="search-input" placeholder="Buscar por nombre, cédula o teléfono...">
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="clientes-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Cédula/RIF</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="clientes-tbody">
+                <!-- Filas se cargarán aquí -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
+    </div>
+
+  </body>
+</html>

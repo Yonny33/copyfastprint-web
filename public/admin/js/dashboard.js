@@ -1,9 +1,11 @@
+import { API_BASE_URL } from '/firebase-config.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");
 
   // --- ESTADO Y CONFIGURACIÓN ---
-  const API_URL = "/api";
+  const API_URL = API_BASE_URL;
   let ingresosGastosChart = null;
 
   // --- HELPERS ---
@@ -110,8 +112,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (error) {
       console.error("Error al cargar datos del dashboard:", error.message);
-      // Opcional: mostrar un error en la UI
-      document.querySelector(".admin-main-content").innerHTML = `<p style="color: var(--error-color); text-align: center;">No se pudieron cargar los datos del dashboard. ${error.message}</p>`;
+      const errorContainer = document.createElement("div");
+      errorContainer.style.cssText = "color: var(--error-color); text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; margin-bottom: 1rem; order: 1;";
+      errorContainer.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error al conectar con la base de datos.`;
+      const main = document.querySelector(".admin-main-content");
+      if(main) main.prepend(errorContainer);
     } finally {
       showLoading(false);
     }

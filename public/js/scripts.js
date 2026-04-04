@@ -1,13 +1,11 @@
 // ==========================================================================
 // ===  FUNCIONALIDAD DEL MENÚ RESPONSIVE (CORREGIDO)  ===
 // ==========================================================================
+window.initMobileMenu = function() {
+    const navLinks = document.getElementById("nav-links");
+    const navToggle = document.getElementById("nav-toggle");
 
-// Obtener los elementos del DOM por sus IDs correctos
-const navLinks = document.getElementById("nav-links");
-const navToggle = document.getElementById("nav-toggle");
-
-// Verificar que los elementos existen antes de añadir escuchadores
-if (navLinks && navToggle) {
+    if (navLinks && navToggle) {
     const navIcon = navToggle.querySelector("i"); // Obtener el elemento <i> del ícono
 
     // Añadir el evento de clic al botón de la hamburguesa
@@ -31,8 +29,11 @@ if (navLinks && navToggle) {
         navToggle.setAttribute("aria-expanded", isMenuOpen);
     });
 } else {
-  console.warn("No se encontraron los elementos del menú (ID: nav-links, nav-toggle).");
-}
+    }
+};
+
+// Ejecutar por si el header ya estuviera en el DOM (fallback)
+document.addEventListener("DOMContentLoaded", window.initMobileMenu);
 
 
 // ==========================================================================

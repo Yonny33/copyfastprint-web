@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ventas - Admin COPYFAST&PRINT</title>
+    <meta name="description" content="Panel de administración para la gestión de ventas." />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="/favicons/manifest.json" />
+
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/admin/js/ventas-32GuM-gl.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-COMbAFny.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/auth-D0e3KaCN.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-BXu2cGsF.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/auth-D701PeY8.css">
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <div id="header-placeholder"></div>
+
+      <main class="admin-main-content">
+        
+        <div class="section-heading">
+          <h2><i class="fas fa-cash-register"></i> Registro de Ventas</h2>
+          <div class="divider"></div>
+          <p>Añade nuevas ventas o edita una existente.</p>
+        </div>
+
+        <div class="card-form">
+            <form id="registro-ventas-form">
+              <input type="hidden" id="edit-venta-id" name="editVentaId">
+              <div class="form-grid-4-col">
+                
+                <div class="form-group floating">
+                  <input type="date" id="fecha" name="fecha" placeholder=" " required />
+                  <label for="fecha">Fecha de Venta *</label>
+                </div>
+                <div class="form-group floating">
+                  <select id="cliente" name="id_cliente" required placeholder=" ">
+                    <option value="" disabled selected>Cargando...</option>
+                  </select>
+                  <label for="cliente">Cliente *</label>
+                </div>
+                <div class="form-group floating">
+                  <select id="producto" name="producto" required placeholder=" ">
+                    <option value="" disabled selected>Cargando...</option>
+                  </select>
+                  <label for="producto">Producto *</label>
+                </div>
+
+                <div class="form-group floating span-4">
+                  <textarea id="detalles_pedido" name="detalles_pedido" placeholder=" "></textarea>
+                  <label for="detalles_pedido">Detalles del Pedido (Opcional)</label>
+                </div>
+
+                <div class="form-group floating">
+                  <input type="number" id="cantidad" name="cantidad" value="1" min="1" placeholder=" " required />
+                  <label for="cantidad">Cantidad *</label>
+                </div>
+                <div class="form-group floating">
+                  <input type="number" id="precio_unitario" name="precio_unitario" min="0" step="0.01" placeholder=" " required />
+                  <label for="precio_unitario">Precio Unitario *</label>
+                </div>
+                <div class="form-group floating">
+                  <input type="number" id="abono_recibido" name="abono_recibido" min="0" step="0.01" placeholder=" " required />
+                  <label for="abono_recibido">Abono Recibido *</label>
+                </div>
+                
+                <div class="form-group floating">
+                  <input type="number" id="venta_bruta" name="venta_bruta" placeholder=" " readonly />
+                  <label for="venta_bruta">Venta Bruta</label>
+                </div>
+                 <div class="form-group floating">
+                  <input type="number" id="saldo_pendiente" name="saldo_pendiente" placeholder=" " readonly />
+                  <label for="saldo_pendiente">Saldo Pendiente</label>
+                </div>
+                <div class="form-group floating">
+                  <select id="metodo_pago" name="metodo_pago" required placeholder=" ">
+                    <option value="">Selecciona uno</option>
+                    <option value="Efectivo">Efectivo</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Pago-Movil">Pago Móvil</option>
+                    <option value="Zelle">Zelle</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                  <label for="metodo_pago">Método de Pago *</label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" id="submit-button" class="btn-submit">
+                  <i class="fas fa-save"></i> Registrar Venta
+                </button>
+                <button type="button" id="cancel-edit-button" class="btn-secondary" style="display: none;">
+                  <i class="fas fa-times"></i> Cancelar Edición
+                </button>
+              </div>
+            </form>
+        </div>
+
+        <div class="card-table modern-table" style="margin-top: 2rem;">
+          <div class="toolbar">
+            <h3><i class="fas fa-history"></i> Ventas Recientes</h3>
+            <div class="search-bar">
+              <input type="text" id="search-ventas-input" placeholder="Buscar por cliente o cédula...">
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="ventas-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Cliente</th>
+                  <th>Cédula/RIF</th>
+                  <th>Total</th>
+                  <th>Deuda</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ventas-tbody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="spinner"></div>
+      <p>Procesando...</p>
+    </div>
+    
+    <div id="venta-details-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Detalles de la Venta</h3>
+          <span class="close-button" id="modal-close-btn">&times;</span>
+        </div>
+        <div class="modal-body" id="venta-details-content">
+        </div>
+      </div>
+    </div>
+
+    
+  </body>
+</html>

@@ -64,10 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // podemos ejecutar la lógica que depende de ellos.
     setActiveLink();
     
-    // Re-inicializar cualquier script global que dependa de elementos en el header/footer
-    // Por ejemplo, si el menu movil esta en scripts.js
-    if(typeof globalScripts === 'function') {
-      globalScripts();
+    // Inicializar el menú móvil después de que el header se haya cargado
+    if (typeof window.initMobileMenu === 'function') {
+        window.initMobileMenu();
     }
   };
 

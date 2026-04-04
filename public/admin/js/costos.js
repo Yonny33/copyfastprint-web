@@ -1,5 +1,7 @@
+import { API_BASE_URL } from '/firebase-config.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = '/api';
+    const API_URL = API_BASE_URL;
     const tableBody = document.querySelector('#costos-table tbody');
     const searchInput = document.getElementById('search-input');
     const loadingOverlay = document.getElementById('loading-overlay');

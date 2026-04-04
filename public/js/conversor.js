@@ -1,7 +1,9 @@
+import { API_BASE_URL } from '/firebase-config.js';
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- URL DE LA API ---
   // Usamos la ruta relativa a nuestra API Express en Firebase Functions
-  const firebaseFunctionURL = "/api/exchange-rates";
+  const firebaseFunctionURL = `${API_BASE_URL}/exchange-rates`;
 
   // === MANEJO DE LA CALCULADORA DE DIVISAS ===
   const amountInput = document.getElementById("amount");

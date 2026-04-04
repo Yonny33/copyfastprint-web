@@ -1,6 +1,8 @@
+import { API_BASE_URL } from '/firebase-config.js';
+
 document.addEventListener("DOMContentLoaded", function () {
   // --- CONSTANTES Y URL DE TU API FIREBASE ---
-  const API_URL = "/api";
+  const API_URL = API_BASE_URL;
 
   // --- ELEMENTOS DEL DOM ---
   const loadingOverlay = document.getElementById("loading-overlay");

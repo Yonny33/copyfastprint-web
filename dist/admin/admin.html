@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Administración - COPYFAST&PRINT</title>
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="/favicons/manifest.json" />
+
+    <!-- CSS y Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin-BUQ9iMaP.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-COMbAFny.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/auth-D0e3KaCN.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/components-BXu2cGsF.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/auth-D701PeY8.css">
+  </head>
+  <body class="admin-page">
+    <div id="loading-overlay" class="loading-overlay" style="display: none">
+      <div class="spinner"></div>
+      <p>Cargando...</p>
+    </div>
+
+    <div class="admin-grid-container">
+      <div id="header-placeholder"></div>
+
+      <main class="admin-main-content">
+        <div class="section-heading">
+          <h2>Dashboard</h2>
+          <div class="divider"></div>
+          <p>Resumen general de la actividad de tu negocio.</p>
+        </div>
+
+        <!-- Fila 1: Indicadores Clave (KPIs) -->
+        <div class="kpi-grid">
+          <!-- ... (El contenido de los KPIs permanece igual) ... -->
+          <div class="kpi-card">
+            <div class="kpi-icon balance">
+              <i class="fas fa-balance-scale"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Balance Neto (Mes)</h3>
+              <p id="kpi-balance-neto">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon deuda">
+              <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Saldo Pendiente Total</h3>
+              <p id="kpi-saldo-pendiente">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon balance">
+              <i class="fas fa-university"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Balance General</h3>
+              <p id="kpi-balance-general">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon ingresos">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Ingresos del Mes</h3>
+              <p id="kpi-ingresos-mes">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon gastos"><i class="fas fa-receipt"></i></div>
+            <div class="kpi-info">
+              <h3>Gastos del Mes</h3>
+              <p id="kpi-gastos-mes">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon inventario"><i class="fas fa-boxes"></i></div>
+            <div class="kpi-info">
+              <h3>Items en Stock</h3>
+              <p id="kpi-items-stock">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon clientes">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Total de Clientes</h3>
+              <p id="kpi-clientes-nuevos">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon deuda">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Clientes con Deudas</h3>
+              <p id="kpi-clientes-deudas">Cargando...</p>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon inventario">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="kpi-info">
+              <h3>Alertas de Inventario</h3>
+              <p id="kpi-alertas-inventario">Cargando...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2: Gráfico Principal -->
+        <div class="card-form" style="background: linear-gradient(145deg, #252525, #1e1e1e); border-radius: 12px; padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+          <h3>
+            <i class="fas fa-chart-bar"></i> Ingresos vs. Gastos (Últimos 6 Meses)
+          </h3>
+          <div class="chart-container">
+            <canvas id="ingresos-gastos-chart"></canvas>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Scripts de la aplicación (Modernizados) -->
+
+  </body>
+</html>
