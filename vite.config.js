@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { resolve, extname, relative } from 'path';
+import { fileURLToPath } from 'url';
+import { glob } from 'glob';
 
 export default defineConfig({
   server: {
@@ -12,44 +14,35 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      // Permite usar '@/archivo' para referirse a la raíz de public
+      '@': resolve(__dirname, 'public'),
+    },
+  },
   root: 'public', // Establecemos public como raíz para que Vite procese los JS
   envDir: '../', // Indica a Vite que busque los archivos .env en la raíz del proyecto (un nivel arriba de public)
   publicDir: '../static', // Nueva carpeta para archivos que NO se procesan (fetch, img, etc)
   build: {
     outDir: '../dist', // Al cambiar el root, dist debe estar un nivel arriba
     emptyOutDir: true,
+    sourcemap: false, // Desactivar en producción para mayor seguridad
     rollupOptions: {
-      input: {
-        // Páginas Pública
-        main: resolve(__dirname, 'public/index.html'),
-        'diseño': resolve(__dirname, 'public/diseño.html'),
-        acercade: resolve(__dirname, 'public/acercade.html'),
-        cotizacion: resolve(__dirname, 'public/cotizacion.html'),
-        'conversor-divisas': resolve(__dirname, 'public/conversor-divisas.html'),
-        herramientas: resolve(__dirname, 'public/herramientas.html'),
-        'remover-fondo': resolve(__dirname, 'public/remover-fondo.html'),
-        'quitar-bordes': resolve(__dirname, 'public/quitar-bordes.html'),
-        'duplicar-tamaño': resolve(__dirname, 'public/duplicar-tamaño.html'),
-        vectorizar: resolve(__dirname, 'public/vectorizar.html'),
-        'dividir-imagen': resolve(__dirname, 'public/dividir-imagen.html'),
-        'mejorar-calidad': resolve(__dirname, 'public/mejorar-calidad.html'),
-        especificaciones: resolve(__dirname, 'public/especificaciones.html'),
-
-        // Páginas de Administración
-        admin: resolve(__dirname, 'public/admin/admin.html'),
-        login: resolve(__dirname, 'public/admin/login-registro.html'),
-        ventas: resolve(__dirname, 'public/admin/ventas.html'),
-        gastos: resolve(__dirname, 'public/admin/gastos.html'),
-        clientes: resolve(__dirname, 'public/admin/clientes.html'),
-        analisis: resolve(__dirname, 'public/admin/analisis.html'),
-        costos: resolve(__dirname, 'public/admin/costos.html'),
-        deudores: resolve(__dirname, 'public/admin/deudores.html'),
-        inventario: resolve(__dirname, 'public/admin/inventario.html'),
-      },
+      // AUTOMATIZACIÓN: Busca todos los .html en public y sus subcarpetas
+      input: Object.fromEntries(
+        glob.sync('public/**/*.html').map(file => [
+          relative('public', file.slice(0, file.length - extname(file).length)),
+          fileURLToPath(new URL(file, import.meta.url))
+        ])
+      ),
       output: {
         chunkFileNames: 'admin/js/[name]-[hash].js',
         entryFileNames: 'admin/js/[name]-[hash].js',
-        assetFileNames: 'admin/assets/[name]-[hash].[ext]'
+        assetFileNames: 'admin/assets/[name]-[hash].[ext]',
+        // MEJORA: Separar Firebase y librerías de terceros en un archivo aparte
+        manualChunks: {
+          vendor: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+        }
       }
     },
   },
