@@ -1,0 +1,417 @@
+/* =============================================================================
+   ADMIN - FORMULARIOS Y FILTROS
+   ============================================================================= */
+/* Layout general de formularios */
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr; /* Mantiene el bloque del formulario como una sola columna principal */
+  max-width: 900px; /* Limita el ancho máximo del formulario */
+  margin: 0 auto; /* Centra el formulario horizontalmente */
+  gap: 1.25rem; /* Espacio optimizado entre formularios */
+  align-items: start;
+  order: 2 !important; /* El formulario va inmediatamente después del título */
+}
+
+/* Si en alguna sección quieres mantener dos formularios juntos (ej. Ventas y Gastos)
+   puedes usar esta clase auxiliar en el HTML para que sigan siendo horizontales */
+.form-grid-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajustado para 3 columnas en escritorio */
+  gap: 1.5rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.85rem;
+  background-color: var(--background-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.form-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.form-group {
+  margin-bottom: 1.5rem;
+}
+}
+
+.form-sidebar .info-box {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.form-sidebar .info-box h3 {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+.form-sidebar .info-box h3 i {
+  margin-right: 10px;
+  color: var(--primary-color);
+}
+.form-sidebar .info-box p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+.report-filters {
+  margin-bottom: 2rem;
+}
+.filter-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+.filter-buttons {
+  justify-self: flex-end;
+}
+
+/* =============================================================================
+   ADMIN - FORMULARIOS MODERNOS (FLOATING LABELS)
+   ============================================================================= */
+.form-group.floating {
+  position: relative;
+  margin-bottom: 0.75rem; /* Reducido drásticamente el espacio entre campos */
+}
+
+.form-group.floating input,
+.form-group.floating select {
+  height: 48px; /* Reducido de 56px a 48px */
+  padding: 20px 12px 4px; /* Ajustado el espacio interno */
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+/* Soporte para Textarea */
+.form-group.floating textarea {
+  padding: 24px 16px 8px;
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s;
+  min-height: 120px; /* Altura mínima para áreas de texto */
+}
+
+.form-group.floating input:focus,
+.form-group.floating select:focus,
+.form-group.floating textarea:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  outline: none;
+}
+
+/* Efecto Hover (Pasar el mouse) para Inputs y Selects */
+.form-group.floating input:hover,
+.form-group.floating select:hover,
+.form-group.floating textarea:hover,
+.form-inline-group input:hover,
+.form-inline-group select:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+
+.form-group.floating label {
+  position: absolute;
+  left: 16px;
+  top: 14px; /* Ajustado para la nueva altura del input */
+  color: var(--text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.form-group.floating input:focus ~ label,
+.form-group.floating input:not(:placeholder-shown) ~ label,
+.form-group.floating select:focus ~ label,
+.form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
+.form-group.floating textarea:focus ~ label,
+.form-group.floating textarea:not(:placeholder-shown) ~ label {
+  top: 4px; /* La etiqueta flota más cerca del borde superior */
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* --- CORRECCIONES DE UI (SELECTS Y ALINEACIÓN) --- */
+
+/* 1. Evitar superposición en Selects: La etiqueta siempre flota */
+.form-group.floating select ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* 2. Corregir color de fondo en opciones del menú desplegable (Modo Oscuro) */
+select option {
+  background-color: var(--background-card);
+  color: var(--text-primary);
+}
+
+/* 3. Clase para alinear inputs compuestos (Cédula/RIF) */
+.form-inline-group {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Centra verticalmente los elementos */
+}
+
+.form-inline-group select,
+.form-inline-group input {
+  height: 56px;
+  margin-bottom: 0;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+.form-inline-group select:focus,
+.form-inline-group input:focus {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  outline: none;
+}
+
+/* 4. Corrección para etiquetas flotantes en grupos en línea (Cédula/RIF) */
+.form-group.floating .form-inline-group ~ label {
+  top: 8px;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* =============================================================================
+   ADMIN - UTILIDADES Y ESTILOS DE COSTOS
+   ============================================================================= */
+
+/* Input de Costo en Tabla */
+.cost-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 120px;
+    text-align: right;
+    font-weight: 500;
+    transition: border-color 0.2s;
+}
+.cost-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Botón Guardar Costo */
+.btn-save-cost {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.btn-save-cost:hover {
+    background: #a00000;
+    transform: translateY(-2px);
+}
+.btn-save-cost:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* =============================================================================
+   ADMIN - CALCULADORA TABS
+   ============================================================================= */
+.calc-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    gap: 10px;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* --- Toggle Switch (Reportes) --- (MOVIDO DE MAIN.CSS) */
+.toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.toggle-label {
+  color: var(--text-secondary);
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4a4a4a;
+  transition: 0.4s;
+}
+.slider.round {
+  border-radius: 28px;
+}
+.slider.round:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: var(--success-color);
+}
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* =============================================================================
+   ADMIN - CALCULADORA DE COSTOS (MODAL)
+   ============================================================================= */
+
+.modal-content.cost-calculator {
+    max-width: 600px;
+}
+
+.tab-content {
+    display: none; /* Oculto por defecto, controlado por JS */
+}
+
+.tab-content.active {
+    display: block; /* La pestaña activa se muestra */
+}
+
+.tab-content .tab-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Contenedor para mostrar datos en la calculadora */
+.info-box.calculator-display {
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    border-left: none; /* Sobrescribe el estilo por defecto de info-box */
+}
+
+.calculator-display .display-label {
+    display: block;
+    color: #aaa;
+    font-size: 0.85rem;
+}
+
+.calculator-display .display-value {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Contenedor para el resultado final de la calculadora */
+.info-box.calculator-result {
+    text-align: center;
+    margin: 1.5rem 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: none; /* Sobrescribe el estilo por defecto de info-box */
+    padding: 1rem;
+}
+
+.calculator-result .display-label {
+    display: block;
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.calculator-result .result-value {
+    color: var(--success-color);
+    margin: 0;
+    font-size: 2rem;
+}
+
+#calc-profit-preview {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}

@@ -1,0 +1,149 @@
+/* =============================================================================
+   ADMIN - TABLAS MODERNAS
+   ============================================================================= */
+
+/* --- Estilos base para tablas HTML --- */
+/* Estos estilos son para tablas HTML estándar, no solo .modern-table */
+
+
+/* --- Estilo unificado para tablas modernas (Inventario, Reportes) --- */
+.card-table.modern-table {
+  padding: 1.5rem;
+}
+.modern-table table {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+.modern-table thead th {
+  border: none;
+  background: var(
+    --background-card
+  ); /* Fondo sólido para que no se vea el texto al hacer scroll */
+  position: sticky; /* Cabecera fija moderna */
+  top: 0;
+  z-index: 5;
+}
+.modern-table tbody tr {
+  background-color: rgba(255, 255, 255, 0.03); /* Fondo oscuro translúcido */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s,
+    background-color 0.2s;
+}
+.modern-table tbody tr:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td,
+th {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+th {
+  background-color: #111;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+tbody tr:hover {
+  background-color: #2a2a2a;
+}
+
+/* Estilos específicos para las celdas de las tablas modernas */
+.modern-table td,
+.modern-table th {
+  border: none;
+  padding: 1rem 1.25rem;
+}
+.modern-table tbody td {
+  color: var(--text-primary); /* Texto claro para modo oscuro */
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+.modern-table tbody tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+.modern-table tbody tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+/* Estilos para botones de acción en tablas */
+td.actions {
+  text-align: center;
+}
+.btn-edit,
+.btn-delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  margin: 0 5px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+.btn-edit:hover {
+  color: var(--warning-color);
+}
+.btn-delete:hover {
+  color: var(--error-color);
+}
+
+/* Colores de estado para textos */
+.text-success { color: var(--success-color) !important; }
+.text-danger { color: var(--error-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+
+/* =============================================================================
+   ADMIN - ESTADOS (MOVIDO DE MAIN.CSS)
+   ============================================================================= */
+.status.pagado {
+  background-color: var(--success-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  display: inline-block;
+}
+.status.pendiente {
+  background-color: var(--error-color);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+/* =============================================================================
+   ADMIN - GRÁFICOS Y TABLAS (CONTENEDORES) (MOVIDO DE MAIN.CSS)
+   ============================================================================= */
+/* CAMBIO: Listas de actividad reciente en una sola columna (Ventas arriba, Gastos abajo) */
+.recent-activity-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  order: 5; /* Las listas de actividad siempre al final */
+}
+.recent-activity-grid .card-table {
+  max-height: 400px; /* Limita la altura para que no sean infinitas */
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Evita desbordamiento horizontal en Grid */
+}
+.recent-activity-grid .table-responsive {
+  overflow-y: auto; /* Habilita scroll vertical interno */
+  min-height: 0; /* Asegura que el scroll funcione correctamente */
+}
+
+/* Estilo para la celda de saldo pendiente en la tabla de deudores */
+td.saldo-pendiente {
+    color: var(--error-color);
+    font-weight: bold;
+}

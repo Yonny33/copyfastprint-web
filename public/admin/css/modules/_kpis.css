@@ -1,0 +1,92 @@
+/* =============================================================================
+   KPIs (Key Performance Indicators)
+   ============================================================================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) !important; /* Forzamos 3 columnas horizontales */
+  gap: 0.75rem; /* Gap más compacto */
+  margin-top: 1.5rem; /* Separación moderada de los formularios */
+  margin-bottom: 2.5rem;
+  order: 2 !important; /* Los indicadores siempre deben ir arriba, después del título */
+}
+.kpi-card {
+  background: linear-gradient(145deg, #252525, #1e1e1e);
+  border-radius: 12px;
+  padding: 1rem; /* Padding reducido para menor altura */
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s;
+}
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  border-color: var(--primary-color);
+}
+.kpi-icon {
+  font-size: 1.6rem; /* Icono más pequeño */
+  width: 48px; /* Contenedor de icono más pequeño */
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem; /* Margen reducido */
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+.kpi-icon.ingresos {
+  color: var(--success-color);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+.kpi-icon.gastos {
+  color: var(--error-color);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+.kpi-icon.clientes {
+  color: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+.kpi-icon.deuda {
+  color: var(--warning-color);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+}
+.kpi-icon.inventario {
+  color: #8b5cf6;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+.kpi-icon.balance {
+  color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+.kpi-info h3 {
+  font-size: 0.8rem; /* Título más pequeño */
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.1rem; /* Espacio reducido */
+  text-transform: uppercase;
+}
+.kpi-info p {
+  font-size: 1.4rem; /* Valor numérico más pequeño */
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
+}
+
+/* Colores específicos para números de KPIs */
+#kpi-ingresos-mes {
+  color: var(--success-color);
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+#kpi-gastos-mes {
+  color: var(--error-color);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+#kpi-saldo-pendiente {
+  color: var(--warning-color);
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}

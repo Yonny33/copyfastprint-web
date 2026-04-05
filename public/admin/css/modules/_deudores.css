@@ -1,0 +1,61 @@
+/* =============================================================================
+   ADMIN - ESTILOS TABLA DEUDORES
+   ============================================================================= */
+
+/* Estilo para la celda de saldo pendiente en la tabla de deudores */
+td.saldo-pendiente {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+/* Contenedor para los botones de acción apilados */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Espacio entre botones */
+    align-items: center;
+}
+
+/* Estilo base para los nuevos botones de acción (Detalles, Abono) */
+.btn-accion {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Ocupan todo el ancho de la celda */
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Icono dentro del botón */
+.btn-accion i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
+/* Efecto hover para el botón de Detalles */
+.btn-accion.btn-details:hover {
+    background-color: #3b82f6; /* Azul para 'ver' */
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Efecto hover para el botón de Abono */
+.btn-accion.btn-abono:hover {
+    background-color: var(--success-color); /* Verde para 'pagar' */
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* Estilos para el icono de advertencia en la tabla de reportes */
+.warning-icon {
+  color: #ffc107; /* Amarillo ámbar, un color estándar para advertencias */
+  margin-left: 8px; /* Espacio para separarlo del nombre */
+  cursor: help;     /* Cambia el cursor para indicar que se puede interactuar (hover) */
+}

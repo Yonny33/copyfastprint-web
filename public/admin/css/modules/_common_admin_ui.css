@@ -1,0 +1,59 @@
+/* =============================================================================
+   ADMIN - UI COMÚN (Toolbar, Search Bar)
+   ============================================================================= */
+.toolbar {
+  display: flex;
+  justify-content: space-between; /* Botón a la izq, Buscador a la der */
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap; /* Permite que se adapte si falta espacio */
+  order: 2; /* Aparece después del título (order 1) */
+}
+.search-bar {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: auto;
+}
+.search-bar i {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  transition: color 0.3s;
+}
+.search-bar input {
+  width: 40px; /* Ancho inicial (solo el icono) */
+  padding: 10px 40px 10px 10px; /* Espacio para el texto y el icono a la derecha */
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent; /* Línea invisible inicialmente */
+  color: transparent; /* Texto invisible inicialmente */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+.search-bar input::placeholder {
+  color: transparent;
+}
+
+/* Efecto Hover / Focus: Expande el buscador y muestra la línea roja */
+.search-bar:hover input,
+.search-bar input:focus,
+.search-bar input:not(:placeholder-shown) {
+  width: 300px; /* Ancho expandido */
+  border-bottom-color: var(--primary-color); /* Línea roja */
+  color: var(--text-primary);
+  cursor: text;
+}
+.search-bar:hover input::placeholder,
+.search-bar input:focus::placeholder {
+  color: var(--text-secondary);
+}
+.search-bar:hover i,
+.search-bar:focus-within i {
+  color: var(--primary-color); /* Icono rojo al activar */
+}

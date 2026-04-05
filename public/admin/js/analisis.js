@@ -1,4 +1,7 @@
 import { API_BASE_URL } from '/firebase-config.js';
+import '../css/modules/_analysis.css';
+import '../css/modules/_tables.css';
+import '../css/modules/_responsive.css';
 
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = API_BASE_URL;

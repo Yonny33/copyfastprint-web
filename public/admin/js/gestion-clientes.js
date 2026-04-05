@@ -1,4 +1,8 @@
 import { API_BASE_URL } from '/firebase-config.js';
+import '../css/modules/_forms.css';
+import '../css/modules/_tables.css';
+import '../css/modules/_responsive.css';
+import '../css/modules/_common_admin_ui.css'; // Para toolbar y search-bar
 
 document.addEventListener("DOMContentLoaded", () => {
   const API_URL = API_BASE_URL;
