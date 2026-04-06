@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [{
           label: "Stock Actual",
           data: data,
-          backgroundColor: 'rgba(139, 0, 0, 0.6)', // Rojo corporativo con transparencia
-          borderColor: 'rgba(139, 0, 0, 1)',
+          backgroundColor: 'rgba(70, 1, 1, 0.6)', 
+          borderColor: 'rgba(70, 1, 1, 1)',
           borderWidth: 1,
         }],
       },

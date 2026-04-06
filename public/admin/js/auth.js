@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Si el usuario está en una página de admin, agregamos los controles.
-      addAdminUIControls();
       iniciarDetectorInactividad();
     } else {
       // --- El usuario NO está autenticado ---
@@ -67,43 +66,5 @@ document.addEventListener("DOMContentLoaded", function () {
       document.addEventListener(evento, reiniciarTemporizador, { passive: true });
     });
     reiniciarTemporizador(); // Iniciar
-  };
-
-  // Función para agregar los botones flotantes y otros elementos de la UI
-  const addAdminUIControls = () => {
-    if (document.getElementById("btn-logout-floating")) return;
-
-    const body = document.body;
-    const floatingButtonsContainer = document.createElement("div");
-    floatingButtonsContainer.className = "floating-buttons-container";
-    floatingButtonsContainer.innerHTML = `
-      <button id="btn-logout-floating" class="btn-flotante btn-flotante-logout" title="Cerrar Sesión">
-          <i class="fas fa-sign-out-alt"></i>
-      </button>
-      <button id="btn-go-top" class="btn-flotante btn-flotante-top" title="Ir arriba">
-          <i class="fas fa-arrow-up"></i>
-      </button>
-    `;
-    body.appendChild(floatingButtonsContainer);
-
-    document.getElementById("btn-logout-floating").addEventListener("click", handleLogout);
-
-    const goTopBtn = document.getElementById("btn-go-top");
-    const mainContent = document.querySelector(".admin-main-content");
-
-    if (goTopBtn) {
-      const handleScroll = () => {
-        const show = window.scrollY > 100 || (mainContent && mainContent.scrollTop > 100);
-        goTopBtn.style.display = show ? "flex" : "none";
-      };
-
-      window.addEventListener("scroll", handleScroll);
-      if (mainContent) mainContent.addEventListener("scroll", handleScroll);
-
-      goTopBtn.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        if (mainContent) mainContent.scrollTo({ top: 0, behavior: "smooth" });
-      });
-    }
   };
 });

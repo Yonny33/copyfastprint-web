@@ -22,11 +22,11 @@
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajustado para 3 columnas en escritorio */
-  gap: 1.5rem;
+  gap: 1rem; /* Espacio reducido entre inputs */
 }
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   font-weight: 600;
   color: var(--text-secondary);
   font-size: 0.9rem;
@@ -54,15 +54,19 @@
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 .form-actions {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center; /* Botón centrado */
   gap: 1rem;
 }
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem; /* Reducción de espacio entre líneas */
 }
-}
+
+/* Clases de utilidad para expansión en el grid */
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+.span-4 { grid-column: span 4; }
 
 .form-sidebar .info-box {
   background-color: rgba(0, 0, 0, 0.2);
@@ -106,15 +110,15 @@
    ============================================================================= */
 .form-group.floating {
   position: relative;
-  margin-bottom: 0.75rem; /* Reducido drásticamente el espacio entre campos */
+  margin-bottom: 0.5rem; /* Sincronizado para menor espacio */
 }
 
 .form-group.floating input,
 .form-group.floating select {
   height: 48px; /* Reducido de 56px a 48px */
   padding: 20px 12px 4px; /* Ajustado el espacio interno */
-  border: 1px solid var(--border-color);
-  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #050505;
   border-radius: 8px;
   width: 100%;
   color: var(--text-primary);
@@ -126,7 +130,7 @@
 .form-group.floating textarea {
   padding: 24px 16px 8px;
   border: 1px solid var(--border-color);
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: #050505;
   border-radius: 8px;
   width: 100%;
   color: var(--text-primary);
@@ -138,9 +142,9 @@
 .form-group.floating input:focus,
 .form-group.floating select:focus,
 .form-group.floating textarea:focus {
-  border-color: var(--primary-color);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 4px var(--accent-glow);
+  border-color: #6a0101;
+  background-color: #000000;
+  box-shadow: 0 0 0 2px rgba(70, 1, 1, 0.5);
   outline: none;
 }
 
@@ -170,7 +174,7 @@
 .form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
 .form-group.floating textarea:focus ~ label,
 .form-group.floating textarea:not(:placeholder-shown) ~ label {
-  top: 4px; /* La etiqueta flota más cerca del borde superior */
+  top: 6px; /* Ajuste fino de la etiqueta flotante */
   font-size: 0.75rem;
   color: var(--primary-color);
   font-weight: 600;

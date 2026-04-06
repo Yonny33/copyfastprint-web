@@ -2,6 +2,8 @@ import { API_BASE_URL } from '/firebase-config.js';
 import '../css/modules/_analysis.css';
 import '../css/modules/_tables.css';
 import '../css/modules/_responsive.css';
+import '../css/modules/_kpis.css';
+import '../css/modules/_common_admin_ui.css';
 
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = API_BASE_URL;
@@ -155,11 +157,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Gradientes
     const gradientIncome = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientIncome.addColorStop(0, "rgba(16, 185, 129, 0.5)");
+    gradientIncome.addColorStop(0, "rgba(6, 78, 59, 0.5)");
     gradientIncome.addColorStop(1, "rgba(16, 185, 129, 0.0)");
 
     const gradientExpense = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientExpense.addColorStop(0, "rgba(239, 68, 68, 0.5)");
+    gradientExpense.addColorStop(0, "rgba(127, 29, 29, 0.5)");
     gradientExpense.addColorStop(1, "rgba(239, 68, 68, 0.0)");
 
     trendChart = new Chart(ctx, {

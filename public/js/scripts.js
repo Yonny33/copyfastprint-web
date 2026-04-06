@@ -92,24 +92,15 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
     document.body.appendChild(scrollTopBtn);
 
-    // Lógica para mostrar/ocultar el botón
+    // Lógica para mostrar/ocultar el botón público
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-            scrollTopBtn.classList.add('visible');
-        } else {
-            scrollTopBtn.classList.remove('visible');
-        }
+        const isVisible = window.scrollY > 300;
+        scrollTopBtn.classList.toggle('visible', isVisible);
     });
 
-    // Lógica para el clic del botón
-    scrollTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollTopBtn.addEventListener('click', scrollToTop);
 });
-
 
 // =================== LIGHTBOX CON NAVEGACIÓN (CONDICIONAL) ===================
 

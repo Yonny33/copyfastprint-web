@@ -10,12 +10,12 @@
   order: 2 !important; /* Los indicadores siempre deben ir arriba, después del título */
 }
 .kpi-card {
-  background: linear-gradient(145deg, #252525, #1e1e1e);
+  background: #0a0a0a;
   border-radius: 12px;
   padding: 1rem; /* Padding reducido para menor altura */
   display: flex;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -23,7 +23,7 @@
 }
 .kpi-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 25px rgba(70, 1, 1, 0.15);
   border-color: var(--primary-color);
 }
 .kpi-icon {
@@ -36,16 +36,16 @@
   justify-content: center;
   margin-right: 1rem; /* Margen reducido */
   flex-shrink: 0;
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .kpi-icon.ingresos {
-  color: var(--success-color);
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+  color: #10b981; /* Un toque de color vibrante solo en el icono */
+  background: rgba(16, 185, 129, 0.05);
 }
 .kpi-icon.gastos {
-  color: var(--error-color);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
 }
 .kpi-icon.clientes {
   color: #3b82f6;

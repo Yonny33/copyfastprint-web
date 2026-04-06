@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
  
     const ctx = canvas.getContext("2d");
     const gradientIngresos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientIngresos.addColorStop(0, 'rgba(16, 185, 129, 0.6)');
+    gradientIngresos.addColorStop(0, 'rgba(6, 78, 59, 0.5)'); // success-color matizado
     gradientIngresos.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
 
     const gradientGastos = ctx.createLinearGradient(0, 0, 0, 400);
-    gradientGastos.addColorStop(0, 'rgba(239, 68, 68, 0.6)');
+    gradientGastos.addColorStop(0, 'rgba(127, 29, 29, 0.5)'); // error-color matizado
     gradientGastos.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
 
     ingresosGastosChart = new Chart(canvas.getContext("2d"), {
@@ -65,18 +65,18 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Ingresos",
             data: chartData.ingresos,
-            backgroundColor: gradientIngresos,
-            borderColor: "#10b981",
+            backgroundColor: gradientIngresos, 
+            borderColor: "#10b981", 
             borderWidth: 3,
-            pointBackgroundColor: "#10b981",
+            pointBackgroundColor: "#10b981", 
             fill: true,
             tension: 0.4
           },
           {
             label: "Gastos",
             data: chartData.gastos,
-            backgroundColor: gradientGastos,
-            borderColor: "#ef4444",
+            backgroundColor: gradientGastos, 
+            borderColor: "#ef4444", 
             borderWidth: 3,
             pointBackgroundColor: "#ef4444",
             fill: true,
@@ -88,11 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' } },
-          x: { grid: { display: false } },
+          y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.03)' }, ticks: { color: "#888" } },
+          x: { grid: { display: false }, ticks: { color: "#888" } },
         },
         plugins: {
-          legend: { position: "top", labels: { color: "#eaeaea" } },
+          legend: { position: "top", labels: { color: "#888", font: { size: 12 } } },
         },
       },
     });

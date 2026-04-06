@@ -24,18 +24,17 @@
   z-index: 5;
 }
 .modern-table tbody tr {
-  background-color: rgba(255, 255, 255, 0.03); /* Fondo oscuro translúcido */
+  background-color: #050505;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   transition:
     box-shadow 0.2s,
     transform 0.2s,
     background-color 0.2s;
 }
 .modern-table tbody tr:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: #0d0d0d;
+  transform: none; /* UI Moderna prefiere estabilidad en tablas */
 }
 table {
   width: 100%;

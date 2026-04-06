@@ -2,17 +2,17 @@
    1. ADMIN - VARIABLES Y ESTILOS GLOBALES
    ============================================================================= */
 :root {
-  --primary-color: #460101;
-  --accent-glow: rgba(139, 0, 0, 0.5);
-  --background-dark: #121212;
-  --background-card: #1e1e1e;
+  --primary-color: #460101; 
+  --accent-glow: rgba(70, 1, 1, 0.3);
+  --background-dark: #000000;
+  --background-card: #0a0a0a; /* Un gris casi negro para separar capas */
   --text-primary: #eaeaea;
-  --text-secondary: #a0a0a0;
-  --border-color: #333333;
-  --success-color: #10b981;
-  --error-color: #ef4444;
-  --warning-color: #f59e0b;
-  --cancel-color: #5a5a5a;
+  --text-secondary: #888888;
+  --border-color: rgba(255, 255, 255, 0.06); /* Bordes ultra finos */
+  --success-color: #064e3b; /* Verde bosque matizado */
+  --error-color: #7f1d1d;   /* Rojo sangre matizado */
+  --warning-color: #78350f;  /* Ámbar tierra */
+  --cancel-color: #1f2937;   /* Gris azulado profundo */
   accent-color: var(--primary-color); /* Fuerza el color rojo en controles nativos */
 }
 
@@ -79,8 +79,8 @@ body.login-page-body {
   left: 0;
   height: 100vh; /* Ocupa toda la altura de la ventana */
   width: 260px; /* Ancho fijo */
-  background: rgba(18, 18, 18, 0.8); /* Fondo semi-transparente */
-  backdrop-filter: blur(10px); /* Efecto glassmorphism */
+  background: rgba(5, 5, 5, 0.95);
+  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(10px); /* Para compatibilidad con Safari */
   z-index: 100; /* Asegura que esté por encima del contenido */
   display: flex;
@@ -114,7 +114,7 @@ body.login-page-body {
   display: flex;
   align-items: center;
   padding: 0.9rem 1.5rem;
-  color: var(--text-secondary);
+  color: #bbbbbb; /* Un poco más de contraste para el menú */
   text-decoration: none;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -164,15 +164,15 @@ body.login-page-body {
    6. ADMIN - GRÁFICOS Y TABLAS
    ============================================================================= */
 .card, .card-table, .card-form {
-  background: linear-gradient(145deg, #252525, #1e1e1e);
+  background: linear-gradient(145deg, #0d0d0d, #050505);
   border-radius: 12px;
-  padding: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  margin-bottom: 2rem;
+  padding: 1rem 1.5rem; /* Compactación máxima de tarjetas */
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+  margin-bottom: 1.25rem; /* Menos espacio entre bloques */
   width: 100%;
   max-width: 1100px !important;
-  margin: 0 auto 2rem !important; /* Centrado horizontal y margen inferior */
+  margin: 0 auto 1.25rem !important;
   box-sizing: border-box;
 }
 
@@ -219,33 +219,34 @@ table {
 }
 .btn-primary,
 .btn-submit {
-  background: linear-gradient(135deg, var(--primary-color), #600000);
+  background: linear-gradient(135deg, #5a0101, var(--primary-color));
   color: white;
   border: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(70, 1, 1, 0.2);
 }
 .btn-primary:hover,
 .btn-submit:hover {
-  background: linear-gradient(135deg, #a00000, #700000);
+  background: #600000;
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(139, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(70, 1, 1, 0.4);
 }
 .btn-secondary {
-  background-color: var(--cancel-color);
-  color: var(--text-primary);
+  background-color: var(--primary-color);
+  color: white;
   border: none;
+  opacity: 0.9;
 }
 .btn-secondary:hover {
-  background-color: #4a4a4a;
+  background-color: #600000;
+  opacity: 1;
 }
 .btn-cancel {
   background-color: transparent;
-  border: 1px solid var(--cancel-color);
-  color: var(--text-secondary);
+  border: 1px solid var(--primary-color);
+  color: var(--text-primary);
 }
 .btn-cancel:hover {
-  background-color: var(--cancel-color);
-  color: var(--text-primary);
+  background-color: var(--primary-color);
 }
 
 .toolbar {
@@ -309,7 +310,6 @@ table {
   width: auto !important;
   margin: 0 auto;
 }
-.status.pagado { }
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -361,340 +361,17 @@ table {
 
 .btn-flotante-top {
   background-color: var(--primary-color);
-  display: none; /* Gestionado por JS */
+  display: none; /* Se activa con la clase .visible vía JS */
 }
-
-.btn-flotante-top:hover {
-  background-color: #6d0000;
+.btn-flotante-top.visible {
+  display: flex;
 }
 
 .btn-flotante-logout {
-  background-color: var(--error-color);
+  background-color: var(--primary-color);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .btn-flotante-logout:hover {
-  background-color: #c53030;
-}
-
-/* =============================================================================
-   17. ADMIN - FORMULARIOS MODERNOS (FLOATING LABELS)
-   ============================================================================= */
-.form-group.floating {
-  position: relative;
-  margin-bottom: 0.75rem; /* Reducido drásticamente el espacio entre campos */
-}
-
-.form-group.floating input,
-.form-group.floating select {
-  height: 48px; /* Reducido de 56px a 48px */
-  padding: 20px 12px 4px; /* Ajustado el espacio interno */
-  border: 1px solid var(--border-color);
-  background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  width: 100%;
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-/* Soporte para Textarea */
-.form-group.floating textarea {
-  padding: 24px 16px 8px;
-  border: 1px solid var(--border-color);
-  background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  width: 100%;
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: all 0.2s;
-  min-height: 120px; /* Altura mínima para áreas de texto */
-}
-
-.form-group.floating input:focus,
-.form-group.floating select:focus,
-.form-group.floating textarea:focus {
-  border-color: var(--primary-color);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 4px var(--accent-glow);
-  outline: none;
-}
-
-/* Efecto Hover (Pasar el mouse) para Inputs y Selects */
-.form-group.floating input:hover,
-.form-group.floating select:hover,
-.form-group.floating textarea:hover,
-.form-inline-group input:hover,
-.form-inline-group select:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 1px var(--accent-glow);
-}
-
-.form-group.floating label {
-  position: absolute;
-  left: 16px;
-  top: 14px; /* Ajustado para la nueva altura del input */
-  color: var(--text-secondary);
-  font-size: 1rem;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-.form-group.floating input:focus ~ label,
-.form-group.floating input:not(:placeholder-shown) ~ label,
-.form-group.floating select:focus ~ label,
-.form-group.floating select:valid ~ label, /* Mantiene la etiqueta arriba si hay una opción válida seleccionada */
-.form-group.floating textarea:focus ~ label,
-.form-group.floating textarea:not(:placeholder-shown) ~ label {
-  top: 4px; /* La etiqueta flota más cerca del borde superior */
-  font-size: 0.75rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-/* --- CORRECCIONES DE UI (SELECTS Y ALINEACIÓN) --- */
-
-/* 1. Evitar superposición en Selects: La etiqueta siempre flota */
-.form-group.floating select ~ label {
-  top: 8px;
-  font-size: 0.75rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-/* 2. Corregir color de fondo en opciones del menú desplegable (Modo Oscuro) */
-select option {
-  background-color: var(--background-card);
-  color: var(--text-primary);
-}
-
-/* 3. Clase para alinear inputs compuestos (Cédula/RIF) */
-.form-inline-group {
-  display: flex;
-  gap: 10px;
-  align-items: center; /* Centra verticalmente los elementos */
-}
-
-.form-inline-group select,
-.form-inline-group input {
-  height: 56px;
-  margin-bottom: 0;
-  background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  transition: all 0.2s;
-}
-.form-inline-group select:focus,
-.form-inline-group input:focus {
-  border-color: var(--primary-color);
-  background-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 4px var(--accent-glow);
-  outline: none;
-}
-
-/* 4. Corrección para etiquetas flotantes en grupos en línea (Cédula/RIF) */
-.form-group.floating .form-inline-group ~ label {
-  top: 8px;
-  font-size: 0.75rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-/* =============================================================================
-   18. ADMIN - UTILIDADES Y ESTILOS DE COSTOS
-   ============================================================================= */
-
-/* Colores de estado para textos */
-.text-success { color: var(--success-color) !important; }
-.text-danger { color: var(--error-color) !important; }
-.text-warning { color: var(--warning-color) !important; }
-.text-secondary { color: var(--text-secondary) !important; }
-
-/* Input de Costo en Tabla */
-.cost-input {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 8px 12px;
-    border-radius: 6px;
-    width: 120px;
-    text-align: right;
-    font-weight: 500;
-    transition: border-color 0.2s;
-}
-.cost-input:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* Botón Guardar Costo */
-.btn-save-cost {
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-.btn-save-cost:hover {
-    background: #a00000;
-    transform: translateY(-2px);
-}
-.btn-save-cost:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-/* =============================================================================
-   19. ADMIN - CALCULADORA TABS
-   ============================================================================= */
-.calc-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1.5rem;
-    gap: 10px;
-}
-.tab-btn {
-    background: none;
-    border: none;
-    padding: 10px 15px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-.tab-btn:hover { color: var(--text-primary); }
-.tab-btn.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-/* =============================================================================
-   20. ADMIN - CALCULADORA DE COSTOS (MODAL)
-   ============================================================================= */
-
-.modal-content.cost-calculator {
-    max-width: 600px;
-}
-
-.tab-content {
-    display: none; /* Oculto por defecto, controlado por JS */
-}
-
-.tab-content.active {
-    display: block; /* La pestaña activa se muestra */
-}
-
-.tab-content .tab-description {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-/* Contenedor para mostrar datos en la calculadora */
-.info-box.calculator-display {
-    margin-bottom: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 6px;
-    text-align: center;
-    border-left: none; /* Sobrescribe el estilo por defecto de info-box */
-}
-
-.calculator-display .display-label {
-    display: block;
-    color: #aaa;
-    font-size: 0.85rem;
-}
-
-.calculator-display .display-value {
-    color: var(--text-primary);
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-/* Contenedor para el resultado final de la calculadora */
-.info-box.calculator-result {
-    text-align: center;
-    margin: 1.5rem 0;
-    background: rgba(255, 255, 255, 0.05);
-    border-left: none; /* Sobrescribe el estilo por defecto de info-box */
-    padding: 1rem;
-}
-
-.calculator-result .display-label {
-    display: block;
-    color: #aaa;
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-}
-
-.calculator-result .result-value {
-    color: var(--success-color);
-    margin: 0;
-    font-size: 2rem;
-}
-
-#calc-profit-preview {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-top: 5px;
-}
-/* =============================================================================
-   21. ADMIN - ESTILOS TABLA DEUDORES
-   ============================================================================= */
-
-/* Estilo para la celda de saldo pendiente en la tabla de deudores */
-td.saldo-pendiente {
-    color: var(--error-color);
-    font-weight: bold;
-}
-
-/* Contenedor para los botones de acción apilados */
-.action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 8px; /* Espacio entre botones */
-    align-items: center;
-}
-
-/* Estilo base para los nuevos botones de acción (Detalles, Abono) */
-.btn-accion {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%; /* Ocupan todo el ancho de la celda */
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-/* Icono dentro del botón */
-.btn-accion i {
-    margin-right: 8px;
-    font-size: 0.9rem;
-}
-
-/* Efecto hover para el botón de Detalles */
-.btn-accion.btn-details:hover {
-    background-color: #3b82f6; /* Azul para 'ver' */
-    border-color: #3b82f6;
-    color: white;
-}
-
-/* Efecto hover para el botón de Abono */
-.btn-accion.btn-abono:hover {
-    background-color: var(--success-color); /* Verde para 'pagar' */
-    border-color: var(--success-color);
-    color: white;
+  background-color: #600000; /* Nuevo color de hover para el rojo oscuro */
 }

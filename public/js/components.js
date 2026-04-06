@@ -38,9 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
       link.classList.remove("active");
 
       // Comparar la pagina actual con el link
-      if (currentPage === linkPage || (currentPage === '' && (linkPage === 'index.html' || linkPage === ''))) {
+      const isDashboard = linkPage === 'admin.html' || linkPage === 'admin';
+      const isAtDashboard = currentPage === 'admin.html' || currentPage === 'admin' || (window.location.pathname.endsWith('/admin/'));
+
+      if ((isDashboard && isAtDashboard) || (!isDashboard && currentPage === linkPage)) {
         link.classList.add("active");
-        
+      } else if (currentPage === '' && (linkPage === 'index.html' || linkPage === '')) {
+        link.classList.add("active");
+      }
         // Manejo especial para el dropdown de 'Herramientas'
         const parentDropdown = link.closest('.dropdown-menu');
         if (parentDropdown) {
@@ -49,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
                toolsLink.classList.add('active');
             }
         }
-      }
     });
   };
 

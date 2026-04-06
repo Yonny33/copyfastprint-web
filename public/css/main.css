@@ -3,15 +3,16 @@
    ============================================================================= */
 
 :root {
-  --primary-color: #8b0000; /* Deep Red from Logo */
-  --accent-glow: rgba(139, 0, 0, 0.5);
-  --background-dark: #050505; /* Negro Profundo Premium */
-  --background-card: rgba(255, 255, 255, 0.03); /* Base para efecto vidrio */
+  --primary-color: #460101; /* Rojo más oscuro solicitado */
+  --accent-glow: rgba(70, 1, 1, 0.3);
+  --background-dark: #000000; /* Negro Absoluto */
+  --background-card: #0a0a0a;
   --text-primary: #eaeaea; /* Primary text color, slightly off-white */
-  --text-secondary: #a0a0a0; /* Secondary text for subtitles, p */
-  --border-color: #333333;
-  --success-color: #28a745;
-  --error-color: #dc3545;
+  --text-secondary: #888888;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --success-color: #064e3b;
+  --error-color: #7f1d1d;
+  --warning-color: #78350f;
 }
 
 * {
@@ -94,18 +95,14 @@ h4 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color), #600000);
+  background: linear-gradient(135deg, var(--primary-color), #2a0000);
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   border: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(
-    135deg,
-    #a00000,
-    #700000
-  ); /* Un poco más brillante */
+  background: linear-gradient(135deg, #600000, #460101);
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(139, 0, 0, 0.4);

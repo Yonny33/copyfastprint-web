@@ -4,8 +4,9 @@
 
 /* Estilo para la celda de saldo pendiente en la tabla de deudores */
 td.saldo-pendiente {
-    color: var(--error-color);
+    color: #ef4444; /* Rojo vibrante pero matizado */
     font-weight: bold;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
 }
 
 /* Contenedor para los botones de acción apilados */
