@@ -1,8 +1,8 @@
 
-import { auth } from '/firebase-config.js';
-import '../css/modules/_login.css';
-import '../css/modules/_forms.css';
-import '../css/modules/_responsive.css';
+import { auth } from '@/firebase-config.js';
+import '@/admin/css/modules/_login.css';
+import '@/admin/css/modules/_forms.css';
+import '@/admin/css/modules/_responsive.css';
 import { signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 document.addEventListener("DOMContentLoaded", () => {

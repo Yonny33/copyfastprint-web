@@ -1,3 +1,6 @@
+import '@/css/modules/_quote.css';
+import '@/admin/css/modules/_forms.css'; // Reutilizamos las etiquetas flotantes
+
 document.addEventListener('DOMContentLoaded', () => {
     // === MANEJO DEL FORMULARIO DE COTIZACIÓN ===
     const form = document.getElementById('cotizacion-form');

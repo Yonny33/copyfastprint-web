@@ -32,8 +32,8 @@ body {
   color: var(--text-primary);
   background-color: var(--background-dark);
   line-height: 1.7;
-  /* Fondo con luz ambiental sutil para dar profundidad */
-  background-image: radial-gradient(circle at 50% 0%, rgba(139, 0, 0, 0.1), transparent 70%);
+  /* Luz ambiental matizada con el nuevo rojo oscuro */
+  background-image: radial-gradient(circle at 50% 0%, rgba(70, 1, 1, 0.15), transparent 70%);
   background-attachment: fixed;
 }
 

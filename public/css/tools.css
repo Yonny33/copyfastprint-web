@@ -35,21 +35,6 @@
   gap: 2rem;
   margin: 2rem 0;
 }
-
-.option-card {
-  background: var(--background-card);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.option-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-glow);
-}
-.option-card .icon { font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem; }
 .btn-select { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 1rem; cursor: pointer; }
 
 .workspace-area { padding-bottom: 4rem; }
@@ -202,103 +187,9 @@
 .btn-modal.btn-cancel { background-color: #555; color: white; }
 .btn-modal.btn-cancel:hover { background-color: #777; }
 
-/* ESTILOS DE LA HERRAMIENTA REMOVER FONDO */
-.tool-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; padding: 1.5rem; background: var(--background-card); border-radius: 12px; margin-bottom: 2rem; }
-.tools-selection { display: flex; gap: 10px; border-right: 1px solid var(--border-color); padding-right: 2rem; }
-.tool-btn { background: #333; color: white; border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-.tool-btn:hover { background: #444; border-color: #666; }
-.tool-btn.active { background: var(--primary-color); border-color: var(--primary-color); color: white; }
-.control-group { display: flex; align-items: center; gap: 10px; color: var(--text-secondary); }
-.checkbox-label { display: flex; align-items: center; cursor: pointer; }
-.bg-selector { display: flex; gap: 8px; }
-.bg-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; background-size: cover; }
-.bg-btn.checker { background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%); background-size: 10px 10px; }
-.bg-btn.white { background-color: #fff; }
-.bg-btn.black { background-color: #000; }
-.bg-btn.red { background-color: #f00; }
-.bg-btn.plus { background-color: #444; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; }
-.bg-btn.active { border-color: var(--primary-color); }
-.brush-cursor { position: fixed; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.2); pointer-events: none; transform: translate(-50%, -50%); display: none; z-index: 1001; }
-
-
-/* === ESTILOS PARA DIVIDIR IMAGEN === */
-.split-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background-color: var(--background-card);
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    justify-content: center;
-    align-items: flex-end; 
-}
-
-.split-controls .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-}
-
-.split-controls label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.split-controls input[type="number"] {
-    background-color: #2c2c2c;
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    border-radius: 6px;
-    padding: 10px;
-    width: 120px; /* Ancho fijo para consistencia */
-    text-align: center;
-}
-
-.split-controls .input-required input {
-    border-left: 3px solid var(--primary-color);
-}
-
-.split-actions {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.btn-split-action {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.btn-split-action:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-}
-
-.split-info {
-    margin-bottom: 1rem;
-    color: var(--text-secondary);
-    min-height: 20px; /* Evita que el layout salte */
-}
-
-.pages-preview {
-    background-color: #2a2a2e;
-    border: 1px solid #444;
-    padding: 2rem;
-    border-radius: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-    min-height: 200px;
-    align-items: center;
-}
+/* NOTA: Las reglas específicas de cada herramienta se han movido 
+   a /css/modules/ para evitar conflictos entre mesas de trabajo. 
+   Se cargan automáticamente mediante los archivos JS correspondientes. */
 
 .pages-preview #initial-message {
     color: #888;

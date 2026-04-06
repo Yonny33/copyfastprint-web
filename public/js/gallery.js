@@ -1,3 +1,5 @@
+import '@/css/modules/_gallery.css';
+
 document.addEventListener('DOMContentLoaded', () => {
     // === FILTRADO DE GALERÍA ===
     const filterButtons = document.querySelectorAll('.filter-btn');

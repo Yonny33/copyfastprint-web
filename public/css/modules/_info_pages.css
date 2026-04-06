@@ -1,0 +1,45 @@
+/* === ESTILOS PARA PÁGINAS DE INFORMACIÓN (INICIO Y ACERCA DE) === */
+.hero-section {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+  position: relative;
+  overflow: hidden;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  width: 120%; height: 120%;
+  background: radial-gradient(circle, rgba(70, 1, 1, 0.2) 0%, transparent 65%);
+  filter: blur(90px);
+  z-index: 0;
+}
+.hero-text h1 {
+  font-size: 4.5rem;
+  font-weight: 800;
+  background: linear-gradient(to bottom right, #ffffff 30%, #888 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Secciones de Historia y Valores */
+.about-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+.value-item {
+  background: var(--background-card);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s;
+  text-align: center;
+}
+.value-item:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.value-item i { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem; }
+@media (max-width: 992px) { .about-section { grid-template-columns: 1fr; } }

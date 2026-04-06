@@ -1,3 +1,5 @@
+import '@/css/modules/_split_tool.css';
+
 document.addEventListener("DOMContentLoaded", function () {
     // --- DOM ELEMENTS ---
     const uploadInput = document.getElementById("img-upload-split");

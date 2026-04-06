@@ -1,8 +1,8 @@
-import { API_BASE_URL } from '/firebase-config.js';
-import '../css/modules/_kpis.css';
-import '../css/modules/_responsive.css';
-import '../css/modules/_tables.css';
-import '../css/modules/_common_admin_ui.css'; // Para toolbar y search-bar si se usan en el dashboard
+import { API_BASE_URL } from '@/firebase-config.js';
+import '@/admin/css/modules/_kpis.css';
+import '@/admin/css/modules/_responsive.css';
+import '@/admin/css/modules/_tables.css';
+import '@/admin/css/modules/_common_admin_ui.css'; // Para toolbar y search-bar si se usan en el dashboard
 
 document.addEventListener("DOMContentLoaded", () => {
   // --- ELEMENTOS DEL DOM ---

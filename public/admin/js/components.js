@@ -1,7 +1,7 @@
 
-import { auth } from '/firebase-config.js';
+import { auth } from '@/firebase-config.js';
 import { signOut } from 'firebase/auth';
-
+ 
 document.addEventListener('DOMContentLoaded', function () {
   // Usar una ruta absoluta desde la raíz del sitio para asegurar que funcione en todas partes
   const headerUrl = '/admin/components/header.html';

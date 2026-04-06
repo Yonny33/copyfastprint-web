@@ -1,3 +1,5 @@
+import '@/css/modules/_remove_bg.css';
+
 document.addEventListener("DOMContentLoaded", function () {
     // --- ELEMENTOS DEL DOM ---
     const canvas = document.getElementById("c");

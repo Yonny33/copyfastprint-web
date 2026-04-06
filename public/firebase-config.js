@@ -23,4 +23,4 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // Exportar la URL de la API basada en el entorno (Vite manejará esto)
-export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'; // No se usa alias aquí, es una ruta de proxy

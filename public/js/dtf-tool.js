@@ -1,3 +1,5 @@
+import '@/css/modules/_dtf_tool.css';
+
 let canvas;
 const PIXELS_PER_CM = 15;
 let currentWidthCm = 58;

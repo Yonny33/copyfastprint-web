@@ -1,9 +1,9 @@
-import { API_BASE_URL } from '/firebase-config.js';
-import '../css/modules/_analysis.css';
-import '../css/modules/_tables.css';
-import '../css/modules/_responsive.css';
-import '../css/modules/_kpis.css';
-import '../css/modules/_common_admin_ui.css';
+import { API_BASE_URL } from '@/firebase-config.js';
+import '@/admin/css/modules/_analysis.css';
+import '@/admin/css/modules/_tables.css';
+import '@/admin/css/modules/_responsive.css';
+import '@/admin/css/modules/_kpis.css';
+import '@/admin/css/modules/_common_admin_ui.css';
 
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = API_BASE_URL;

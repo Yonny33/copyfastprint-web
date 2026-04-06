@@ -1,3 +1,5 @@
+import '@/css/modules/_vector_tool.css';
+
 document.addEventListener("DOMContentLoaded", function () {
     // --- ELEMENTOS DEL DOM ---
     const imgOriginalPreview = document.getElementById("img-original-preview");

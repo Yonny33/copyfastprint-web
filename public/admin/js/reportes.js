@@ -1,10 +1,10 @@
 import { API_BASE_URL } from '/firebase-config.js';
-import '../css/modules/_forms.css';
-import '../css/modules/_modals.css';
-import '../css/modules/_tables.css';
-import '../css/modules/_deudores.css';
-import '../css/modules/_responsive.css';
-import '../css/modules/_common_admin_ui.css';
+import '@/admin/css/modules/_forms.css';
+import '@/admin/css/modules/_modals.css';
+import '@/admin/css/modules/_tables.css';
+import '@/admin/css/modules/_deudores.css';
+import '@/admin/css/modules/_responsive.css';
+import '@/admin/css/modules/_common_admin_ui.css';
 
 document.addEventListener("DOMContentLoaded", function () {
   // --- CONSTANTES Y URL DE TU API FIREBASE ---

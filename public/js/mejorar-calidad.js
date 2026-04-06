@@ -1,3 +1,5 @@
+import '@/css/modules/_enhance_tool.css';
+
 document.addEventListener("DOMContentLoaded", () => {
     // --- DOM ELEMENTS ---
     const uploadInput = document.getElementById("image-upload");
