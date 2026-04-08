@@ -29,11 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const currentPage = window.location.pathname.split("/").pop();
+    // Decodificamos la URL para manejar correctamente caracteres como acentos o la 'ñ'
+    const currentPage = decodeURIComponent(window.location.pathname).split("/").pop();
 
     navLinks.forEach(link => {
-      const linkPage = link.getAttribute("href").split("/").pop();
-
+      const href = link.getAttribute("href") || "";
+      const linkPage = decodeURIComponent(href).split("/").pop();
+      
       // Quitar la clase 'active' de todos los links primero
       link.classList.remove("active");
 
@@ -41,12 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const isDashboard = linkPage === 'admin.html' || linkPage === 'admin';
       const isAtDashboard = currentPage === 'admin.html' || currentPage === 'admin' || (window.location.pathname.endsWith('/admin/'));
 
-      if ((isDashboard && isAtDashboard) || (!isDashboard && currentPage === linkPage)) {
+      if (((isDashboard && isAtDashboard) || (!isDashboard && currentPage === linkPage)) ||
+          (currentPage === '' && (linkPage === 'index.html' || linkPage === ''))) {
+        
         link.classList.add("active");
-      } else if (currentPage === '' && (linkPage === 'index.html' || linkPage === '')) {
-        link.classList.add("active");
-      }
-        // Manejo especial para el dropdown de 'Herramientas'
+
+        // Manejo especial para el dropdown de 'Herramientas': solo si el link activo está dentro
         const parentDropdown = link.closest('.dropdown-menu');
         if (parentDropdown) {
             const toolsLink = document.querySelector('a[href="/herramientas.html"], a[href="herramientas.html"]');
@@ -54,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
                toolsLink.classList.add('active');
             }
         }
+      }
     });
   };
 

@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let lastMouseY = 0;
 
     // --- EVENT LISTENERS ---
+    initDraggableToolbar();
 
     toleranceSlider.addEventListener("input", () => (toleranceValue.textContent = toleranceSlider.value));
     featherSlider.addEventListener("input", () => (featherValue.textContent = featherSlider.value));
@@ -142,6 +143,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // --- SOPORTE TÁCTIL (MÓVILES/TABLETS) ---
+    canvas.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    }, { passive: false });
+
     canvas.addEventListener("mousemove", function(e) {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
@@ -151,6 +160,13 @@ document.addEventListener("DOMContentLoaded", function () {
             performBrushAction(e);
         }
     });
+
+    canvas.addEventListener("touchmove", (e) => {
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
+        canvas.dispatchEvent(mouseEvent);
+        e.preventDefault();
+    }, { passive: false });
 
     canvas.addEventListener("mouseup", () => { isDrawing = false; });
     canvas.addEventListener("mouseleave", () => { isDrawing = false; brushCursor.style.display = "none"; });
@@ -358,6 +374,53 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         return imageData;
+    }
+
+    // ==========================================================================
+    // ===  LÓGICA DE TOOLBAR ARRASTRABLE  ===
+    // ==========================================================================
+    function initDraggableToolbar() {
+        const toolbar = document.querySelector('.floating-toolbar');
+        if (!toolbar) return;
+
+        toolbar.style.top = '20%'; 
+        toolbar.style.transform = 'none';
+
+        if (!toolbar.querySelector('.toolbar-drag-handle')) {
+            const handle = document.createElement('div');
+            handle.className = 'toolbar-drag-handle';
+            handle.innerHTML = '<i class="fas fa-grip-lines"></i>';
+            toolbar.prepend(handle);
+
+            let isDragging = false;
+            let currentY;
+            let initialY;
+            let yOffset = 0;
+
+            handle.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', dragEnd);
+
+            function dragStart(e) {
+                initialY = e.clientY - yOffset;
+                if (e.target === handle || handle.contains(e.target)) {
+                    isDragging = true;
+                }
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentY = e.clientY - initialY;
+                    yOffset = currentY;
+                    toolbar.style.transform = `translateY(${currentY}px)`;
+                }
+            }
+
+            function dragEnd() {
+                isDragging = false;
+            }
+        }
     }
 
     function showLoading(text) {

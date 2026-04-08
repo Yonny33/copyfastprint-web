@@ -314,7 +314,7 @@ h4 {
 .footer {
   background-color: #080808; /* Fondo casi negro para continuidad con el Hero */
   color: var(--text-secondary);
-  padding: 40px 20px; /* Altura reducida para un footer más compacto */
+  padding: 60px 20px 40px; /* Aumentamos el padding superior para mayor elegancia */
   text-align: center;
   border-top: 1px solid rgba(255, 255, 255, 0.05); /* Borde muy sutil */
   margin-top: 0; /* CORRECCIÓN: Elimina la franja negra separadora */
@@ -345,11 +345,11 @@ h4 {
 .footer-content h2 {
   font-size: 2.5rem;
   color: var(--text-primary);
-  margin-bottom: 10px;
+  margin-bottom: 15px; /* Un poco más de espacio bajo el título principal */
   letter-spacing: -1px;
 }
 .social-networks {
-  margin-top: 40px;
+  margin-top: 30px; /* Reducimos el salto para que las redes no parezcan desconectadas */
   display: flex;
   justify-content: center;
   gap: 25px; /* Usamos gap para espaciado uniforme */

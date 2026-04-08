@@ -18,6 +18,10 @@ export default defineConfig({
     alias: {
       // Permite usar '@/archivo' para referirse a la raíz de public
       '@': resolve(__dirname, 'public'),
+      // Aseguramos la resolución de Firebase desde la raíz del proyecto
+      'firebase/app': resolve(__dirname, 'node_modules/firebase/app'),
+      'firebase/auth': resolve(__dirname, 'node_modules/firebase/auth'),
+      'firebase/firestore': resolve(__dirname, 'node_modules/firebase/firestore'),
     },
   },
   root: 'public', // Establecemos public como raíz para que Vite procese los JS

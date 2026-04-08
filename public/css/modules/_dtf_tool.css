@@ -13,14 +13,35 @@
 
 .canvas-bg-palette {
     background: var(--background-card);
-    padding: 1rem;
+    padding: 1.2rem;
     border-radius: 12px;
-    border: 1px solid var(--border-color-soft);
-    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.25rem;
     text-align: center;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.design-layout { display: flex; flex-direction: column; position: relative; }
+/* Asignar colores a los botones de la paleta basados en su data-color */
+.palette-btn[data-color="white"] { background-color: #ffffff; }
+.palette-btn[data-color="black"] { background-color: #000000; border-color: #333; }
+.palette-btn[data-color="#460101"] { background-color: #460101; }
+.palette-btn[data-color="#0000ff"] { background-color: #0000ff; }
+.palette-btn[data-color="#00ff00"] { background-color: #00ff00; }
+.palette-btn[data-color="checker"] { 
+    background-image: conic-gradient(#333 90deg, #444 90deg 180deg, #333 180deg 270deg, #444 270deg);
+    background-size: 10px 10px;
+}
+
+.design-layout { 
+    display: flex; 
+    flex-direction: column; 
+    position: relative;
+    transition: transform 0.2s ease-out;
+    transform-origin: top center; /* El zoom se expande desde arriba */
+}
 .design-row { display: flex; }
 .ruler-top { height: 25px; background-color: #222; position: relative; margin-left: 25px; border-bottom: 1px solid #555; overflow: hidden; }
 .ruler-left { width: 25px; background-color: #222; position: relative; border-right: 1px solid #555; overflow: hidden; }
@@ -32,4 +53,14 @@
     background: rgba(0,0,0,0.3);
     color: white;
     border-radius: 6px;
+}
+
+/* Estilos para las líneas guía de alineación */
+.alignment-guideline {
+    pointer-events: none;
+}
+
+/* Optimización de espacio en móviles */
+@media (max-width: 768px) {
+    .option-card { padding: 1.5rem; }
 }

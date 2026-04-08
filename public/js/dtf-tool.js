@@ -4,6 +4,7 @@ let canvas;
 const PIXELS_PER_CM = 15;
 let currentWidthCm = 58;
 let currentHeightCm = 100;
+let canvasZoom = 1.0;
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- EVENTOS DE SELECCIÓN DE ANCHO INICIAL ---
@@ -75,6 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.renderAll();
         }
     });
+
+    // --- EVENTOS DE ZOOM ---
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    const btnZoomOut = document.getElementById('btn-zoom-out');
+
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => updateCanvasZoom(0.1));
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => updateCanvasZoom(-0.1));
+
+    initDraggableToolbar();
 });
 
 function selectWorkspace(widthCm) {
@@ -110,7 +120,10 @@ function initFabricCanvas(widthCm, heightCm) {
 
     // Configuración de bordes inteligentes
     setupBorders(widthPx, heightPx);
-    
+
+    // Inicializar guías de alineación
+    initCenteringGuidelines(canvas);
+
     // Configuración de eventos del lienzo
     setupCanvasEvents();
 }
@@ -150,6 +163,18 @@ function setupCanvasEvents() {
         'selection:cleared': () => document.getElementById("dim-tooltip").style.display = "none",
         'object:modified': () => { if (!canvas.getActiveObject()) document.getElementById("dim-tooltip").style.display = "none"; }
     });
+}
+
+function updateCanvasZoom(delta) {
+    const layout = document.querySelector('.design-layout');
+    if (!layout) return;
+
+    canvasZoom = Math.max(0.3, Math.min(2, canvasZoom + delta));
+    
+    // Aplicamos el zoom a toda la mesa (Reglas + Canvas) mediante CSS
+    layout.style.transform = `scale(${canvasZoom})`;
+    
+    if (canvas) canvas.calcOffset();
 }
 
 // --- NUEVA FUNCIÓN CENTRALIZADA PARA AJUSTAR ANCHO ---
@@ -379,6 +404,110 @@ document.getElementById("btn-reset-img").addEventListener("click", () => {
     updateDimTooltip(activeObject, true);
   }
 });
+
+// ==========================================================================
+// ===  LÓGICA DE GUÍAS DE ALINEACIÓN (SMART GUIDES)  ===
+// ==========================================================================
+function initCenteringGuidelines(canvas) {
+    const canvasWidth = canvas.getWidth();
+    const canvasHeight = canvas.getHeight();
+    const ctx = canvas.getSelectionContext();
+    const aligningLineOffset = 5;
+    const aligningLineMargin = 4;
+    const aligningLineWidth = 1;
+    const aligningLineColor = '#ff4d4d'; // Rojo vibrante para resaltar
+
+    canvas.on('object:moving', function(e) {
+        // LIMPIAR EL CONTEXTO SUPERIOR ANTES DE DIBUJAR
+        canvas.clearContext(canvas.getSelectionContext());
+
+        const activeObject = e.target;
+        const canvasObjects = canvas.getObjects().filter(obj => obj !== activeObject && !obj.isBorder && !obj.isGuide);
+        const activeObjectCenter = activeObject.getCenterPoint();
+
+        canvasObjects.forEach(obj => {
+            const objCenter = obj.getCenterPoint();
+            
+            // Alineación Vertical (Centro con Centro)
+            if (Math.abs(activeObjectCenter.x - objCenter.x) < aligningLineMargin) {
+                activeObject.set({ left: objCenter.x - (activeObject.width * activeObject.scaleX / 2) }).setCoords();
+                drawGuideLine(ctx, objCenter.x, 0, objCenter.x, canvasHeight, aligningLineColor);
+            }
+
+            // Alineación Horizontal (Centro con Centro)
+            if (Math.abs(activeObjectCenter.y - objCenter.y) < aligningLineMargin) {
+                activeObject.set({ top: objCenter.y - (activeObject.height * activeObject.scaleY / 2) }).setCoords();
+                drawGuideLine(ctx, 0, objCenter.y, canvasWidth, objCenter.y, aligningLineColor);
+            }
+        });
+    });
+
+    // Limpiar guías cuando se suelta el objeto
+    canvas.on('mouse:up', () => {
+        canvas.clearContext(canvas.getSelectionContext());
+        canvas.requestRenderAll(); // Al renderizar de nuevo, las líneas dibujadas manualmente en el ctx desaparecen
+    });
+}
+
+function drawGuideLine(ctx, x1, y1, x2, y2, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+}
+
+// ==========================================================================
+// ===  LÓGICA DE TOOLBAR ARRASTRABLE  ===
+// ==========================================================================
+function initDraggableToolbar() {
+    const toolbar = document.querySelector('.floating-toolbar');
+    if (!toolbar) return;
+
+    // Posicionamiento inicial fijo para evitar conflictos con el centrado CSS
+    toolbar.style.top = '20%'; 
+    toolbar.style.transform = 'none';
+
+    // Inyectar el tirador de arrastre si no existe
+    if (!toolbar.querySelector('.toolbar-drag-handle')) {
+        const handle = document.createElement('div');
+        handle.className = 'toolbar-drag-handle';
+        handle.innerHTML = '<i class="fas fa-grip-lines"></i>';
+        toolbar.prepend(handle);
+
+        let isDragging = false;
+        let currentY;
+        let initialY;
+        let yOffset = 0;
+
+        handle.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            initialY = e.clientY - yOffset;
+            if (e.target === handle || handle.contains(e.target)) {
+                isDragging = true;
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentY = e.clientY - initialY;
+                yOffset = currentY;
+                toolbar.style.transform = `translateY(${currentY}px)`;
+            }
+        }
+
+        function dragEnd() {
+            isDragging = false;
+        }
+    }
+}
 
 function showLoading(text) {
     let overlay = document.getElementById('tool-loader');
