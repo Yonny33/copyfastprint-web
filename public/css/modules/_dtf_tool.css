@@ -43,8 +43,8 @@
     transform-origin: top center; /* El zoom se expande desde arriba */
 }
 .design-row { display: flex; }
-.ruler-top { height: 25px; background-color: #222; position: relative; margin-left: 25px; border-bottom: 1px solid #555; overflow: hidden; }
-.ruler-left { width: 25px; background-color: #222; position: relative; border-right: 1px solid #555; overflow: hidden; }
+.ruler-top { height: 25px; background-color: #222; position: relative; margin-left: 25px; border-bottom: 1px solid #555; overflow: hidden; cursor: pointer; }
+.ruler-left { width: 25px; background-color: #222; position: relative; border-right: 1px solid #555; overflow: hidden; cursor: pointer; }
 
 .modal-content.dtf-modal { max-width: 450px; }
 .dtf-modal .modal-input-group input { 

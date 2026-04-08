@@ -83,7 +83,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: move;
+  cursor: grab; /* Cambiado a mano abierta */
   color: #fff;
   background: var(--primary-color);
   border-radius: 10px 10px 0 0;
@@ -95,6 +95,10 @@
 
 .toolbar-drag-handle:hover {
   opacity: 1;
+}
+
+.toolbar-drag-handle:active {
+  cursor: grabbing; /* Cambiado a mano cerrada al hacer clic */
 }
 
 .fab-container { position: relative; display: flex; align-items: center; }

@@ -28,7 +28,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const resetBtn = document.getElementById("btn-reset");
     const downloadBtn = document.getElementById("btn-download");
 
+    // --- CONFIGURACIÓN DE CURSORES PERSONALIZADOS ---
+    // SVG de Varita Mágica en color rojo corporativo
+    const wandCursor = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23460101' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 4 5 2'/%3E%3Cpath d='m17.7 11-5.3-5.3'/%3E%3Cpath d='m10.9 17.8-5.3-5.3'/%3E%3Cpath d='M7.2 21.4 2.1 16.3c-.6-.6-.6-1.6 0-2.2l2.8-2.8 5.3 5.3-2.8 2.8c-.6.6-1.6.6-2.2 0Z'/%3E%3Cpath d='M19 13l2 2'/%3E%3Cpath d='M10 2l2 2'/%3E%3Cpath d='M21 3l-2 2'/%3E%3Cpath d='M13 19l2 2'/%3E%3C/svg%3E\") 0 20, auto";
+
     // --- ESTADO DE LA APLICACIÓN ---
+    let canvasZoom = 1.0;
     let originalImage = null;
     let originalFile = null;
     let history = [];
@@ -41,6 +46,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- EVENT LISTENERS ---
     initDraggableToolbar();
+
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    const btnZoomOut = document.getElementById('btn-zoom-out');
+
+    if (btnZoomIn) btnZoomIn.addEventListener('click', () => updateCanvasZoom(0.1));
+    if (btnZoomOut) btnZoomOut.addEventListener('click', () => updateCanvasZoom(-0.1));
 
     toleranceSlider.addEventListener("input", () => (toleranceValue.textContent = toleranceSlider.value));
     featherSlider.addEventListener("input", () => (featherValue.textContent = featherSlider.value));
@@ -68,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (btn.id === "tool-wand") {
                 currentTool = 'wand';
-                canvas.style.cursor = "crosshair";
+                canvas.style.cursor = wandCursor; // APLICAR VARITA MÁGICA
                 brushCursor.style.display = "none";
                 wandControls.forEach(el => el.style.display = "flex");
                 brushControls.forEach(el => el.style.display = "none");
@@ -109,6 +120,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Asegurar que al iniciar el cursor sea la varita si es la herramienta por defecto
+    if (currentTool === 'wand') {
+        canvas.style.cursor = wandCursor;
+    }
+
     uploadInput.addEventListener("change", function (e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -119,6 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const img = new Image();
             img.onload = function () {
                 originalImage = img;
+                canvasZoom = 1.0; // Reiniciar zoom al subir
+                updateCanvasZoom(0);
                 resetCanvas();
                 placeholder.style.display = "none";
                 canvas.style.display = "block";
@@ -374,6 +392,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         return imageData;
+    }
+
+    function updateCanvasZoom(delta) {
+        const canvasEl = document.getElementById('c');
+        if (!canvasEl) return;
+
+        canvasZoom = Math.max(0.2, Math.min(4, canvasZoom + delta));
+        canvasEl.style.transform = `scale(${canvasZoom})`;
+        canvasEl.style.transition = 'transform 0.2s ease-out';
     }
 
     // ==========================================================================

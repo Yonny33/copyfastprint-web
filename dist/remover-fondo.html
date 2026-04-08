@@ -12,12 +12,12 @@
 
     <!-- Estilos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/admin/js/remover-fondo-kOBVG-7R.js"></script>
+    <script type="module" crossorigin src="/admin/js/remover-fondo-_lv-a23a.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/components-BOJn8ViU.js">
     <link rel="stylesheet" crossorigin href="/admin/assets/components-DhRWCUGN.css">
-    <link rel="stylesheet" crossorigin href="/admin/assets/remover-fondo-NiRCbNcR.css">
-    <link rel="stylesheet" crossorigin href="/admin/assets/tools-DMFVvJ70.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/remover-fondo-kRnkicCl.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-8Zpq-hpS.css">
   </head>
   <body>
     
@@ -82,7 +82,7 @@
         </div>
 
         <!-- ÁREA DE TRABAJO -->
-        <div class="canvas-container-wrapper" id="canvas-wrapper" style="cursor: crosshair; min-height: 400px; align-items: center; justify-content: center;">
+        <div class="canvas-container-wrapper remover-fondo-canvas" id="canvas-wrapper">
           <div id="placeholder-text" style="color: #666; text-align: center;">
             <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
             Sube una imagen para comenzar
@@ -116,6 +116,19 @@
           <span class="fab-tooltip">Subir Imagen</span>
           <input type="file" id="img-upload" accept="image/*" hidden />
         </div>
+        <div class="fab-container">
+          <button class="fab-btn zoom" id="btn-zoom-in" title="Aumentar Zoom">
+            <i class="fas fa-search-plus"></i>
+          </button>
+          <span class="fab-tooltip">Aumentar Zoom</span>
+        </div>
+        <div class="fab-container">
+          <button class="fab-btn zoom" id="btn-zoom-out" title="Reducir Zoom">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <span class="fab-tooltip">Reducir Zoom</span>
+        </div>
+        <div style="height: 10px; border-top: 1px solid rgba(255,255,255,0.1); margin: 5px 0;"></div>
         <div class="fab-container">
           <button class="fab-btn clear" id="btn-undo" title="Deshacer">
             <i class="fas fa-undo"></i>
