@@ -175,6 +175,28 @@
     box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
 }
 
+/* === TARJETAS DE KPIs (MÉTRICAS DE COSTOS) === */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--background-card);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+.stat-card .value { display: block; font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin: 0.5rem 0; }
+.stat-card .label { font-size: 0.85rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px; }
+.stat-card .icon { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+
 
 .tool-loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
 .tool-loading-overlay {

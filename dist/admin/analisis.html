@@ -46,7 +46,7 @@
         Chart.defaults.elements.point.radius = 4;
       }
     </script>
-    <script type="module" crossorigin src="/admin/js/admin\\analisis-BatEEiap.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin\\analisis-CXq-kJCS.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/vendor-B5gEuqmI.js">
     <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-DMqX9BD5.js">
@@ -54,7 +54,7 @@
     <link rel="stylesheet" crossorigin href="/admin/assets/_responsive-DaEuz1Zo.css">
     <link rel="stylesheet" crossorigin href="/admin/assets/analisis-r80Op40t.css">
     <link rel="stylesheet" crossorigin href="/admin/assets/_common_admin_ui-Cwg2_77A.css">
-    <link rel="stylesheet" crossorigin href="/admin/assets/_kpis-BoyxUMO3.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/_kpis-ZHSh85FE.css">
   </head>
   <body class="admin-page">
     <div id="loading-overlay" class="loading-overlay" style="display: none">
@@ -75,27 +75,21 @@
         </div>
 
         <!-- KPIs Anuales Restaurados -->
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-icon ingresos"><i class="fas fa-chart-line"></i></div>
-            <div class="kpi-info">
-              <h3>Venta Total Año</h3>
-              <p id="kpi-venta-anual">Bs. 0.00</p>
-            </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="icon ingresos"><i class="fas fa-chart-line"></i></div>
+            <span class="value" id="kpi-venta-anual">Bs. 0.00</span>
+            <span class="label">Venta Total Año</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon gastos"><i class="fas fa-receipt"></i></div>
-            <div class="kpi-info">
-              <h3>Gasto Total Año</h3>
-              <p id="kpi-gasto-anual">Bs. 0.00</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon gastos"><i class="fas fa-receipt"></i></div>
+            <span class="value" id="kpi-gasto-anual">Bs. 0.00</span>
+            <span class="label">Gasto Total Año</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon balance"><i class="fas fa-balance-scale"></i></div>
-            <div class="kpi-info">
-              <h3>Rentabilidad Media</h3>
-              <p id="kpi-rentabilidad-anual">0%</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon balance"><i class="fas fa-balance-scale"></i></div>
+            <span class="value" id="kpi-rentabilidad-anual">0%</span>
+            <span class="label">Rentabilidad Media</span>
           </div>
         </div>
 

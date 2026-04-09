@@ -6,6 +6,7 @@
     <title>Admin - Costos y Rentabilidad</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/css/main.css">
+    <link rel="stylesheet" href="/css/tools.css">
 </head>
 <body class="admin-page">
     <div class="admin-grid-container">
@@ -20,27 +21,21 @@
             </div>
 
             <!-- KPIs Rápidos de Rentabilidad -->
-            <div class="kpi-grid" style="order: 2 !important;">
-                <div class="kpi-card">
-                    <div class="kpi-icon ingresos"><i class="fas fa-percentage"></i></div>
-                    <div class="kpi-info">
-                        <h3>Margen Promedio</h3>
-                        <p id="avg-margin">0%</p>
-                    </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon ingresos"><i class="fas fa-percentage"></i></div>
+                    <span class="value" id="avg-margin">0%</span>
+                    <span class="label">Margen Promedio</span>
                 </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon inventario"><i class="fas fa-check-double"></i></div>
-                    <div class="kpi-info">
-                        <h3>Productos Analizados</h3>
-                        <p id="products-analyzed">0/0</p>
-                    </div>
+                <div class="stat-card">
+                    <div class="icon inventario"><i class="fas fa-check-double"></i></div>
+                    <span class="value" id="products-analyzed">0/0</span>
+                    <span class="label">Productos Analizados</span>
                 </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon balance"><i class="fas fa-coins"></i></div>
-                    <div class="kpi-info">
-                        <h3>Ganancia Potencial (Stock)</h3>
-                        <p id="potential-profit">$0.00</p>
-                    </div>
+                <div class="stat-card">
+                    <div class="icon balance"><i class="fas fa-coins"></i></div>
+                    <span class="value" id="potential-profit">Bs. 0.00</span>
+                    <span class="label">Ganancia Potencial (Stock)</span>
                 </div>
             </div>
 

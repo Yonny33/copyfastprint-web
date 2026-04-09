@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- CONFIGURACIÓN DE CURSORES PERSONALIZADOS ---
     // SVG de Varita Mágica en color rojo corporativo
-    const wandCursor = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23460101' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 4 5 2'/%3E%3Cpath d='m17.7 11-5.3-5.3'/%3E%3Cpath d='m10.9 17.8-5.3-5.3'/%3E%3Cpath d='M7.2 21.4 2.1 16.3c-.6-.6-.6-1.6 0-2.2l2.8-2.8 5.3 5.3-2.8 2.8c-.6.6-1.6.6-2.2 0Z'/%3E%3Cpath d='M19 13l2 2'/%3E%3Cpath d='M10 2l2 2'/%3E%3Cpath d='M21 3l-2 2'/%3E%3Cpath d='M13 19l2 2'/%3E%3C/svg%3E\") 0 20, auto";
+    const wandCursor = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23460101' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 4 5 2'/%3E%3Cpath d='m17.7 11-5.3-5.3'/%3E%3Cpath d='m10.9 17.8-5.3-5.3'/%3E%3Cpath d='M7.2 21.4 2.1 16.3c-.6-.6-.6-1.6 0-2.2l2.8-2.8 5.3 5.3-2.8 2.8c-.6.6-1.6.6-2.2 0Z'/%3E%3Cpath d='M19 13l2 2'/%3E%3Cpath d='M10 2l2 2'/%3E%3Cpath d='M21 3l-2 2'/%3E%3Cpath d='M13 19l2 2'/%3E%3C/svg%3E\") 4 4, auto";
 
     // --- ESTADO DE LA APLICACIÓN ---
     let canvasZoom = 1.0;
@@ -273,11 +273,10 @@ document.addEventListener("DOMContentLoaded", function () {
             try {
                 await new Promise((resolve, reject) => {
                     const script = document.createElement('script');
-                    // URL ACTUALIZADA a la versión 1.6.0, que es más reciente y estable
-                    script.src = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/dist/imgly-background-removal.umd.js";
+                    script.src = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.3/dist/imgly-background-removal.umd.js";
                     script.crossOrigin = "anonymous";
                     script.onload = resolve;
-                    script.onerror = (err) => reject(new Error(`Error al cargar el script de la IA: ${err.message}`));
+                    script.onerror = () => reject(new Error("Error al cargar el motor de IA."));
                     document.head.appendChild(script);
                 });
             } catch (e) {
@@ -292,13 +291,14 @@ document.addEventListener("DOMContentLoaded", function () {
         showLoading("IA Analizando Imagen...");
 
         try {
-            // Configuración para que la IA encuentre sus modelos (apuntando a la v1.6.0)
+            // Configuración optimizada para carga desde CDN
             const config = {
-                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.6.0/dist/",
+                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.5.3/dist/",
+                model: 'medium'
             };
 
             const source = originalFile || originalImage.src;
-            const blob = await imglyRemoveBackground(source, config);
+            const blob = await imglyRemoveBackground.removeBackground(source, config);
             const url = URL.createObjectURL(blob);
             const img = new Image();
             img.onload = () => {

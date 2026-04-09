@@ -635,7 +635,7 @@ app.get("/dashboard", async (req, res) => {
 
       // 6. Inventario (Solo traemos stock y mínimos para calcular alertas)
       db.collection("inventario")
-        .select("stock_actual", "stock_minimo")
+        .select("stock_actual", "stock_minimo", "precio_venta", "precio_costo")
         .get(),
 
       // 7. CORRECCIÓN: Traer TODAS las ventas con saldo pendiente > 0
@@ -673,12 +673,27 @@ app.get("/dashboard", async (req, res) => {
     // 2. Inventario
     let alertasInventario = 0;
     let totalItemsStock = 0;
+    let gananciaPotencialTotal = 0;
+    let valorVentaTotalProyectado = 0;
+    let productosConCosto = 0;
+    const productosAnalizados = inventarioSnapshot.size;
+
     inventarioSnapshot.docs.forEach((doc) => {
       const prod = doc.data();
       const stock = parseFloat(prod.stock_actual || 0);
       const min = parseFloat(prod.stock_minimo || 0);
+      const pVenta = parseFloat(prod.precio_venta || 0);
+      const pCosto = parseFloat(prod.precio_costo || 0);
+
+      if (pCosto > 0) productosConCosto++;
+
       totalItemsStock += stock;
       if (stock <= min) alertasInventario++;
+
+      if (stock > 0) {
+        gananciaPotencialTotal += stock * (pVenta - pCosto);
+        valorVentaTotalProyectado += stock * pVenta;
+      }
     });
 
     // 3. Total Clientes (Desde Aggregation)
@@ -734,6 +749,10 @@ app.get("/dashboard", async (req, res) => {
         chartGastos.push(gMes);
     }
 
+    const margenPromedio = valorVentaTotalProyectado > 0 
+      ? ((gananciaPotencialTotal / valorVentaTotalProyectado) * 100).toFixed(1) 
+      : 0;
+
     // NOTA: Para obtener las "Últimas Ventas" en la tabla, hacemos una query pequeña extra
     const ultimasVentasSnapshot = await db.collection("ventas")
         .orderBy("fecha", "desc")
@@ -761,6 +780,9 @@ app.get("/dashboard", async (req, res) => {
           clientesConDeuda: clientesDeudores.size,
           balanceGeneral: balanceGeneralHistorico,
           totalSaldoPendiente: totalSaldoPendiente,
+          margenPromedio: margenPromedio,
+          productosAnalizados: `${productosConCosto}/${productosAnalizados}`,
+          gananciaPotencial: gananciaPotencialTotal
         },
         chartData: {
           labels: chartLabels,

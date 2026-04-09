@@ -17,13 +17,14 @@
 
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script type="module" crossorigin src="/admin/js/admin\\admin-BSNuVkCf.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin\\admin-DGhxYdA7.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/vendor-B5gEuqmI.js">
     <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-DMqX9BD5.js">
     <link rel="modulepreload" crossorigin href="/admin/js/_responsive-sfkeo2qP.js">
     <link rel="stylesheet" crossorigin href="/admin/assets/_responsive-DaEuz1Zo.css">
-    <link rel="stylesheet" crossorigin href="/admin/assets/_kpis-BoyxUMO3.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-BzABfPJ6.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/_kpis-ZHSh85FE.css">
     <link rel="stylesheet" crossorigin href="/admin/assets/_common_admin_ui-Cwg2_77A.css">
   </head>
   <body class="admin-page">
@@ -43,84 +44,51 @@
         </div>
 
         <!-- Fila 1: Indicadores Clave (KPIs) -->
-        <div class="kpi-grid">
-          <!-- ... (El contenido de los KPIs permanece igual) ... -->
-          <div class="kpi-card">
-            <div class="kpi-icon balance">
-              <i class="fas fa-balance-scale"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Balance Neto (Mes)</h3>
-              <p id="kpi-balance-neto">Cargando...</p>
-            </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="icon balance"><i class="fas fa-balance-scale"></i></div>
+            <span class="value" id="kpi-balance-neto">Cargando...</span>
+            <span class="label">Balance Neto (Mes)</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon deuda">
-              <i class="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Saldo Pendiente Total</h3>
-              <p id="kpi-saldo-pendiente">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon deuda"><i class="fas fa-file-invoice-dollar"></i></div>
+            <span class="value" id="kpi-saldo-pendiente">Cargando...</span>
+            <span class="label">Saldo Pendiente Total</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon balance">
-              <i class="fas fa-university"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Balance General</h3>
-              <p id="kpi-balance-general">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon balance"><i class="fas fa-university"></i></div>
+            <span class="value" id="kpi-balance-general">Cargando...</span>
+            <span class="label">Balance General</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon ingresos">
-              <i class="fas fa-chart-line"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Ingresos del Mes</h3>
-              <p id="kpi-ingresos-mes">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon ingresos"><i class="fas fa-chart-line"></i></div>
+            <span class="value" id="kpi-ingresos-mes">Cargando...</span>
+            <span class="label">Ingresos del Mes</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon gastos"><i class="fas fa-receipt"></i></div>
-            <div class="kpi-info">
-              <h3>Gastos del Mes</h3>
-              <p id="kpi-gastos-mes">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon gastos"><i class="fas fa-receipt"></i></div>
+            <span class="value" id="kpi-gastos-mes">Cargando...</span>
+            <span class="label">Gastos del Mes</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon inventario"><i class="fas fa-boxes"></i></div>
-            <div class="kpi-info">
-              <h3>Items en Stock</h3>
-              <p id="kpi-items-stock">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon inventario"><i class="fas fa-boxes"></i></div>
+            <span class="value" id="kpi-items-stock">Cargando...</span>
+            <span class="label">Items en Stock</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon clientes">
-              <i class="fas fa-user-plus"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Total de Clientes</h3>
-              <p id="kpi-clientes-nuevos">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon clientes"><i class="fas fa-user-plus"></i></div>
+            <span class="value" id="kpi-clientes-nuevos">Cargando...</span>
+            <span class="label">Total de Clientes</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon deuda">
-              <i class="fas fa-hand-holding-usd"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Clientes con Deudas</h3>
-              <p id="kpi-clientes-deudas">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon deuda"><i class="fas fa-hand-holding-usd"></i></div>
+            <span class="value" id="kpi-clientes-deudas">Cargando...</span>
+            <span class="label">Clientes con Deudas</span>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon inventario">
-              <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="kpi-info">
-              <h3>Alertas de Inventario</h3>
-              <p id="kpi-alertas-inventario">Cargando...</p>
-            </div>
+          <div class="stat-card">
+            <div class="icon inventario"><i class="fas fa-exclamation-triangle"></i></div>
+            <span class="value" id="kpi-alertas-inventario">Cargando...</span>
+            <span class="label">Alertas de Inventario</span>
           </div>
         </div>
 
