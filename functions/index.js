@@ -676,6 +676,7 @@ app.get("/dashboard", async (req, res) => {
     let gananciaPotencialTotal = 0;
     let valorVentaTotalProyectado = 0;
     let productosConCosto = 0;
+    const listaStock = [];
     const productosAnalizados = inventarioSnapshot.size;
 
     inventarioSnapshot.docs.forEach((doc) => {
@@ -689,6 +690,11 @@ app.get("/dashboard", async (req, res) => {
 
       totalItemsStock += stock;
       if (stock <= min) alertasInventario++;
+
+      listaStock.push({ 
+        nombre: prod.nombre || "Producto", 
+        cantidad: stock 
+      });
 
       if (stock > 0) {
         gananciaPotencialTotal += stock * (pVenta - pCosto);
@@ -784,6 +790,10 @@ app.get("/dashboard", async (req, res) => {
           productosAnalizados: `${productosConCosto}/${productosAnalizados}`,
           gananciaPotencial: gananciaPotencialTotal
         },
+        inventoryChart: {
+          labels: listaStock.map(p => p.nombre),
+          data: listaStock.map(p => p.cantidad)
+        },
         chartData: {
           labels: chartLabels,
           ingresos: chartIngresos,
@@ -833,11 +843,11 @@ app.get("/analisis", async (req, res) => {
     // Procesar Ventas
     ventasSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      const fecha = new Date(data.fecha);
-      if (isNaN(fecha.getTime())) return;
+      if (!data.fecha) return;
+      const parts = data.fecha.split('-'); // YYYY-MM-DD
 
-      const year = fecha.getFullYear();
-      const month = fecha.getMonth(); // 0-11
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1; // 0-11
       const monto = parseFloat(data.venta_bruta || 0);
 
       initYear(year);
@@ -848,11 +858,11 @@ app.get("/analisis", async (req, res) => {
     // Procesar Gastos
     gastosSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      const fecha = new Date(data.fecha);
-      if (isNaN(fecha.getTime())) return;
+      if (!data.fecha) return;
+      const parts = data.fecha.split('-');
 
-      const year = fecha.getFullYear();
-      const month = fecha.getMonth(); // 0-11
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1; // 0-11
       const monto = parseFloat(data.monto || 0);
 
       initYear(year);

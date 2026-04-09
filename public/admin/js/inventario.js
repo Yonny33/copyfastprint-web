@@ -4,6 +4,10 @@ import '@/admin/css/modules/_tables.css';
 import '@/admin/css/modules/_responsive.css';
 import '@/admin/css/modules/_common_admin_ui.css'; // Para toolbar y search-bar
 
+import Chart from 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
+
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = API_BASE_URL;
 
@@ -115,7 +119,20 @@ document.addEventListener("DOMContentLoaded", function () {
           x: { beginAtZero: true, grid: { color: "rgba(255, 255, 255, 0.1)" } },
           y: { grid: { color: "rgba(255, 255, 255, 0.05)" } }
         },
-        plugins: { legend: { display: false } },
+        plugins: { 
+          legend: { display: false },
+          datalabels: {
+            anchor: 'end',
+            align: 'right',
+            offset: 4,
+            color: '#eaeaea',
+            font: {
+              weight: 'bold',
+              size: 11
+            },
+            formatter: (value) => (value > 0 ? value : '0')
+          }
+        },
       },
     });
   }

@@ -29,24 +29,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script>
-      // Configuración Global de Chart.js - Estilo Corporativo (Rojo)
-      if (typeof Chart !== 'undefined') {
-        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-        Chart.defaults.color = "#a0a0a0";
-        
-        // Líneas y Puntos (para gráficos de tendencia)
-        Chart.defaults.elements.line.borderColor = "#8b0000";
-        Chart.defaults.elements.line.backgroundColor = "rgba(139, 0, 0, 0.2)";
-        Chart.defaults.elements.line.tension = 0.4; // Curvas suaves modernas
-        
-        Chart.defaults.elements.point.backgroundColor = "#8b0000";
-        Chart.defaults.elements.point.borderColor = "#fff";
-        Chart.defaults.elements.point.hoverBackgroundColor = "#ff0000";
-        Chart.defaults.elements.point.radius = 4;
-      }
-    </script>
   </head>
   <body class="admin-page">
     <div id="loading-overlay" class="loading-overlay" style="display: none">
@@ -58,12 +40,18 @@
       <div id="header-placeholder"></div>
 
       <main class="admin-main-content">
-        <div class="section-heading">
-          <h2>Análisis Financiero Anual</h2>
-          <div class="divider"></div>
-          <p>
-            Visión estratégica del rendimiento mensual y anual de la empresa.
-          </p>
+        <div class="section-heading" style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <h2>Análisis Financiero Anual</h2>
+            <div class="divider"></div>
+            <p>
+              Visión estratégica del rendimiento mensual y anual de la empresa.
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <span style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; display: block; margin-bottom: 5px;">Viendo Año</span>
+            <div id="display-year" style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color); line-height: 1;">----</div>
+          </div>
         </div>
 
         <!-- KPIs Anuales Restaurados -->
@@ -82,32 +70,6 @@
             <div class="icon balance"><i class="fas fa-balance-scale"></i></div>
             <span class="value" id="kpi-rentabilidad-anual">0%</span>
             <span class="label">Rentabilidad Media</span>
-          </div>
-        </div>
-
-        <!-- Encabezado con Año Seleccionado -->
-        <div class="analysis-header">
-          <div>
-            <span
-              style="
-                color: var(--text-secondary);
-                text-transform: uppercase;
-                letter-spacing: 2px;
-              "
-              >Viendo Año</span
-            >
-            <div id="display-year" class="current-year-display">----</div>
-          </div>
-          <div style="text-align: right">
-            <p style="margin: 0; color: var(--text-secondary)">
-              Rentabilidad Anual
-            </p>
-            <h3
-              id="year-profitability"
-              style="margin: 0; font-size: 1.8rem; color: var(--success-color)"
-            >
-              --%
-            </h3>
           </div>
         </div>
 

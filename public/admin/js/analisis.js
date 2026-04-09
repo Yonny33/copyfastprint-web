@@ -5,11 +5,25 @@ import '@/admin/css/modules/_responsive.css';
 import '@/admin/css/modules/_kpis.css';
 import '@/admin/css/modules/_common_admin_ui.css';
 
+import Chart from 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
+
+// Configuración Global de Chart.js - Estilo Corporativo
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+Chart.defaults.color = "#a0a0a0";
+Chart.defaults.elements.line.borderColor = "#8b0000";
+Chart.defaults.elements.line.backgroundColor = "rgba(139, 0, 0, 0.2)";
+Chart.defaults.elements.line.tension = 0.4;
+Chart.defaults.elements.point.backgroundColor = "#8b0000";
+Chart.defaults.elements.point.borderColor = "#fff";
+Chart.defaults.elements.point.hoverBackgroundColor = "#ff0000";
+Chart.defaults.elements.point.radius = 4;
+
 document.addEventListener("DOMContentLoaded", function () {
   const API_URL = API_BASE_URL;
   const loadingOverlay = document.getElementById("loading-overlay");
   const displayYear = document.getElementById("display-year");
-  const yearProfitability = document.getElementById("year-profitability");
   const monthsGrid = document.getElementById("months-grid");
   const historicalTableBody = document.querySelector("#historical-table tbody");
   const trendChartCanvas = document.getElementById("trend-chart");
@@ -36,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const formatCurrency = (val) =>
-    `Bs. ${parseFloat(val || 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    `Bs. ${parseFloat(val || 0).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // --- CARGAR DATOS ---
   const fetchAnalysisData = async () => {
@@ -97,12 +111,18 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- SELECCIONAR AÑO Y ACTUALIZAR VISTA ---
   const selectYear = (yearData) => {
     // Actualizar UI Header
-    displayYear.textContent = yearData.year;
-    yearProfitability.textContent = `${yearData.rentabilidad}%`;
-    yearProfitability.style.color =
-      parseFloat(yearData.rentabilidad) >= 0
-        ? "var(--success-color)"
-        : "var(--error-color)";
+    if (displayYear) displayYear.textContent = yearData.year;
+    // Actualizar las 3 tarjetas de KPI superiores
+    const kpiVenta = document.getElementById('kpi-venta-anual');
+    const kpiGasto = document.getElementById('kpi-gasto-anual');
+    const kpiRent = document.getElementById('kpi-rentabilidad-anual');
+
+    if (kpiVenta) kpiVenta.textContent = formatCurrency(yearData.totalIngresos);
+    if (kpiGasto) kpiGasto.textContent = formatCurrency(yearData.totalGastos);
+    if (kpiRent) {
+        kpiRent.textContent = `${yearData.rentabilidad}%`;
+        kpiRent.style.color = parseFloat(yearData.rentabilidad) >= 0 ? "var(--success-color)" : "var(--error-color)";
+    }
 
     // Resaltar fila en tabla
     document
@@ -208,6 +228,18 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         plugins: {
           legend: { labels: { color: "#ccc" } },
+          datalabels: {
+            anchor: 'center',
+            align: 'top',
+            offset: 10,
+            color: '#888',
+            font: {
+              size: 9
+            },
+            formatter: (value) => {
+              return value !== 0 ? value.toLocaleString("es-VE", { maximumFractionDigits: 0 }) : '';
+            }
+          }
         },
         scales: {
           y: { grid: { color: "#333" }, ticks: { color: "#888" } },
