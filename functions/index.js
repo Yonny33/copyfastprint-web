@@ -843,11 +843,15 @@ app.get("/analisis", async (req, res) => {
     // Procesar Ventas
     ventasSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      if (!data.fecha) return;
-      const parts = data.fecha.split('-'); // YYYY-MM-DD
+      let fechaStr = "";
+      if (data.fecha && typeof data.fecha === 'string') fechaStr = data.fecha;
+      else if (data.fecha && data.fecha.toDate) fechaStr = data.fecha.toDate().toISOString().split('T')[0];
+      
+      if (!fechaStr || !fechaStr.includes('-')) return;
+      const parts = fechaStr.split('-');
 
       const year = parseInt(parts[0]);
-      const month = parseInt(parts[1]) - 1; // 0-11
+      const month = parseInt(parts[1]) - 1;
       const monto = parseFloat(data.venta_bruta || 0);
 
       initYear(year);
@@ -858,11 +862,15 @@ app.get("/analisis", async (req, res) => {
     // Procesar Gastos
     gastosSnapshot.docs.forEach((doc) => {
       const data = doc.data();
-      if (!data.fecha) return;
-      const parts = data.fecha.split('-');
+      let fechaStr = "";
+      if (data.fecha && typeof data.fecha === 'string') fechaStr = data.fecha;
+      else if (data.fecha && data.fecha.toDate) fechaStr = data.fecha.toDate().toISOString().split('T')[0];
+
+      if (!fechaStr || !fechaStr.includes('-')) return;
+      const parts = fechaStr.split('-');
 
       const year = parseInt(parts[0]);
-      const month = parseInt(parts[1]) - 1; // 0-11
+      const month = parseInt(parts[1]) - 1;
       const monto = parseFloat(data.monto || 0);
 
       initYear(year);

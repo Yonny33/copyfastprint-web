@@ -12,7 +12,7 @@
 
     <!-- Estilos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/admin/js/remover-fondo-CX33j7CL.js"></script>
+    <script type="module" crossorigin src="/admin/js/remover-fondo-DHkNCnkd.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/components-BOJn8ViU.js">
     <link rel="stylesheet" crossorigin href="/admin/assets/components-DhRWCUGN.css">
@@ -36,14 +36,8 @@
         <!-- PANEL DE CONTROL -->
         <div class="tool-controls">
           <div class="tools-selection">
-            <button class="tool-btn" id="btn-ai" title="Quitar fondo con Inteligencia Artificial">
-              <i class="fas fa-robot"></i> Remover con IA
-            </button>
             <button class="tool-btn active" id="tool-wand" title="Varita Mágica para quitar por color">
               <i class="fas fa-magic"></i> Varita Mágica
-            </button>
-            <button class="tool-btn" id="tool-eraser" title="Borrador Manual">
-              <i class="fas fa-eraser"></i> Borrador
             </button>
           </div>
           <div class="control-group group-wand">
@@ -74,11 +68,6 @@
               <input type="color" id="custom-bg-color" style="visibility: hidden; position: absolute; width: 0; height: 0;">
             </div>
           </div>
-          <div class="control-group group-brush" style="display: none;">
-            <label for="brush-size"><i class="fas fa-circle"></i> Tamaño Pincel:</label>
-            <input type="range" id="brush-size" min="1" max="100" value="20" />
-            <span id="brush-size-val">20px</span>
-          </div>
         </div>
 
         <!-- ÁREA DE TRABAJO -->
@@ -94,14 +83,8 @@
             <h3><i class="fas fa-lightbulb"></i> Cómo usar:</h3>
             <ul>
                 <li><strong>1. Subir:</strong> Carga tu imagen (JPG o PNG) usando el botón de la barra flotante.</li>
-                <li>
-                    <strong>2. Elegir Método:</strong>
-                    <ul>
-                        <li><strong>Remover con IA:</strong> La forma más rápida y precisa. Haz clic en el botón y deja que la IA haga el trabajo.</li>
-                        <li><strong>Varita Mágica:</strong> Ideal para fondos de color sólido. Haz clic en el color que quieres eliminar.</li>
-                        <li><strong>Borrador:</strong> Para retoques manuales y eliminar pequeños detalles.</li>
-                    </ul>
-                </li>
+                <li><strong>2. Varita Mágica:</strong> Haz clic sobre cualquier color de la imagen para eliminarlo.</li>
+                <li><strong>3. Ajustes:</strong> Usa la "Tolerancia" para captar más o menos tonos similares y "Suavizado" para bordes más finos.</li>
                 <li><strong>3. Descargar:</strong> Guarda tu imagen como un PNG con fondo transparente, ¡lista para usar!</li>
             </ul>
         </div>

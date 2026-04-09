@@ -13,14 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const featherValue = document.getElementById("feather-val");
     const contiguousCheckbox = document.getElementById("contiguous");
     
-    const btnAI = document.getElementById("btn-ai");
-    const toolBtns = document.querySelectorAll(".tool-btn");
-    const brushSizeSlider = document.getElementById("brush-size");
-    const brushSizeVal = document.getElementById("brush-size-val");
-    const wandControls = document.querySelectorAll(".group-wand");
-    const brushControls = document.querySelectorAll(".group-brush");
     const bgBtns = document.querySelectorAll(".bg-btn");
-    const brushCursor = document.getElementById("brush-cursor");
     const btnAddColor = document.getElementById("btn-add-color");
     const customColorInput = document.getElementById("custom-bg-color");
 
@@ -38,11 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let originalFile = null;
     let history = [];
     const MAX_HISTORY = 10;
-    let currentTool = 'wand';
-    let isDrawing = false;
-    let brushSize = 20;
-    let lastMouseX = 0;
-    let lastMouseY = 0;
+    let isWandActive = true;
 
     // --- EVENT LISTENERS ---
     initDraggableToolbar();
@@ -55,42 +44,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     toleranceSlider.addEventListener("input", () => (toleranceValue.textContent = toleranceSlider.value));
     featherSlider.addEventListener("input", () => (featherValue.textContent = featherSlider.value));
-    brushSizeSlider.addEventListener("input", () => {
-        brushSize = parseInt(brushSizeSlider.value, 10);
-        brushSizeVal.textContent = brushSize + "px";
-        if (currentTool === 'eraser') {
-            updateBrushCursor({ clientX: lastMouseX, clientY: lastMouseY });
-        }
-    });
-
-    toolBtns.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            if (btn.id === "btn-ai") {
-                if (!originalImage) {
-                    alert("Por favor, sube una imagen primero para usar la IA.");
-                    return;
-                }
-                runAI();
-                return;
-            }
-
-            toolBtns.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            if (btn.id === "tool-wand") {
-                currentTool = 'wand';
-                canvas.style.cursor = wandCursor; // APLICAR VARITA MÁGICA
-                brushCursor.style.display = "none";
-                wandControls.forEach(el => el.style.display = "flex");
-                brushControls.forEach(el => el.style.display = "none");
-            } else {
-                currentTool = 'eraser';
-                canvas.style.cursor = "none";
-                wandControls.forEach(el => el.style.display = "none");
-                brushControls.forEach(el => el.style.display = "flex");
-            }
-        });
-    });
 
     bgBtns.forEach(btn => {
         btn.addEventListener("click", () => {
@@ -120,10 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Asegurar que al iniciar el cursor sea la varita si es la herramienta por defecto
-    if (currentTool === 'wand') {
-        canvas.style.cursor = wandCursor;
-    }
+    canvas.style.cursor = wandCursor;
 
     uploadInput.addEventListener("change", function (e) {
         const file = e.target.files[0];
@@ -150,15 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- MANEJO DEL CANVAS ---
     canvas.addEventListener("mousedown", function(e) {
         if (!originalImage) return;
-        isDrawing = true;
         saveState();
-
-        if (currentTool === 'wand') {
-            performWandAction(e);
-            isDrawing = false;
-        } else {
-            performBrushAction(e);
-        }
+        performWandAction(e);
     });
 
     // --- SOPORTE TÁCTIL (MÓVILES/TABLETS) ---
@@ -169,15 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
     }, { passive: false });
 
-    canvas.addEventListener("mousemove", function(e) {
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-        updateBrushCursor(e);
-        if (!isDrawing || !originalImage) return;
-        if (currentTool !== 'wand') {
-            performBrushAction(e);
-        }
-    });
+    canvas.addEventListener("mousemove", (e) => { /* No brush action needed */ });
 
     canvas.addEventListener("touchmove", (e) => {
         const touch = e.touches[0];
@@ -186,23 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
     }, { passive: false });
 
-    canvas.addEventListener("mouseup", () => { isDrawing = false; });
-    canvas.addEventListener("mouseleave", () => { isDrawing = false; brushCursor.style.display = "none"; });
-
-    function updateBrushCursor(e) {
-        if (currentTool !== 'eraser' || !originalImage) {
-            brushCursor.style.display = "none";
-            return;
-        }
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const visualSize = brushSize / scaleX;
-        brushCursor.style.width = visualSize + "px";
-        brushCursor.style.height = visualSize + "px";
-        brushCursor.style.left = e.clientX + "px";
-        brushCursor.style.top = e.clientY + "px";
-        brushCursor.style.display = "block";
-    }
+    canvas.addEventListener("mouseup", () => {});
+    canvas.addEventListener("mouseleave", () => {});
 
     function saveState() {
         const currentImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -244,81 +164,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let workingImageData = floodFill(ctx.getImageData(0, 0, canvas.width, canvas.height), x, y, tolerance, contiguous);
         if (feather > 0) workingImageData = applyFeather(workingImageData, feather);
         ctx.putImageData(workingImageData, 0, 0);
-    }
-
-    function performBrushAction(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-
-        ctx.beginPath();
-        ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
-        ctx.closePath();
-
-        if (currentTool === 'eraser') {
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.fill();
-            ctx.globalCompositeOperation = 'source-over';
-        }
-    }
-
-    async function runAI() {
-        if (!originalImage) return;
-        
-        // Comprobar si la librería ya está cargada globalmente
-        if (typeof imglyRemoveBackground === 'undefined') {
-            showLoading("Descargando motor de IA...");
-            try {
-                await new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.3/dist/imgly-background-removal.umd.js";
-                    script.crossOrigin = "anonymous";
-                    script.onload = resolve;
-                    script.onerror = () => reject(new Error("Error al cargar el motor de IA."));
-                    document.head.appendChild(script);
-                });
-            } catch (e) {
-                console.error(e);
-                hideLoading();
-                alert(`La librería de IA no se pudo cargar. Verifica tu conexión a internet o intenta recargar la página.\nError: ${e.message}`);
-                return;
-            }
-        }
-
-        saveState();
-        showLoading("IA Analizando Imagen...");
-
-        try {
-            // Configuración optimizada para carga desde CDN
-            const config = {
-                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal-data@1.5.3/dist/",
-                model: 'medium'
-            };
-
-            const source = originalFile || originalImage.src;
-            const blob = await imglyRemoveBackground.removeBackground(source, config);
-            const url = URL.createObjectURL(blob);
-            const img = new Image();
-            img.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                URL.revokeObjectURL(url); // Liberar memoria
-                hideLoading();
-            };
-            img.onerror = (err) => {
-                 console.error("Error al cargar la imagen procesada por la IA:", err);
-                 alert("Hubo un error al mostrar la imagen procesada.");
-                 hideLoading();
-            }
-            img.src = url;
-
-        } catch (error) {
-            console.error("Error durante el procesamiento con IA:", error);
-            alert(`Se produjo un error al procesar la imagen con la IA: ${error.message}\n\nRevisa la consola para más detalles.`);
-            hideLoading();
-        }
     }
 
     function resetCanvas() {
