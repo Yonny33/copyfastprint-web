@@ -111,7 +111,7 @@ td.actions {
   display: inline-block;
 }
 .status.pendiente {
-  background-color: var(--error-color);
+  background-color: #4b5563; /* Gris neutro para quitar el rojo */
   color: white;
   padding: 5px 10px;
   border-radius: 15px;

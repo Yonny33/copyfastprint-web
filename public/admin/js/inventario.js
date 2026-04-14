@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <td>${product.categoria || "N/A"}</td>
             <td>${product.tipo === "servicio" ? "N/A" : stock}</td>
             <td>${estado}</td>
-            <td class="actions">
+            <td class="actions" style="display: flex; gap: 8px; justify-content: center; align-items: center; border-bottom: none;">
                 <button class="btn-edit" data-id="${product.id_producto}" title="Editar"><i class="fas fa-edit"></i></button>
                 <button class="btn-delete" data-id="${product.id_producto}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
             </td>
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
           data: data,
           backgroundColor: 'rgba(70, 1, 1, 0.6)', 
           borderColor: 'rgba(70, 1, 1, 1)',
-          borderWidth: 1,
+            borderWidth: 1,
         }],
       },
       options: {

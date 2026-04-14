@@ -156,9 +156,11 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${formatCurrency(saldoPendiente)}</td>
         <td><span>${venta.estado_pedido || 'N/A'}</span></td>
         <td class="actions">
-            <button class="btn-accion btn-details" data-id="${venta.id}" title="Ver Detalles"><i class="fas fa-eye"></i></button>
-            <button class="btn-accion btn-edit" data-id="${venta.id}" title="Editar Venta"><i class="fas fa-edit"></i></button>
-            <button class="btn-accion btn-delete" data-id="${venta.id}" title="Eliminar Venta"><i class="fas fa-trash-alt"></i></button>
+            <div class="action-buttons">
+                <button class="btn-accion btn-details" data-id="${venta.id}" title="Ver Detalles"><i class="fas fa-eye"></i></button>
+                <button class="btn-accion btn-edit" data-id="${venta.id}" title="Editar Venta"><i class="fas fa-edit"></i></button>
+                <button class="btn-accion btn-delete" data-id="${venta.id}" title="Eliminar Venta"><i class="fas fa-trash-alt"></i></button>
+            </div>
         </td>
       `;
       ventasTableBody.appendChild(row);

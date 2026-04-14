@@ -12,9 +12,9 @@ td.saldo-pendiente {
 /* Contenedor para los botones de acción apilados */
 .action-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px; /* Espacio entre botones */
-    align-items: center;
+    justify-content: center;
 }
 
 /* Estilo base para los nuevos botones de acción (Detalles, Abono) */
@@ -26,10 +26,10 @@ td.saldo-pendiente {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 100%; /* Ocupan todo el ancho de la celda */
+    width: auto;
     font-size: 0.85rem;
     font-weight: 600;
 }
