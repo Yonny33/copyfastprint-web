@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudio PDF - COPYFAST&PRINT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script type="module" crossorigin src="/admin/js/admin\\gestion-pdfs-HWfh04Ev.js"></script>
+    <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/vendor-DPXNLk_s.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-CAxC6apF.js">
+    <link rel="modulepreload" crossorigin href="/admin/js/_responsive-DFmXB64n.js">
+    <link rel="stylesheet" crossorigin href="/admin/assets/_responsive-lsuBYtC6.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/gestion-pdfs-6TtwB_34.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/tools-BzABfPJ6.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/_common_admin_ui-DKEBWfDs.css">
+  </head>
+  <body class="admin-page">
+    <div class="admin-grid-container">
+      <div id="header-placeholder"></div>
+
+      <main class="admin-main-content">
+      <header class="page-header">
+        <div class="header-info">
+          <h1><i class="fas fa-file-pdf"></i> Estudio de Documentos</h1>
+          <p>Sube, lee y anota tus archivos PDF antes de imprimir.</p>
+        </div>
+        <div class="header-actions">
+          <label for="pdf-upload" class="btn-primary">
+            <i class="fas fa-cloud-upload-alt"></i> Subir Nuevo PDF
+          </label>
+          <input type="file" id="pdf-upload" accept="application/pdf" hidden />
+        </div>
+      </header>
+
+      <div class="drive-container">
+        <div class="search-bar card">
+          <i class="fas fa-search"></i>
+          <input type="text" id="pdf-search" placeholder="Buscar en mi unidad...">
+        </div>
+        <div id="pdf-grid" class="pdf-grid">
+          <!-- Las tarjetas de archivos se cargan aquí -->
+        </div>
+      </div>
+    </main>
+
+    <!-- MODAL VISOR TIPO GOOGLE DRIVE -->
+    <div id="pdf-modal-viewer" class="pdf-modal">
+      <div class="modal-header">
+        <div class="file-info">
+          <i class="fas fa-file-pdf"></i>
+          <span id="modal-file-name">Nombre del archivo.pdf</span>
+        </div>
+        <div class="modal-tools">
+          <div class="tool-group pagination">
+            <button id="prev-page"><i class="fas fa-chevron-left"></i></button>
+            <span><span id="current-page">0</span> / <span id="total-pages">0</span></span>
+            <button id="next-page"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="divider-v"></div>
+          <div class="tool-group zoom">
+            <button id="btn-zoom-out"><i class="fas fa-search-minus"></i></button>
+            <span id="zoom-percent">150%</span>
+            <button id="btn-zoom-in"><i class="fas fa-search-plus"></i></button>
+          </div>
+          <div class="divider-v"></div>
+          <button id="btn-close-viewer" class="btn-close"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="editor-toolbar" class="pdf-floating-toolbar">
+            <button class="tool-btn active" data-tool="cursor"><i class="fas fa-mouse-pointer"></i></button>
+            <button class="tool-btn" data-tool="pen"><i class="fas fa-pen"></i></button>
+            <button class="tool-btn" data-tool="highlighter"><i class="fas fa-highlighter"></i></button>
+            <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+        </div>
+        <div id="pdf-canvas-container" class="canvas-wrapper">
+          <canvas id="pdf-render-canvas"></canvas>
+          <canvas id="annotation-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+      <div class="spinner"></div>
+    </div>
+
+  </body>
+</html>

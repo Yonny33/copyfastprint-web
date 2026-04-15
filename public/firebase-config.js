@@ -4,6 +4,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Tu configuración de Firebase
 const firebaseConfig = {
@@ -21,6 +22,7 @@ const app = initializeApp(firebaseConfig);
 // Inicializar y exportar los servicios que necesites
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 // Exportar la URL de la API basada en el entorno (Vite manejará esto)
 export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'; // No se usa alias aquí, es una ruta de proxy

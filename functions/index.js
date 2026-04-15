@@ -1057,6 +1057,37 @@ app.post("/admin/migrar-ventas-numeros", async (req, res) => {
   }
 });
 
+// --- ENDPOINTS PARA GESTIÓN DE PDFS ---
+app.get("/pdfs", async (req, res) => {
+  try {
+    const snapshot = await db.collection("documentos_pdf").orderBy("fecha", "desc").get();
+    const pdfs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.status(200).json({ status: "success", data: pdfs });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
+app.post("/pdfs", async (req, res) => {
+  try {
+    const data = req.body;
+    data.fecha = data.fecha || new Date().toISOString();
+    const docRef = await db.collection("documentos_pdf").add(data);
+    res.status(201).json({ status: "success", id: docRef.id });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
+app.delete("/pdfs/:id", async (req, res) => {
+  try {
+    await db.collection("documentos_pdf").doc(req.params.id).delete();
+    res.status(200).json({ status: "success", message: "PDF eliminado de la base de datos" });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+});
+
 // --- Exportar la API de Express como una Cloud Function ---
 // Cada vez que se llame a esta función HTTPS, se ejecutará nuestra app de Express.
 exports.api = onRequest(

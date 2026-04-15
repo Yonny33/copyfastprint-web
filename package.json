@@ -17,6 +17,8 @@
   "dependencies": {
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "firebase": "^12.11.0"
+    "firebase": "^12.11.0",
+    "pdfjs-dist": "^4.0.379",
+    "pdf-lib": "^1.17.1"
   }
 }
