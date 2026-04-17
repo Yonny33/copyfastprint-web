@@ -107,11 +107,35 @@
 
 .modal-body {
     flex: 1;
-    overflow: hidden;
+    overflow: hidden; /* Evita scroll doble, el scroll lo tendrá el wrapper */
     position: relative;
     display: flex;
-    justify-content: center;
     background: #111;
+}
+
+.canvas-wrapper {
+    flex: 1;
+    overflow: auto; /* Aquí aparece la barra de subir y bajar */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: flex-start; /* Permite que el scroll empiece desde arriba */
+    padding: 3rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #222;
+}
+
+.canvas-stack {
+    position: relative; /* Necesario para encimar los canvas */
+    background: white;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5); /* Sombra elegante tipo Drive */
+    line-height: 0; /* Elimina espacios fantasma debajo del canvas */
+}
+
+#annotation-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none; /* Permite clics a través de la capa de dibujo si es necesario */
 }
 
 .pdf-floating-toolbar {
@@ -127,4 +151,89 @@
     gap: 10px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     z-index: 10;
+}
+
+/* Estilos para los botones de herramientas en el modal */
+.pdf-floating-toolbar .tool-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pdf-floating-toolbar .tool-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pdf-floating-toolbar .tool-btn:hover,
+.pdf-floating-toolbar .tool-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.pdf-floating-toolbar .tool-btn.active {
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Estilos para el input de color */
+.pdf-floating-toolbar input[type="color"] {
+    width: 30px;
+    height: 30px;
+    border: none;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    border-radius: 50%;
+    overflow: hidden; /* Para asegurar que el color se vea redondo */
+}
+
+.pdf-floating-toolbar input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.pdf-floating-toolbar input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+/* Estilos para el input de rango (tamaño) */
+.pdf-floating-toolbar input[type="range"] {
+    width: 80px;
+    height: 4px; /* Altura de la barra */
+    background: var(--text-secondary);
+    border-radius: 2px;
+    -webkit-appearance: none; /* Eliminar estilos por defecto de Chrome */
+    appearance: none;
+    cursor: pointer;
+}
+
+.pdf-floating-toolbar input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Eliminar estilos por defecto de Chrome */
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: grab;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.pdf-floating-toolbar input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: grab;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+#annotation-canvas {
+    /* pointer-events: none; */ /* Eliminamos esta línea para permitir la interacción */
+    cursor: default; /* Cursor por defecto, se cambiará con la herramienta */
 }

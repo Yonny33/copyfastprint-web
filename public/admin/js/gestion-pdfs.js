@@ -22,10 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
         currentPage: document.getElementById('current-page'),
         totalPages: document.getElementById('total-pages'),
         fileName: document.getElementById('modal-file-name'),
-        search: document.getElementById('pdf-search')
+        search: document.getElementById('pdf-search'),
+        // Nuevos elementos para las herramientas de dibujo
+        toolColor: document.getElementById('tool-color'),
+        toolSize: document.getElementById('tool-size'),
+        toolControls: document.getElementById('tool-controls'),
+        clearAnnotations: document.getElementById('clear-annotations')
     };
 
-    const renderCtx = elements.renderCanvas.getContext('2d');
+    const renderCtx = elements.renderCanvas.getContext('2d', { willReadFrequently: true }); // Necesario para algunas operaciones de borrado
     const annotCtx = elements.annotCanvas.getContext('2d');
     
     let currentPdf = null;
@@ -33,6 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let isDrawing = false;
     let currentTool = 'cursor';
     let currentZoom = 1.5; // Escala inicial
+    let lastX = 0;
+    let lastY = 0;
     let allPdfs = [];
 
     // --- CARGAR LISTA ---
@@ -122,10 +129,61 @@ document.addEventListener("DOMContentLoaded", () => {
         annotCtx.clearRect(0, 0, elements.annotCanvas.width, elements.annotCanvas.height);
     };
 
+    // --- LÓGICA DE DIBUJO (EDITOR) ---
+    const startDrawing = (e) => {
+        if (currentTool === 'cursor') return;
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+        annotCtx.beginPath();
+        annotCtx.moveTo(lastX, lastY);
+    };
+
+    const draw = (e) => {
+        if (!isDrawing) return;
+        
+        const color = elements.toolColor.value;
+        const size = elements.toolSize.value;
+
+        annotCtx.lineWidth = size;
+        annotCtx.lineCap = 'round';
+        annotCtx.lineJoin = 'round';
+
+        if (currentTool === 'pen') {
+            annotCtx.globalCompositeOperation = 'source-over'; // Dibujo normal
+            annotCtx.strokeStyle = color;
+        } else if (currentTool === 'highlighter') {
+            // Efecto de resaltador: multiplicar colores y transparencia
+            annotCtx.globalCompositeOperation = 'multiply';
+            const r = parseInt(color.slice(1,3), 16);
+            const g = parseInt(color.slice(3,5), 16);
+            const b = parseInt(color.slice(5,7), 16);
+            annotCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.4)`; // 40% opacidad
+            annotCtx.lineWidth = size * 4; // El resaltador suele ser más ancho
+        } else if (currentTool === 'eraser') {
+            annotCtx.globalCompositeOperation = 'destination-out'; // Borra lo que hay debajo
+            annotCtx.strokeStyle = 'rgba(0,0,0,1)'; // El color no importa para destination-out
+            annotCtx.lineWidth = size * 5; // Borrador más ancho
+        }
+
+        annotCtx.lineTo(e.offsetX, e.offsetY);
+        annotCtx.stroke();
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    };
+
+    const stopDrawing = () => {
+        isDrawing = false;
+    };
+
     // --- EVENTOS ---
     document.getElementById('btn-zoom-in').addEventListener('click', () => {
         currentZoom += 0.25;
         renderPage(currentPageNum);
+    });
+
+    elements.clearAnnotations.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres borrar todas las anotaciones de esta página?')) {
+            annotCtx.clearRect(0, 0, elements.annotCanvas.width, elements.annotCanvas.height);
+        }
     });
 
     document.getElementById('btn-zoom-out').addEventListener('click', () => {
@@ -148,6 +206,28 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.search.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         renderDriveGrid(allPdfs.filter(p => p.nombre.toLowerCase().includes(term)));
+    });
+
+    // Eventos para las herramientas de dibujo
+    elements.annotCanvas.addEventListener('mousedown', startDrawing);
+    elements.annotCanvas.addEventListener('mousemove', draw);
+    elements.annotCanvas.addEventListener('mouseup', stopDrawing);
+    elements.annotCanvas.addEventListener('mouseout', stopDrawing); // Detener dibujo si el ratón sale del canvas
+
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTool = btn.dataset.tool;
+            // Actualizar cursor y visibilidad de los controles de herramienta
+            if (currentTool === 'cursor') {
+                elements.annotCanvas.style.cursor = 'default';
+                elements.toolControls.style.display = 'none';
+            } else {
+                elements.annotCanvas.style.cursor = 'crosshair';
+                elements.toolControls.style.display = 'flex';
+            }
+        });
     });
 
     elements.pdfUpload.addEventListener('change', async (e) => {

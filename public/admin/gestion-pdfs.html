@@ -62,14 +62,23 @@
       </div>
       <div class="modal-body">
         <div id="editor-toolbar" class="pdf-floating-toolbar">
-            <button class="tool-btn active" data-tool="cursor"><i class="fas fa-mouse-pointer"></i></button>
-            <button class="tool-btn" data-tool="pen"><i class="fas fa-pen"></i></button>
-            <button class="tool-btn" data-tool="highlighter"><i class="fas fa-highlighter"></i></button>
-            <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+            <div class="tool-group">
+                <button class="tool-btn active" data-tool="cursor" title="Seleccionar"><i class="fas fa-mouse-pointer"></i></button>
+                <button class="tool-btn" data-tool="pen" title="Lápiz"><i class="fas fa-pen"></i></button>
+                <button class="tool-btn" data-tool="highlighter" title="Resaltador"><i class="fas fa-highlighter"></i></button>
+                <button class="tool-btn" data-tool="eraser" title="Borrador"><i class="fas fa-eraser"></i></button>
+                <button class="tool-btn" id="clear-annotations" title="Limpiar Anotaciones"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <div id="tool-controls" class="tool-group" style="display: none;">
+                <input type="color" id="tool-color" value="#FFFF00" title="Color">
+                <input type="range" id="tool-size" min="1" max="20" value="10" title="Tamaño">
+            </div>
         </div>
-        <div id="pdf-canvas-container" class="canvas-wrapper">
-          <canvas id="pdf-render-canvas"></canvas>
-          <canvas id="annotation-canvas"></canvas>
+        <div class="canvas-wrapper">
+          <div id="pdf-canvas-container" class="canvas-stack">
+            <canvas id="pdf-render-canvas"></canvas>
+            <canvas id="annotation-canvas"></canvas>
+          </div>
         </div>
       </div>
     </div>

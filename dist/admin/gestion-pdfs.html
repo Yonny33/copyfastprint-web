@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Estudio PDF - COPYFAST&PRINT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/admin/js/admin\\gestion-pdfs-HWfh04Ev.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin\\gestion-pdfs-D7Y68uiO.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/vendor-DPXNLk_s.js">
     <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-CAxC6apF.js">
     <link rel="modulepreload" crossorigin href="/admin/js/_responsive-DFmXB64n.js">
     <link rel="stylesheet" crossorigin href="/admin/assets/_responsive-lsuBYtC6.css">
-    <link rel="stylesheet" crossorigin href="/admin/assets/gestion-pdfs-6TtwB_34.css">
+    <link rel="stylesheet" crossorigin href="/admin/assets/gestion-pdfs-CRWNoFOh.css">
     <link rel="stylesheet" crossorigin href="/admin/assets/tools-BzABfPJ6.css">
     <link rel="stylesheet" crossorigin href="/admin/assets/_common_admin_ui-DKEBWfDs.css">
   </head>
@@ -69,14 +69,23 @@
       </div>
       <div class="modal-body">
         <div id="editor-toolbar" class="pdf-floating-toolbar">
-            <button class="tool-btn active" data-tool="cursor"><i class="fas fa-mouse-pointer"></i></button>
-            <button class="tool-btn" data-tool="pen"><i class="fas fa-pen"></i></button>
-            <button class="tool-btn" data-tool="highlighter"><i class="fas fa-highlighter"></i></button>
-            <button class="tool-btn" data-tool="eraser"><i class="fas fa-eraser"></i></button>
+            <div class="tool-group">
+                <button class="tool-btn active" data-tool="cursor" title="Seleccionar"><i class="fas fa-mouse-pointer"></i></button>
+                <button class="tool-btn" data-tool="pen" title="Lápiz"><i class="fas fa-pen"></i></button>
+                <button class="tool-btn" data-tool="highlighter" title="Resaltador"><i class="fas fa-highlighter"></i></button>
+                <button class="tool-btn" data-tool="eraser" title="Borrador"><i class="fas fa-eraser"></i></button>
+                <button class="tool-btn" id="clear-annotations" title="Limpiar Anotaciones"><i class="fas fa-trash-alt"></i></button>
+            </div>
+            <div id="tool-controls" class="tool-group" style="display: none;">
+                <input type="color" id="tool-color" value="#FFFF00" title="Color">
+                <input type="range" id="tool-size" min="1" max="20" value="10" title="Tamaño">
+            </div>
         </div>
-        <div id="pdf-canvas-container" class="canvas-wrapper">
-          <canvas id="pdf-render-canvas"></canvas>
-          <canvas id="annotation-canvas"></canvas>
+        <div class="canvas-wrapper">
+          <div id="pdf-canvas-container" class="canvas-stack">
+            <canvas id="pdf-render-canvas"></canvas>
+            <canvas id="annotation-canvas"></canvas>
+          </div>
         </div>
       </div>
     </div>
