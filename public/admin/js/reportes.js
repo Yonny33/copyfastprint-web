@@ -47,22 +47,27 @@ document.addEventListener("DOMContentLoaded", function () {
     return `Bs. ${Number(amount).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
   
-  const formatDate = (dateString) => {
-      if (!dateString) return "N/A";
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) { 
-          const datePart = dateString.split(" ")[0];
-          const newDate = new Date(datePart + "T00:00:00");
-          if(isNaN(newDate.getTime())) return dateString;
-          return newDate.toLocaleDateString("es-VE");
-      }
-      return date.toLocaleDateString("es-VE");
+  const formatDate = (val) => {
+      const date = parseDate(val);
+      return date ? date.toLocaleDateString("es-VE") : (val || "N/A");
   };
 
-  const parseDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString.split(" ")[0] + "T00:00:00");
-    return isNaN(date.getTime()) ? null : date;
+  const parseDate = (val) => {
+      if (!val) return null;
+      if (val instanceof Date) return val;
+      // Soporte para Timestamps de Firestore ({seconds, nanoseconds})
+      if (typeof val === 'object' && (val.seconds || val._seconds)) {
+          return new Date((val.seconds || val._seconds) * 1000);
+      }
+      let d = new Date(val);
+      if (!isNaN(d.getTime())) return d;
+      try {
+          // Intento de parseo manual para formatos inconsistentes "YYYY/MM/DD" o "YYYY-MM-DD HH:mm"
+          const datePart = String(val).split(/[\sT]/)[0];
+          d = new Date(datePart.replace(/\//g, '-') + "T00:00:00");
+          if (!isNaN(d.getTime())) return d;
+      } catch (e) {}
+      return null;
   };
 
   // --- RENDERIZADO DE LA TABLA ---
@@ -82,11 +87,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const row = document.createElement("tr");
         
         let alertaAbono = '';
-        const abonosDelCliente = todosLosAbonos.filter(abono => abono.id_cliente === v.id_cliente);
-        let fechaUltimaActividad = parseDate(v.fecha);
+        // Usamos String() para asegurar que la comparación funcione aunque los IDs sean de distinto tipo
+        const abonosDelCliente = todosLosAbonos.filter(abono => String(abono.id_cliente) === String(v.id_cliente));
+        
+        // Si la fecha de venta no es válida, usamos una fecha base antigua (2020)
+        // para asegurar que las deudas antiguas sin fecha se marquen con alerta.
+        let fechaUltimaActividad = parseDate(v.fecha) || new Date(2020, 0, 1);
 
         if (abonosDelCliente.length > 0) {
-            fechaUltimaActividad = abonosDelCliente.reduce((max, abono) => new Date(abono.fecha) > max ? new Date(abono.fecha) : max, new Date(0));
+            const fechaMaxAbono = abonosDelCliente.reduce((max, abono) => {
+                const f = parseDate(abono.fecha);
+                return (f && f > max) ? f : max;
+            }, new Date(0));
+            
+            if (fechaMaxAbono.getTime() > 0) fechaUltimaActividad = fechaMaxAbono;
         }
 
         if (fechaUltimaActividad) {

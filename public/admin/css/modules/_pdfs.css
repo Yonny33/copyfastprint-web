@@ -135,7 +135,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    pointer-events: none; /* Permite clics a través de la capa de dibujo si es necesario */
+    pointer-events: none; /* Desactivado por defecto para el modo cursor */
+    mix-blend-mode: multiply; /* Permite que el color se fusione con el texto del PDF */
 }
 
 .pdf-floating-toolbar {
@@ -233,7 +234,4 @@
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
-#annotation-canvas {
-    /* pointer-events: none; */ /* Eliminamos esta línea para permitir la interacción */
-    cursor: default; /* Cursor por defecto, se cambiará con la herramienta */
-}
+/* Eliminado bloque duplicado para evitar conflictos de cascada */

@@ -134,8 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentTool === 'cursor') return;
         isDrawing = true;
         [lastX, lastY] = [e.offsetX, e.offsetY];
-        annotCtx.beginPath();
-        annotCtx.moveTo(lastX, lastY);
     };
 
     const draw = (e) => {
@@ -144,25 +142,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const color = elements.toolColor.value;
         const size = elements.toolSize.value;
 
+        // Iniciamos un nuevo camino para cada segmento para evitar acumulación de opacidad
+        annotCtx.beginPath();
+        annotCtx.moveTo(lastX, lastY);
+        
         annotCtx.lineWidth = size;
         annotCtx.lineCap = 'round';
         annotCtx.lineJoin = 'round';
 
         if (currentTool === 'pen') {
-            annotCtx.globalCompositeOperation = 'source-over'; // Dibujo normal
+            annotCtx.globalCompositeOperation = 'source-over';
             annotCtx.strokeStyle = color;
         } else if (currentTool === 'highlighter') {
-            // Efecto de resaltador: multiplicar colores y transparencia
-            annotCtx.globalCompositeOperation = 'multiply';
+            // El modo multiply ahora se maneja vía CSS en el elemento canvas
+            annotCtx.globalCompositeOperation = 'source-over';
             const r = parseInt(color.slice(1,3), 16);
             const g = parseInt(color.slice(3,5), 16);
             const b = parseInt(color.slice(5,7), 16);
-            annotCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.4)`; // 40% opacidad
-            annotCtx.lineWidth = size * 4; // El resaltador suele ser más ancho
+            annotCtx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.5)`; 
+            annotCtx.lineWidth = size * 3;
         } else if (currentTool === 'eraser') {
-            annotCtx.globalCompositeOperation = 'destination-out'; // Borra lo que hay debajo
-            annotCtx.strokeStyle = 'rgba(0,0,0,1)'; // El color no importa para destination-out
-            annotCtx.lineWidth = size * 5; // Borrador más ancho
+            annotCtx.globalCompositeOperation = 'destination-out';
+            annotCtx.strokeStyle = 'rgba(0,0,0,1)';
+            annotCtx.lineWidth = size * 4;
         }
 
         annotCtx.lineTo(e.offsetX, e.offsetY);
@@ -222,9 +224,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // Actualizar cursor y visibilidad de los controles de herramienta
             if (currentTool === 'cursor') {
                 elements.annotCanvas.style.cursor = 'default';
+                elements.annotCanvas.style.pointerEvents = 'none'; // Permite seleccionar texto en el PDF
                 elements.toolControls.style.display = 'none';
             } else {
                 elements.annotCanvas.style.cursor = 'crosshair';
+                elements.annotCanvas.style.pointerEvents = 'auto'; // Habilita el dibujo
                 elements.toolControls.style.display = 'flex';
             }
         });
