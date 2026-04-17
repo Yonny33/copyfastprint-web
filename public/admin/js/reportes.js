@@ -89,8 +89,13 @@ document.addEventListener("DOMContentLoaded", function () {
             fechaUltimaActividad = abonosDelCliente.reduce((max, abono) => new Date(abono.fecha) > max ? new Date(abono.fecha) : max, new Date(0));
         }
 
-        if (fechaUltimaActividad && (ahora - fechaUltimaActividad > unaSemanaEnMilisegundos)) {
-            alertaAbono = '<i class="fas fa-exclamation-triangle warning-icon" title="Más de 7 días sin abonar"></i>';
+        if (fechaUltimaActividad) {
+            const diferenciaMs = ahora - fechaUltimaActividad;
+            const diasRetraso = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24));
+
+            if (diasRetraso >= 7) {
+                alertaAbono = `<i class="fas fa-exclamation-triangle warning-icon" title="Retraso de ${diasRetraso} días sin abonar"></i> <span style="color: #ffc107; font-size: 0.75rem; font-weight: bold;">${diasRetraso}d</span>`;
+            }
         }
 
         let accionesHtml = '-';
