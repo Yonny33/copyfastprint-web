@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <tbody>
                   ${abonosDelCliente.map(abono => `
                     <tr>
-                      <td>${new Date(abono.fecha).toLocaleString('es-VE')}</td>
+                      <td>${formatDate(abono.fecha)} ${parseDate(abono.fecha)?.toLocaleTimeString('es-VE') || ''}</td>
                       <td><small>${abono.id_venta || 'N/A'}</small></td>
                       <td style="text-align: right;">${formatCurrency(abono.monto)}</td>
                     </tr>
