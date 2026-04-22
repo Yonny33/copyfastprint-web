@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const formatCurrency = (amount) => {
-    return `Bs. ${Number(amount).toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const val = parseFloat(amount) || 0;
+    return `Bs. ${val.toLocaleString("es-VE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
   
   const formatDate = (val) => {
@@ -188,10 +189,11 @@ document.addEventListener("DOMContentLoaded", function () {
       // 1. Popular la sección de detalles de la venta
       detallesVentaInfo.innerHTML = `
         <p><strong>Cliente:</strong> ${ventaData.nombre_cliente || "N/A"}</p>
-        <p><strong>Fecha de Venta:</strong> ${formatDate(ventaData.fecha)}</p>
-        <p><strong>Monto Total:</strong> ${formatCurrency(ventaData.monto_total)}</p>
-        <p><strong>Cantidad de Items:</strong> ${totalItems}</p>
-        <p><strong>Detalles del Pedido:</strong><br>${ventaData.detalles_pedido || "Sin detalles adicionales."}</p>
+        <p><strong>Última Actividad:</strong> ${formatDate(ventaData.fecha)}</p>
+        <p><strong>Monto Total de Ventas:</strong> ${formatCurrency(ventaData.venta_bruta || ventaData.monto_total)}</p>
+        <p><strong>Saldo Pendiente:</strong> <span style="color: var(--error-color); font-weight: bold;">${formatCurrency(ventaData.saldo_pendiente)}</span></p>
+        <p><strong>Ventas Agregadas:</strong><br>${ventaData.descripcion || "Sin descripción"}</p>
+        <p><strong>Notas del Pedido:</strong><br>${ventaData.detalles_pedido || "Sin notas adicionales."}</p>
       `;
       
       // 2. Popular la sección de abonos
