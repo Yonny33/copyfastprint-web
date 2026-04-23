@@ -81,6 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   });
+
+  // Ejecutar el filtro inicial basado en el botón que tenga la clase 'active'
+  const initialActiveBtn = document.querySelector(".filter-btn.active");
+  if (initialActiveBtn) {
+    initialActiveBtn.click();
+  }
 });
 
 // ==========================================================================
