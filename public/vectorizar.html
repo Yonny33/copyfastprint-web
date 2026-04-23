@@ -26,7 +26,36 @@
       </section>
 
       <section class="workspace-area container">
-        
+        <!-- Herramientas de Configuración -->
+        <div class="tool-controls" style="margin-bottom: 2.5rem; background: rgba(255,255,255,0.02); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 25px;">
+            <div class="control-group">
+              <label for="vector-preset"><i class="fas fa-wand-magic-sparkles"></i> Estilo:</label>
+              <select id="vector-preset" style="width: 100%; padding: 10px; border-radius: 6px; background: #000; color: #fff; border: 1px solid #333;">
+                <option value="default">Estándar</option>
+                <option value="logo">Logo / Colores Planos</option>
+                <option value="photo">Fotografía (Artístico)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label for="vector-colors"><i class="fas fa-palette"></i> Colores: <span id="vector-colors-val" style="color: var(--primary-color); font-weight: bold;">64</span></label>
+              <input type="range" id="vector-colors" min="2" max="256" value="64" style="width: 100%;" />
+            </div>
+            <div class="control-group">
+              <label for="vector-detail"><i class="fas fa-microscope"></i> Precisión: <span id="vector-detail-val" style="color: var(--primary-color); font-weight: bold;">0.1</span></label>
+              <input type="range" id="vector-detail" min="0.01" max="1" step="0.01" value="0.1" style="width: 100%;" />
+            </div>
+            <div class="control-group">
+              <label for="vector-blur"><i class="fas fa-droplet-slash"></i> Suavizar (Blur): <span id="vector-blur-val" style="color: var(--primary-color); font-weight: bold;">0</span></label>
+              <input type="range" id="vector-blur" min="0" max="5" step="0.5" value="0" style="width: 100%;" />
+            </div>
+            <div class="control-group">
+              <label for="vector-omit"><i class="fas fa-eraser"></i> Limpieza (Omit): <span id="vector-omit-val" style="color: var(--primary-color); font-weight: bold;">0</span></label>
+              <input type="range" id="vector-omit" min="0" max="100" value="0" style="width: 100%;" />
+            </div>
+          </div>
+        </div>
+
         <div class="comparison-grid">
           <!-- Lado Izquierdo: Original -->
           <div class="preview-card">
@@ -53,6 +82,14 @@
           </div>
         </div>
 
+        <!-- Botón de Acción Principal: Justo debajo de las mesas de trabajo -->
+        <div id="container-process-btn" style="display: none; justify-content: center; padding: 40px 0;">
+          <button id="btn-process-vector" class="btn btn-primary" style="min-width: 320px; font-size: 1.25rem; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 15px; border-radius: 50px;">
+            <i class="fas fa-vector-square" style="font-size: 1.5rem;"></i> 
+            VECTORIZAR AHORA
+          </button>
+        </div>
+
         <div class="floating-toolbar">
           <div class="fab-container">
             <label for="img-upload-vector" class="fab-btn upload" title="Subir Imagen">
@@ -62,14 +99,6 @@
             <input type="file" id="img-upload-vector" accept="image/*" hidden />
           </div>
           
-          <!-- Botón de Acción Principal -->
-          <div class="fab-container" id="container-process-btn" style="display: none;">
-            <button class="fab-btn" id="btn-process-vector" title="Vectorizar Ahora" style="background: var(--primary-color); color: white; border-color: white;">
-              <i class="fas fa-magic"></i>
-            </button>
-            <span class="fab-tooltip">Vectorizar Ahora</span>
-          </div>
-
           <div class="fab-container">
             <button class="fab-btn delete" id="btn-delete-vector" title="Eliminar Imagen">
               <i class="fas fa-trash"></i>

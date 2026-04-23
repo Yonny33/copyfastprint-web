@@ -20,6 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const detailSlider = document.getElementById("vector-detail");
     const detailVal = document.getElementById("vector-detail-val");
     const presetSelect = document.getElementById("vector-preset");
+    const blurInput = document.getElementById("vector-blur");
+    const blurVal = document.getElementById("vector-blur-val");
+    const omitInput = document.getElementById("vector-omit");
+    const omitVal = document.getElementById("vector-omit-val");
 
     // --- ESTADO ---
     let currentSvgString = null;
@@ -40,6 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (detailSlider) {
         detailSlider.addEventListener("input", () => {
             if (detailVal) detailVal.textContent = detailSlider.value;
+        });
+    }
+
+    if (blurInput) {
+        blurInput.addEventListener("input", () => {
+            if (blurVal) blurVal.textContent = blurInput.value;
+        });
+    }
+
+    if (omitInput) {
+        omitInput.addEventListener("input", () => {
+            if (omitVal) omitVal.textContent = omitInput.value;
         });
     }
 
@@ -77,6 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Obtener valores dinámicos de los controles para evitar errores de referencia
         const numColors = colorsInput ? parseInt(colorsInput.value) : 64;
         const detailLevel = detailSlider ? parseFloat(detailSlider.value) : 0.1;
+        const blurRadius = blurInput ? parseFloat(blurInput.value) : 0;
+        const pathOmit = omitInput ? parseInt(omitInput.value) : 0;
         const preset = presetSelect ? presetSelect.value : 'default';
 
         showLoading("Procesando vectores...");
@@ -84,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const options = {
             ltres: detailLevel,       
             qtres: detailLevel,       
-            pathomit: 0,      
+            pathomit: pathOmit,      
             
             colorsampling: 2, 
             numberofcolors: numColors, 
@@ -94,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
             scale: 1,       
             strokewidth: 0, 
             linefilter: false, 
-            blurradius: 0,     
+            blurradius: blurRadius,     
             blurdelta: 10
         };
 
