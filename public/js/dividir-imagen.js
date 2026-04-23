@@ -90,9 +90,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const rotatedCanvas = getRotatedCanvas(workingImg, rotation);
 
-        REAL_PX_PER_MM = rotatedCanvas.width / designWidthMm;
+        // ESTÁNDAR PROFESIONAL: Forzar 300 DPI (puntos por pulgada)
+        // 300 ppp / 25.4 mm por pulgada = ~11.81 px/mm
+        const originalPxPerMm = rotatedCanvas.width / designWidthMm;
+        const targetPxPerMm = 300 / 25.4; 
+        
+        // Si la imagen es pequeña, la escalamos internamente a 300 DPI
+        // Si es de mayor resolución, mantenemos la calidad original
+        REAL_PX_PER_MM = Math.max(originalPxPerMm, targetPxPerMm);
+
         const imgW_mm = designWidthMm;
-        const imgH_mm = rotatedCanvas.height / REAL_PX_PER_MM;
+        const imgH_mm = rotatedCanvas.height / originalPxPerMm;
 
         const paperW_port = parseFloat(inputPaperWidth.value);
         const paperH_port = parseFloat(inputPaperHeight.value);

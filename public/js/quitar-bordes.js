@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- ESTADO DE LA APLICACIÓN ---
     let originalImage = null;
     let currentZoom = 1.0;
+    let wasFixedManually = false; // Rastrear si el usuario ya presionó "Corregir Halo"
 
     // --- EVENT LISTENERS ---
 
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     featherSlider.addEventListener("input", () => {
         if (featherValue) featherValue.textContent = featherSlider.value;
         if (originalImage) {
+            wasFixedManually = false; // Resetear estado al ajustar parámetros
             processImage();
         }
     });
@@ -41,8 +43,23 @@ document.addEventListener("DOMContentLoaded", function () {
             const img = new Image();
             img.onload = function () {
                 originalImage = img;
+                wasFixedManually = false;
                 placeholder.style.display = "none";
                 canvas.style.display = "block";
+
+                // SOLUCIÓN AL "MARCO": Forzamos que el canvas sea transparente 
+                // y quitamos sombras de bloque para que el filtro siga la silueta real.
+                canvas.style.backgroundColor = "transparent";
+                canvas.style.backgroundImage = "none";
+                canvas.style.boxShadow = "none";
+
+                if (canvasWrapper) {
+                    // Movemos el fondo de tablero al contenedor para mantener visibilidad
+                    canvasWrapper.style.backgroundImage = "linear-gradient(45deg, #2a2a2a 25%, transparent 25%), linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2a2a2a 75%), linear-gradient(-45deg, transparent 75%, #2a2a2a 75%)";
+                    canvasWrapper.style.backgroundSize = "20px 20px";
+                    canvasWrapper.style.backgroundColor = "#181818";
+                }
+
                 resetZoom(); // Reiniciar zoom al cargar nueva imagen
                 processImage(); // Procesar la imagen por primera vez
             };
@@ -77,17 +94,30 @@ document.addEventListener("DOMContentLoaded", function () {
     // Botón Corregir Halo
     fixHaloBtn.addEventListener("click", function () {
         if (!originalImage) return;
+        wasFixedManually = true;
         cleanHalo();
-        // Actualizar UI a verde
-        updateHaloUI(false);
     });
 
     // Botón Descargar
     downloadBtn.addEventListener("click", function () {
         if (!originalImage) return;
+
+        // EXPORTACIÓN PARA GRAN FORMATO (300 DPI)
+        const multiplier = 3;
+        const exportCanvas = document.createElement("canvas");
+        exportCanvas.width = canvas.width * multiplier;
+        exportCanvas.height = canvas.height * multiplier;
+        const exportCtx = exportCanvas.getContext("2d");
+
+        exportCtx.imageSmoothingEnabled = true;
+        exportCtx.imageSmoothingQuality = 'high';
+
+        // Dibujar el canvas procesado (sin el filtro de brillo de la UI)
+        exportCtx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
+
         const link = document.createElement("a");
-        link.download = "imagen-bordes-suaves.png";
-        link.href = canvas.toDataURL("image/png");
+        link.download = `bordes-limpios-hd-${Date.now()}.png`;
+        link.href = exportCanvas.toDataURL("image/png");
         link.click();
     });
 
@@ -177,14 +207,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function updateHaloUI(hasHalo) {
-        if (hasHalo) {
-            // Aplicar borde y resplandor directamente al canvas (objeto)
-            // Usamos drop-shadow para que el borde siga la silueta de la imagen (transparencia)
-            canvas.style.filter = "drop-shadow(0 0 2px #8b0000) drop-shadow(0 0 4px #8b0000)"; 
+        if (wasFixedManually) {
+            // Marcado en VERDE brillante tras limpiar
+            canvas.style.filter = "drop-shadow(0 0 2px #28a745) drop-shadow(0 0 6px #28a745)";
+            haloContainer.style.display = "none";
+        } else if (hasHalo) {
+            // Marcado en ROJO si detecta residuos (píxeles sucios para DTF)
+            canvas.style.filter = "drop-shadow(0 0 2px #ff0000) drop-shadow(0 0 6px #ff0000)"; 
             haloContainer.style.display = "block";
         } else {
-            // Borde verde al objeto
-            canvas.style.filter = "drop-shadow(0 0 2px #28a745) drop-shadow(0 0 4px #28a745)";
+            // Si la imagen está pura/limpia, marcar en verde suave
+            canvas.style.filter = "drop-shadow(0 0 2px #28a745) drop-shadow(0 0 3px #28a745)";
             haloContainer.style.display = "none";
         }
     }
@@ -200,6 +233,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         ctx.putImageData(imageData, 0, 0);
         
+        updateHaloUI(false); // Refrescar a verde inmediatamente
+
         // Actualizar la imagen original para que futuros ajustes de slider partan de la imagen limpia
         const newImg = new Image();
         newImg.onload = function() {

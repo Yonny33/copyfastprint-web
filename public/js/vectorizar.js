@@ -14,6 +14,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const processBtn = document.getElementById("btn-process-vector");
     const processBtnContainer = document.getElementById("container-process-btn");
 
+    // --- NUEVOS CONTROLES DE CONFIGURACIÓN ---
+    const colorsInput = document.getElementById("vector-colors");
+    const colorsVal = document.getElementById("vector-colors-val");
+    const detailSlider = document.getElementById("vector-detail");
+    const detailVal = document.getElementById("vector-detail-val");
+    const presetSelect = document.getElementById("vector-preset");
+
     // --- ESTADO ---
     let currentSvgString = null;
     let originalImageDataUrl = null;
@@ -23,6 +30,18 @@ document.addEventListener("DOMContentLoaded", function () {
     downloadBtn.addEventListener("click", handleDownload);
     deleteBtn.addEventListener("click", handleDelete);
     processBtn.addEventListener("click", handleVectorize);
+
+    if (colorsInput) {
+        colorsInput.addEventListener("input", () => {
+            if (colorsVal) colorsVal.textContent = colorsInput.value;
+        });
+    }
+
+    if (detailSlider) {
+        detailSlider.addEventListener("input", () => {
+            if (detailVal) detailVal.textContent = detailSlider.value;
+        });
+    }
 
     // --- FUNCIONES PRINCIPALES ---
 
@@ -55,28 +74,37 @@ document.addEventListener("DOMContentLoaded", function () {
     function handleVectorize() {
         if (!originalImageDataUrl) return;
 
+        // Obtener valores dinámicos de los controles para evitar errores de referencia
+        const numColors = colorsInput ? parseInt(colorsInput.value) : 64;
+        const detailLevel = detailSlider ? parseFloat(detailSlider.value) : 0.1;
+        const preset = presetSelect ? presetSelect.value : 'default';
+
         showLoading("Procesando vectores...");
 
-        // Configuración de Calidad para ImageTracer (Ajustada para Alta Fidelidad)
         const options = {
-            // Precisión de trazado (Menor valor = Más fidelidad a la forma original)
-            ltres: 0.1,       
-            qtres: 0.1,       
-            pathomit: 0,      // No eliminar detalles pequeños
+            ltres: detailLevel,       
+            qtres: detailLevel,       
+            pathomit: 0,      
             
-            // Colores (Aumentados para evitar descolorización)
-            colorsampling: 2, // Determinista
-            numberofcolors: 64, // Más colores para que se vea real
+            colorsampling: 2, 
+            numberofcolors: numColors, 
             mincolorratio: 0,
-            colorquantcycles: 10, // Más intentos para encontrar el color exacto
+            colorquantcycles: numColors > 32 ? 15 : 10, 
             
-            // Renderizado
             scale: 1,       
             strokewidth: 0, 
-            linefilter: false, // Desactivar simplificación de líneas rectas
-            blurradius: 0,     // No desenfocar (mantiene bordes nítidos)
+            linefilter: false, 
+            blurradius: 0,     
             blurdelta: 10
         };
+
+        if (preset === 'logo') {
+            options.ltres = 0.05;
+            options.qtres = 0.05;
+            options.numberofcolors = Math.min(numColors, 16);
+        } else if (preset === 'photo') {
+            options.linefilter = true;
+        }
 
         // Ejecutar vectorización con un pequeño delay para que el UI no se congele antes de mostrar el loader
         setTimeout(() => {
