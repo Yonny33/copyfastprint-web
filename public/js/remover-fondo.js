@@ -1,4 +1,5 @@
 import '@/css/modules/_remove_bg.css';
+import { ImageCore } from './image-core.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     // --- ELEMENTOS DEL DOM ---
@@ -143,25 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     downloadBtn.addEventListener("click", function () {
         if (!originalImage) return;
-        
-        // EXPORTACIÓN EN ALTA RESOLUCIÓN (300 DPI)
-        // Creamos un canvas temporal escalado para asegurar nitidez en formato grande
-        const multiplier = 3; 
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = canvas.width * multiplier;
-        exportCanvas.height = canvas.height * multiplier;
-        const exportCtx = exportCanvas.getContext("2d");
-        
-        exportCtx.imageSmoothingEnabled = true;
-        exportCtx.imageSmoothingQuality = 'high';
-        
-        // Dibujamos el contenido procesado escalado al 300%
-        exportCtx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
-
-        const link = document.createElement("a");
-        link.download = `fondo-removido-hd-${Date.now()}.png`;
-        link.href = exportCanvas.toDataURL("image/png");
-        link.click();
+        // Usamos el motor unificado de descarga
+        ImageCore.downloadHD(canvas, "fondo-removido-hd");
     });
 
     // --- FUNCIONES PRINCIPALES ---

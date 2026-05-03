@@ -1,4 +1,5 @@
 import '@/css/modules/_vector_tool.css';
+import { ImageCore } from './image-core.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     // --- ELEMENTOS DEL DOM ---
@@ -116,49 +117,49 @@ document.addEventListener("DOMContentLoaded", function () {
             blurdelta: 10
         };
 
-        if (preset === 'logo') {
-            options.ltres = 0.05;
-            options.qtres = 0.05;
-            options.numberofcolors = Math.min(numColors, 16);
-        } else if (preset === 'photo') {
-            options.linefilter = true;
-        }
+        // Obtener los píxeles de la imagen (El Worker no puede usar "Image")
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = imgOriginalPreview.naturalWidth;
+        tempCanvas.height = imgOriginalPreview.naturalHeight;
+        tempCtx.drawImage(imgOriginalPreview, 0, 0);
+        const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
 
-        // Ejecutar vectorización con un pequeño delay para que el UI no se congele antes de mostrar el loader
-        setTimeout(() => {
-            try {
-                ImageTracer.imageToSVG(originalImageDataUrl, function(svgstr) {
-                    currentSvgString = svgstr;
-                    
-                    // Mostrar resultado
-                    svgOutput.innerHTML = svgstr;
-                    
-                    // Ajustar SVG para que sea responsive dentro del contenedor
-                    const svgEl = svgOutput.querySelector('svg');
-                    if(svgEl) {
-                        // 1. Asegurar que tenga viewBox (Coordenadas internas)
-                        // ImageTracer a veces no lo pone, y sin esto el SVG no escala y se ve como una línea.
-                        const w = parseFloat(svgEl.getAttribute('width'));
-                        const h = parseFloat(svgEl.getAttribute('height'));
-                        
-                        if (!svgEl.hasAttribute('viewBox') && !isNaN(w) && !isNaN(h)) {
-                            svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
-                        }
+        // Inicializar Web Worker (Tecnología de Rendimiento)
+        const worker = new Worker(new URL('./vector-worker.js', import.meta.url), { type: 'classic' });
+        
+        // Enviamos los píxeles y dimensiones. Transferimos el buffer para máximo rendimiento.
+        worker.postMessage({ 
+            pixels: imgData.data, 
+            width: imgData.width, 
+            height: imgData.height, 
+            options 
+        }, [imgData.data.buffer]);
 
-                        // 2. Quitar atributos fijos para que el CSS controle el tamaño (100%)
-                        svgEl.removeAttribute('width');
-                        svgEl.removeAttribute('height');
+        worker.onmessage = function(e) {
+            const { success, svgstr, error } = e.data;
+            if (success) {
+                currentSvgString = svgstr;
+                svgOutput.innerHTML = svgstr;
+                
+                const svgEl = svgOutput.querySelector('svg');
+                if(svgEl) {
+                    const w = parseFloat(svgEl.getAttribute('width'));
+                    const h = parseFloat(svgEl.getAttribute('height'));
+                    if (!svgEl.hasAttribute('viewBox') && !isNaN(w) && !isNaN(h)) {
+                        svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
                     }
-
-                    placeholderVector.style.display = "none";
-                    hideLoading();
-                }, options);
-            } catch (e) {
-                console.error(e);
-                alert("Error al vectorizar. Intenta con una imagen más simple.");
-                hideLoading();
+                    svgEl.removeAttribute('width');
+                    svgEl.removeAttribute('height');
+                }
+                placeholderVector.style.display = "none";
+            } else {
+                console.error(error);
+                alert("Error en el procesamiento en segundo plano.");
             }
-        }, 100);
+            hideLoading();
+            worker.terminate(); // Liberar memoria
+        };
     }
 
     function handleDownload() {

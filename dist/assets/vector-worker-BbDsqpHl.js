@@ -1,0 +1,1 @@
+(function(){"use strict";importScripts("https://cdn.jsdelivr.net/npm/imagetracerjs@1.2.6/imagetracer_v1.2.6.min.js"),self.onmessage=function(e){const{pixels:t,width:a,height:r,options:c}=e.data;try{const s={width:a,height:r,data:t},i=ImageTracer.imagedataToSVG(s,c);self.postMessage({success:!0,svgstr:i})}catch(s){self.postMessage({success:!1,error:s.message})}}})();

@@ -1,4 +1,5 @@
 import '@/css/modules/_borders_tool.css';
+import { ImageCore } from './image-core.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     // --- ELEMENTOS DEL DOM ---
@@ -101,24 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Botón Descargar
     downloadBtn.addEventListener("click", function () {
         if (!originalImage) return;
-
-        // EXPORTACIÓN PARA GRAN FORMATO (300 DPI)
-        const multiplier = 3;
-        const exportCanvas = document.createElement("canvas");
-        exportCanvas.width = canvas.width * multiplier;
-        exportCanvas.height = canvas.height * multiplier;
-        const exportCtx = exportCanvas.getContext("2d");
-
-        exportCtx.imageSmoothingEnabled = true;
-        exportCtx.imageSmoothingQuality = 'high';
-
-        // Dibujar el canvas procesado (sin el filtro de brillo de la UI)
-        exportCtx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
-
-        const link = document.createElement("a");
-        link.download = `bordes-limpios-hd-${Date.now()}.png`;
-        link.href = exportCanvas.toDataURL("image/png");
-        link.click();
+        // Usamos el motor unificado
+        ImageCore.downloadHD(canvas, "bordes-limpios-hd");
     });
 
     // --- FUNCIONES PRINCIPALES ---
