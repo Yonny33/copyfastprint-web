@@ -123,6 +123,13 @@ app.get("/inventario", async (req, res) => {
 app.post("/inventario", async (req, res) => {
   try {
     const productoData = req.body;
+    
+    // ASEGURAR TIPOS NUMÉRICOS: Si se guardan como texto, la matemática (increment) fallará después.
+    if (productoData.stock_actual !== undefined) productoData.stock_actual = parseFloat(productoData.stock_actual) || 0;
+    if (productoData.stock_minimo !== undefined) productoData.stock_minimo = parseFloat(productoData.stock_minimo) || 0;
+    if (productoData.precio_costo !== undefined) productoData.precio_costo = parseFloat(productoData.precio_costo) || 0;
+    if (productoData.precio_venta !== undefined) productoData.precio_venta = parseFloat(productoData.precio_venta) || 0;
+
     // Eliminar id_producto del cuerpo si viene vacío para que Firestore genere uno
     delete productoData.id_producto;
 
@@ -145,8 +152,22 @@ app.put("/inventario/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
+    
+    // Sanitización de tipos para ediciones normales
+    if (data.stock_actual !== undefined && data.cantidad_sumar === undefined) data.stock_actual = parseFloat(data.stock_actual) || 0;
+    if (data.stock_minimo !== undefined) data.stock_minimo = parseFloat(data.stock_minimo) || 0;
+    if (data.precio_costo !== undefined) data.precio_costo = parseFloat(data.precio_costo) || 0;
+    if (data.precio_venta !== undefined) data.precio_venta = parseFloat(data.precio_venta) || 0;
+
     // No queremos guardar el ID dentro del documento como un campo duplicado
     delete data.id_producto;
+
+    // Lógica para sumar al stock existente (maneja automáticame valores negativos)
+    if (data.cantidad_sumar !== undefined) {
+      const cantidad = parseFloat(data.cantidad_sumar);
+      data.stock_actual = admin.firestore.FieldValue.increment(cantidad);
+      delete data.cantidad_sumar;
+    }
 
     await db.collection("inventario").doc(id).update(data);
     res

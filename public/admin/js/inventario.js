@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const tablaInventarioBody = document.getElementById("inventario-tbody");
   const searchInput = document.getElementById("search-inventario-input");
   const cancelEditButton = document.getElementById("cancel-edit-button");
+  const modeSelector = document.querySelectorAll('input[name="form-mode"]'); // Radio buttons: nuevo vs existente
+  const productSelectContainer = document.getElementById("product-select-container");
+  const existingProductSelect = document.getElementById("existing-product-select");
   const stockChartCanvas = document.getElementById("stock-chart");
   
   let allProducts = [];
@@ -37,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
         allProducts = data.data ? data.data.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || "")) : [];
         renderInventoryTable(allProducts);
         renderStockChart(allProducts); // Renderizar el gráfico con los datos iniciales
+        populateProductSelect(allProducts); // Poblar el dropdown de carga de stock
       } else {
         throw new Error(data.message || "Error al obtener los datos del inventario.");
       }
@@ -84,6 +88,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
     tablaInventarioBody.querySelectorAll(".btn-edit").forEach((btn) => btn.addEventListener("click", handleEditClick));
     tablaInventarioBody.querySelectorAll(".btn-delete").forEach((btn) => btn.addEventListener("click", handleDeleteClick));
+  };
+
+  // --- POBLAR EL SELECT DE PRODUCTOS EXISTENTES ---
+  const populateProductSelect = (products) => {
+    if (!existingProductSelect) return;
+    existingProductSelect.innerHTML = '<option value="" disabled selected>Selecciona un producto para cargar stock...</option>';
+    products.forEach(product => {
+      if (product.tipo !== 'servicio') {
+        const option = document.createElement("option");
+        option.value = product.id_producto;
+        option.textContent = product.nombre_producto || product.nombre || "Sin Nombre";
+        existingProductSelect.appendChild(option);
+      }
+    });
+  };
+
+  // --- LÓGICA DE CAMBIO DE MODO (NUEVO VS EXISTENTE) ---
+  const handleModeChange = (mode) => {
+    const isExisting = mode === 'existing';
+    // Mostrar/ocultar el buscador de productos
+    if (productSelectContainer) productSelectContainer.style.display = isExisting ? 'block' : 'none';
+    if (existingProductSelect) existingProductSelect.required = isExisting;
+    
+    // Campos que deben ocultarse y dejar de ser obligatorios en modo entrada
+    const fieldsToHide = ['categoria', 'tipo', 'precio_costo', 'precio_venta', 'stock_minimo', 'nombre_producto'];
+    fieldsToHide.forEach(name => {
+      const field = inventarioForm.elements[name];
+      if (field) {
+        const group = field.closest('.form-group');
+        if (group) group.style.display = isExisting ? 'none' : 'block';
+        // IMPORTANTE: Quitar 'required' para que el navegador permita enviar el form
+        if (['nombre_producto', 'categoria', 'tipo'].includes(name)) {
+            field.required = !isExisting;
+        }
+      }
+    });
+
+    // Limpiar valores sin resetear los radio buttons
+    inventarioForm.querySelectorAll('input:not([type="radio"]), select:not(#existing-product-select), textarea').forEach(i => i.value = '');
+
+    const stockLabel = inventarioForm.querySelector('label[for="stock_actual"]');
+    if (stockLabel) stockLabel.textContent = isExisting ? 'Cantidad que Ingresa *' : 'Stock Actual *';
   };
 
   const renderStockChart = (products) => {
@@ -142,16 +188,49 @@ document.addEventListener("DOMContentLoaded", function () {
     showLoading(true);
     
     const formData = new FormData(inventarioForm);
-    const productData = Object.fromEntries(formData.entries());
-    const idProducto = productData.editProductId;
+    let rawData = Object.fromEntries(formData.entries());
+    const idProducto = inventarioForm.elements.editProductId?.value;
+    const isAdjustmentMode = document.querySelector('input[name="form-mode"]:checked')?.value === 'existing';
+
+    // Convertir campos numéricos para evitar que se guarden como texto
+    const productData = {
+        ...rawData,
+        stock_actual: parseFloat(rawData.stock_actual) || 0,
+        stock_minimo: parseFloat(rawData.stock_minimo) || 0,
+        precio_costo: parseFloat(rawData.precio_costo) || 0,
+        precio_venta: parseFloat(rawData.precio_venta) || 0
+    };
 
     delete productData.editProductId;
-    if (productData.tipo === 'servicio') {
-      delete productData.stock_actual;
-      delete productData.stock_minimo;
+    delete productData['form-mode'];
+
+    // MODO AJUSTE: Si el usuario quiere sumar stock a un producto existente
+    if (isAdjustmentMode && idProducto) {
+        const payloadAjuste = {
+            cantidad_sumar: productData.stock_actual,
+            descripcion: `Entrada de mercancía: ${productData.descripcion || ''}`.trim()
+        };
+        
+        try {
+            const response = await fetch(`${API_URL}/inventario/${idProducto}`, { 
+                method: "PUT", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(payloadAjuste) 
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message);
+            alert("Stock actualizado correctamente.");
+            resetForm();
+            fetchInventoryData();
+            return; // Finalizar aquí
+        } catch (error) {
+            alert("Error al cargar stock: " + error.message);
+            showLoading(false);
+            return;
+        }
     }
 
-    const url = idProducto ? `${API_URL}/inventario/${idProducto}` : `${API_URL}/inventario`;
+    const url = (idProducto || isAdjustmentMode) ? `${API_URL}/inventario/${idProducto}` : `${API_URL}/inventario`;
     const method = idProducto ? "PUT" : "POST";
 
     try {
@@ -233,4 +312,18 @@ document.addEventListener("DOMContentLoaded", function () {
   if (inventarioForm) inventarioForm.addEventListener("submit", handleFormSubmit);
   if (searchInput) searchInput.addEventListener("input", handleSearch);
   if (cancelEditButton) cancelEditButton.addEventListener("click", resetForm);
+
+  // Escuchar cambios en el selector de productos existentes para asignar el ID oculto
+  if (existingProductSelect) {
+    existingProductSelect.addEventListener("change", (e) => {
+      if (inventarioForm.elements.editProductId) {
+        inventarioForm.elements.editProductId.value = e.target.value;
+      }
+    });
+  }
+  
+  // Listener para los radio buttons de modo
+  modeSelector.forEach(radio => {
+    radio.addEventListener('change', (e) => handleModeChange(e.target.value));
+  });
 });

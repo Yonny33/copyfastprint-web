@@ -13,10 +13,16 @@
     <link rel="manifest" href="/favicons/manifest.json" />
 
     <!-- CSS y Font Awesome -->
-    <link rel="stylesheet" href="/admin/css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Chart.js para el gráfico de stock -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script type="module" src="/admin/js/inventario.js"></script>
+    <!-- CSS necesarios para el inventario -->
+    <link rel="stylesheet" href="/admin/css/main.css">
+    <link rel="stylesheet" href="/admin/css/modules/_forms.css">
+    <link rel="stylesheet" href="/admin/css/modules/_tables.css">
+    <link rel="stylesheet" href="/admin/css/modules/_responsive.css">
+    <link rel="stylesheet" href="/admin/css/modules/_common_admin_ui.css">
   </head>
   <body class="admin-page">
     <div class="admin-grid-container">
@@ -31,7 +37,28 @@
 
         <div class="card-form">
           <form id="inventario-form">
+            <!-- Selector de Modo: Nuevo vs Existente -->
+            <div class="mode-selector" style="margin-bottom: 25px; display: flex; gap: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--border-color);">
+              <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-primary);">
+                <input type="radio" name="form-mode" value="new" checked style="width: 18px; height: 18px; accent-color: var(--primary-color);"> 
+                <span><i class="fas fa-plus-circle" style="color: #10b981;"></i> Nuevo Producto</span>
+              </label>
+              <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-primary);">
+                <input type="radio" name="form-mode" value="existing" style="width: 18px; height: 18px; accent-color: var(--primary-color);"> 
+                <span><i class="fas fa-truck-loading" style="color: var(--primary-color);"></i> Entrada de Mercancía</span>
+              </label>
+            </div>
+
             <input type="hidden" id="edit-product-id" name="editProductId" />
+
+            <!-- Contenedor para seleccionar producto existente (Se muestra solo en 'Entrada de Mercancía') -->
+            <div id="product-select-container" class="form-group floating" style="display: none; margin-bottom: 20px;">
+              <select id="existing-product-select">
+                <option value="" disabled selected>Selecciona un producto para cargar stock...</option>
+              </select>
+              <label for="existing-product-select">Buscar Producto Existente</label>
+            </div>
+
             <div class="form-grid">
               <div class="form-group floating">
                 <input type="text" id="nombre_producto" name="nombre_producto" placeholder=" " required />
@@ -58,7 +85,7 @@
                 <label for="tipo">Tipo *</label>
               </div>
               <div class="form-group floating span-3">
-                <textarea id="descripcion" name="descripcion" rows="2" placeholder=" "></textarea>
+                <textarea id="descripcion" name="descripcion" rows="1" placeholder=" "></textarea>
                 <label for="descripcion">Descripción (Opcional)</label>
               </div>
               <div class="form-group floating">
@@ -127,6 +154,8 @@
     <script type="module" src="/admin/js/auth.js"></script>
     <script type="module" src="/admin/js/components.js"></script>
     <script type="module" src="/admin/js/inventario.js"></script>
+
+
 
   </body>
 </html>
