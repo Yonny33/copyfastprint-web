@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
     showLoading(true, loadingOverlay);
     try {
       const [ventasResponse, abonosResponse] = await Promise.all([
-        fetch(`${API_URL}/ventas`),
+        fetch(`${API_URL}/ventas?solo_deudas=true`),
         fetch(`${API_URL}/abonos`)
       ]);
 

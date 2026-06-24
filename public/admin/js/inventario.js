@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const modeSelector = document.querySelectorAll('input[name="form-mode"]'); // Radio buttons: nuevo vs existente
   const productSelectContainer = document.getElementById("product-select-container");
   const existingProductSelect = document.getElementById("existing-product-select");
+  const motivoAjusteContainer = document.getElementById("motivo-ajuste-container");
+  const motivoAjusteSelect = document.getElementById("motivo_ajuste");
   const stockChartCanvas = document.getElementById("stock-chart");
   
   let allProducts = [];
@@ -109,8 +111,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const isExisting = mode === 'existing';
     // Mostrar/ocultar el buscador de productos
     if (productSelectContainer) productSelectContainer.style.display = isExisting ? 'block' : 'none';
+    if (motivoAjusteContainer) motivoAjusteContainer.style.display = isExisting ? 'block' : 'none';
+    if (motivoAjusteSelect) motivoAjusteSelect.required = isExisting;
     if (existingProductSelect) existingProductSelect.required = isExisting;
     
+    const stockActualInput = inventarioForm.elements['stock_actual'];
+
     // Campos que deben ocultarse y dejar de ser obligatorios en modo entrada
     const fieldsToHide = ['categoria', 'tipo', 'precio_costo', 'precio_venta', 'stock_minimo', 'nombre_producto'];
     fieldsToHide.forEach(name => {
@@ -128,6 +134,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Limpiar valores sin resetear los radio buttons
     inventarioForm.querySelectorAll('input:not([type="radio"]), select:not(#existing-product-select), textarea').forEach(i => i.value = '');
 
+    // Ajustar el atributo 'min' del campo stock_actual
+    if (stockActualInput) {
+        if (isExisting) {
+            stockActualInput.removeAttribute('min'); // Permitir valores negativos para ajustes
+        } else {
+            stockActualInput.setAttribute('min', '0'); // Volver a aplicar para nuevo producto/edición normal
+        }
+    }
+
     const stockLabel = inventarioForm.querySelector('label[for="stock_actual"]');
     if (stockLabel) stockLabel.textContent = isExisting ? 'Cantidad que Ingresa *' : 'Stock Actual *';
   };
@@ -136,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!stockChartCanvas || !products) return;
 
     const productsForChart = products
-      .filter(p => p.tipo !== 'servicio' && p.stock_actual > 0)
+      .filter(p => p.tipo !== 'servicio')
       .sort((a, b) => (b.stock_actual || 0) - (a.stock_actual || 0))
       .slice(0, 15);
 
@@ -152,8 +167,12 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [{
           label: "Stock Actual",
           data: data,
-          backgroundColor: 'rgba(70, 1, 1, 0.6)', 
-          borderColor: 'rgba(70, 1, 1, 1)',
+          backgroundColor: data.map(val => {
+            if (val <= 0) return '#d97706'; // Naranja para stock agotado o negativo (Alerta)
+            if (val <= 5) return '#eab308'; // Amarillo para stock crítico (<= 5)
+            return 'rgba(70, 1, 1, 0.6)';  // Rojo oscuro para stock normal
+          }),
+          borderColor: 'rgba(255, 255, 255, 0.1)',
             borderWidth: 1,
         }],
       },
@@ -208,7 +227,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (isAdjustmentMode && idProducto) {
         const payloadAjuste = {
             cantidad_sumar: productData.stock_actual,
-            descripcion: `Entrada de mercancía: ${productData.descripcion || ''}`.trim()
+            // Ahora la descripción incluye el motivo del ajuste
+            descripcion: `${rawData.motivo_ajuste || 'Ajuste'}: ${productData.descripcion || ''}`.trim()
+
         };
         
         try {
@@ -293,6 +314,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const submitButton = document.getElementById('submit-button');
     if (submitButton) submitButton.innerHTML = '<i class="fas fa-save"></i> Guardar Producto';
     if (cancelEditButton) cancelEditButton.style.display = 'none';
+
+    // Asegurar que el atributo 'min' se restablezca correctamente según el modo actual
+    const currentMode = document.querySelector('input[name="form-mode"]:checked')?.value;
+    handleModeChange(currentMode); // Re-aplicar la lógica del modo después del reset
   };
 
   const handleSearch = () => {

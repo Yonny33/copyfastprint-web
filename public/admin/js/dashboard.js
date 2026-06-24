@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- ESTADO Y CONFIGURACIÓN ---
   const API_URL = API_BASE_URL;
   let ingresosGastosChart = null;
-  let inventoryStockChart = null;
 
   // --- HELPERS ---
   const safeSetText = (id, text) => {
@@ -116,54 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  const renderInventoryChart = (inventoryData = { labels: [], data: [] }) => {
-    const canvas = document.getElementById("inventory-stock-chart");
-    if (!canvas) return;
-    if (inventoryStockChart) inventoryStockChart.destroy();
-
-    inventoryStockChart = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: inventoryData.labels,
-        datasets: [{
-          label: 'Cantidad en Stock',
-          data: inventoryData.data,
-          backgroundColor: inventoryData.data.map(val => val < 5 ? '#d97706' : '#460101'), 
-          borderRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { 
-            beginAtZero: true, 
-            grid: { color: 'rgba(255, 255, 255, 0.03)' },
-            ticks: { color: "#888" }
-          },
-          x: { 
-            grid: { display: false },
-            ticks: { color: "#888", font: { size: 10 } }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          datalabels: {
-            anchor: 'end',
-            align: 'top',
-            offset: 4,
-            color: '#eaeaea',
-            font: {
-              weight: 'bold',
-              size: 11
-            },
-            formatter: (value) => (value > 0 ? value : '') // Ocultar ceros
-          }
-        }
-      }
-    });
-  };
-
   // --- FUNCIÓN PRINCIPAL DE CARGA ---
   const loadDashboardData = async () => {
     showLoading(true);
@@ -174,10 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
 
       if (result.status === "success" && result.data) {
-        const { kpis, chartData, inventoryChart } = result.data;
+        const { kpis, chartData } = result.data;
         renderKpis(kpis);
         if (chartData) renderChart(chartData);
-        if (inventoryChart) renderInventoryChart(inventoryChart);
       } else {
         throw new Error(result.message || "La API no devolvió el formato esperado.");
       }

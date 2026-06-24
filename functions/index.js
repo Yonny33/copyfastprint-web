@@ -200,17 +200,20 @@ app.delete("/inventario/:id", async (req, res) => {
 // Endpoint para OBTENER todas las ventas (para Reportes)
 app.get("/ventas", async (req, res) => {
   try {
-    // OPTIMIZACIÓN: Paginación y Límites
-    // Si no se especifica límite, traemos solo las últimas 100 para no saturar
-    const limit = req.query.limit ? parseInt(req.query.limit) : 100;
-    
+    const soloDeudas = req.query.solo_deudas === "true";
+    let query = db.collection("ventas");
+
+    if (soloDeudas) {
+      // Si pedimos deudas, traemos todos los registros con saldo pendiente sin límite de 100
+      query = query.where("saldo_pendiente", ">", 0.01);
+    } else {
+      const limit = req.query.limit ? parseInt(req.query.limit) : 100;
+      query = query.orderBy("fecha", "desc").limit(limit);
+    }
+
     // Obtenemos ventas y clientes en paralelo para cruzar la Cédula
-    // Nota: En sistemas muy grandes, esto se reemplaza por "denormalización" (guardar nombre en la venta)
     const [ventasSnapshot, clientesSnapshot] = await Promise.all([
-      db.collection("ventas")
-        .orderBy("fecha", "desc")
-        .limit(limit)
-        .get(),
+      query.get(),
       // Solo traemos campos necesarios de clientes para ahorrar ancho de banda
       db.collection("clientes")
         .select("nombre", "cedula", "rif")
@@ -810,10 +813,6 @@ app.get("/dashboard", async (req, res) => {
           margenPromedio: margenPromedio,
           productosAnalizados: `${productosConCosto}/${productosAnalizados}`,
           gananciaPotencial: gananciaPotencialTotal
-        },
-        inventoryChart: {
-          labels: listaStock.map(p => p.nombre),
-          data: listaStock.map(p => p.cantidad)
         },
         chartData: {
           labels: chartLabels,

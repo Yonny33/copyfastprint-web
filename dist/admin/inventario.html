@@ -17,7 +17,7 @@
     <!-- Chart.js para el gráfico de stock -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <!-- CSS necesarios para el inventario -->
-    <script type="module" crossorigin src="/admin/js/admin\\inventario-14awMVSr.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin\\inventario-BtjtoVmV.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/vendor-DPXNLk_s.js">
     <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-CAxC6apF.js">
@@ -48,7 +48,7 @@
               </label>
               <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-primary);">
                 <input type="radio" name="form-mode" value="existing" style="width: 18px; height: 18px; accent-color: var(--primary-color);"> 
-                <span><i class="fas fa-truck-loading" style="color: var(--primary-color);"></i> Entrada de Mercancía</span>
+                <span><i class="fas fa-truck-loading" style="color: var(--primary-color);"></i> Ajuste de Mercancía</span>
               </label>
             </div>
 
@@ -59,7 +59,18 @@
               <select id="existing-product-select">
                 <option value="" disabled selected>Selecciona un producto para cargar stock...</option>
               </select>
-              <label for="existing-product-select">Buscar Producto Existente</label>
+              <label for="existing-product-select">Producto a Ajustar *</label>
+            </div>
+
+            <!-- Motivo de Ajuste (Se muestra solo en 'Entrada de Mercancía') -->
+            <div id="motivo-ajuste-container" class="form-group floating" style="display: none; margin-bottom: 20px;">
+              <select id="motivo_ajuste" name="motivo_ajuste">
+                <option value="" disabled selected>Selecciona un motivo...</option>
+                <option value="Entrada de Mercancía">Entrada de Mercancía (Compra)</option>
+                <option value="Producto Defectuoso/Merma">Producto Defectuoso/Merma</option>
+                <option value="Error de Conteo">Error de Conteo</option>
+              </select>
+              <label for="motivo_ajuste">Motivo del Ajuste *</label>
             </div>
 
             <div class="form-grid">
