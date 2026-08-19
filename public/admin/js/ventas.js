@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const editVentaIdInput = document.getElementById("edit-venta-id");
   const clienteSelect = document.getElementById("cliente");
   const productoSelect = document.getElementById("producto");
+  const insumoSelect = document.getElementById("insumo_adicional");
+  const cantidadInsumoInput = document.getElementById("cantidad_insumo");
   const metodoPagoSelect = document.getElementById("metodo_pago");
   const cantidadInput = document.getElementById("cantidad");
   const precioUnitarioInput = document.getElementById("precio_unitario");
@@ -105,6 +107,8 @@ document.addEventListener("DOMContentLoaded", function () {
       precioUnitarioInput.value = venta.precio_unitario;
       abonoRecibidoInput.value = venta.abono_recibido;
       metodoPagoSelect.value = venta.metodo_pago;
+      if (insumoSelect) insumoSelect.value = venta.id_insumo_seleccionado || '';
+      if (cantidadInsumoInput) cantidadInsumoInput.value = venta.cantidad_insumo_seleccionado || 1;
       
       actualizarCalculos();
 
@@ -126,12 +130,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (abonoRecibido <= 0) metodoPagoSelect.value = "";
   };
 
-  const cargarSelects = async (url, selectElement, textField, valueField) => {
+  const cargarSelects = async (url, selectElement, textField, valueField, defaultEmpty = false) => {
       try {
           const response = await fetch(url);
           const result = await response.json();
           if (result.status === "success" && result.data) {
-              selectElement.innerHTML = `<option value="" disabled selected>Seleccione</option>`;
+              const defaultText = defaultEmpty ? "Ninguno (Sin Insumo Extra)" : "Seleccione";
+              selectElement.innerHTML = `<option value="" ${defaultEmpty ? "selected" : "disabled selected"}>${defaultText}</option>`;
               result.data.forEach(item => {
                   const text = item[textField] || item['nombre_producto'] || item['nombre'] || 'Sin Nombre';
                   selectElement.add(new Option(text, item[valueField]));
@@ -227,6 +232,14 @@ document.addEventListener("DOMContentLoaded", function () {
       data.id_cliente = selectedClient.value;
       data.nombre_cliente = selectedClient.text;
     }
+
+    if (insumoSelect && insumoSelect.value) {
+      data.id_insumo_seleccionado = insumoSelect.value;
+      data.cantidad_insumo_seleccionado = parseFloat(cantidadInsumoInput?.value || 1);
+    } else {
+      data.id_insumo_seleccionado = null;
+      data.cantidad_insumo_seleccionado = 0;
+    }
     // --- FIN DEL FIX ---
 
     const url = isEditing ? `${API_URL}/ventas/${ventaId}` : `${API_URL}/ventas`;
@@ -261,6 +274,17 @@ document.addEventListener("DOMContentLoaded", function () {
     setFechaActual();
     cargarSelects(`${API_URL}/clientes`, clienteSelect, 'nombre', 'id_cliente');
     cargarSelects(`${API_URL}/inventario`, productoSelect, 'nombre_producto', 'id_producto');
+    if (insumoSelect) cargarSelects(`${API_URL}/inventario`, insumoSelect, 'nombre_producto', 'id_producto', true);
+
+    insumoSelect?.addEventListener("change", () => {
+      const selectedOptionText = insumoSelect.options[insumoSelect.selectedIndex]?.text?.toUpperCase() || "";
+      if (selectedOptionText.includes("PAPEL")) {
+        if (cantidadInsumoInput) cantidadInsumoInput.value = "2";
+      } else if (selectedOptionText.includes("DISEÑO") || selectedOptionText.includes("DTF")) {
+        if (cantidadInsumoInput) cantidadInsumoInput.value = "1";
+      }
+    });
+
     actualizarCalculos();
     loadAndRenderVentas();
 

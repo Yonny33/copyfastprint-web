@@ -14,7 +14,7 @@
 
     <!-- CSS y Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <script type="module" crossorigin src="/admin/js/admin\\ventas-DcexYugn.js"></script>
+    <script type="module" crossorigin src="/admin/js/admin\\ventas-B39X_1yQ.js"></script>
     <link rel="modulepreload" crossorigin href="/admin/js/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/admin/js/vendor-DPXNLk_s.js">
     <link rel="modulepreload" crossorigin href="/admin/js/firebase-config-CAxC6apF.js">
@@ -56,6 +56,16 @@
                     <option value="" disabled selected>Cargando...</option>
                   </select>
                   <label for="producto">Producto *</label>
+                </div>
+                <div class="form-group floating">
+                  <select id="insumo_adicional" name="id_insumo_seleccionado" placeholder=" ">
+                    <option value="">Ninguno (Sin Insumo Extra)</option>
+                  </select>
+                  <label for="insumo_adicional">Insumo / Técnica Consumida (Opcional)</label>
+                </div>
+                <div class="form-group floating">
+                  <input type="number" id="cantidad_insumo" name="cantidad_insumo_seleccionado" value="1" min="1" step="1" placeholder=" " />
+                  <label for="cantidad_insumo">Cant. Insumo Consumida</label>
                 </div>
 
                 <div class="form-group floating span-4">

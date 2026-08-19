@@ -319,11 +319,12 @@ app.post("/ventas", async (req, res) => {
       const productoRef = db.collection("inventario").doc(idProducto);
       const productoDoc = await t.get(productoRef);
 
-      // 1.1 Leer Insumo Asociado (Si el producto consume otro material, ej: Suéter consume Papel)
+      // 1.1 Leer Insumo Asociado (Doble fuente: dinámico desde la venta o predeterminado del producto)
+      const targetInsumoId = ventaData.id_insumo_seleccionado || (productoDoc.exists ? productoDoc.data().id_insumo : null);
       let insumoRef = null;
       let insumoDoc = null;
-      if (productoDoc.exists && productoDoc.data().id_insumo) {
-          insumoRef = db.collection("inventario").doc(productoDoc.data().id_insumo);
+      if (targetInsumoId) {
+          insumoRef = db.collection("inventario").doc(targetInsumoId);
           insumoDoc = await t.get(insumoRef);
       }
 
@@ -369,7 +370,9 @@ app.post("/ventas", async (req, res) => {
       if (insumoDoc && insumoDoc.exists) {
           const insumoData = insumoDoc.data();
           const stockInsumo = parseFloat(insumoData.stock_actual || 0);
-          const consumoPorUnidad = parseFloat(productoData.cantidad_insumo || 0);
+          const consumoPorUnidad = ventaData.id_insumo_seleccionado 
+              ? (parseFloat(ventaData.cantidad_insumo_seleccionado) || 1)
+              : (parseFloat(productoData.cantidad_insumo) || 0);
           const descuentoTotal = consumoPorUnidad * cantidad;
           t.update(insumoRef, { stock_actual: stockInsumo - descuentoTotal });
       }
@@ -511,6 +514,20 @@ app.delete("/ventas/:id", async (req, res) => {
               stock_actual: stockActual + cantidadRestaurar,
             });
           }
+        }
+      }
+
+      // Restaurar insumo si la venta tenía insumo dinámico o fijo
+      const targetInsumoId = ventaData.id_insumo_seleccionado;
+      if (targetInsumoId) {
+        const insumoRef = db.collection("inventario").doc(targetInsumoId);
+        const insumoDoc = await t.get(insumoRef);
+        if (insumoDoc.exists) {
+          const insumoData = insumoDoc.data();
+          const stockActualInsumo = parseFloat(insumoData.stock_actual || 0);
+          const cantidadInsumoUnidad = parseFloat(ventaData.cantidad_insumo_seleccionado || 1);
+          const cantidadRestaurarInsumo = cantidadInsumoUnidad * parseFloat(ventaData.cantidad || 0);
+          t.update(insumoRef, { stock_actual: stockActualInsumo + cantidadRestaurarInsumo });
         }
       }
 
