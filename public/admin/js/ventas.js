@@ -132,7 +132,10 @@ document.addEventListener("DOMContentLoaded", function () {
           const result = await response.json();
           if (result.status === "success" && result.data) {
               selectElement.innerHTML = `<option value="" disabled selected>Seleccione</option>`;
-              result.data.forEach(item => selectElement.add(new Option(item[textField], item[valueField])));
+              result.data.forEach(item => {
+                  const text = item[textField] || item['nombre_producto'] || item['nombre'] || 'Sin Nombre';
+                  selectElement.add(new Option(text, item[valueField]));
+              });
           } else throw new Error(result.message);
       } catch (error) { selectElement.innerHTML = `<option value="">Error</option>`; }
   };
@@ -257,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     setFechaActual();
     cargarSelects(`${API_URL}/clientes`, clienteSelect, 'nombre', 'id_cliente');
-    cargarSelects(`${API_URL}/inventario`, productoSelect, 'nombre', 'id_producto');
+    cargarSelects(`${API_URL}/inventario`, productoSelect, 'nombre_producto', 'id_producto');
     actualizarCalculos();
     loadAndRenderVentas();
 

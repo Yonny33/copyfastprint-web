@@ -13,5 +13,9 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5501,
+  "html.validate.selfClosingTagsNotSupported": false,
+  "html.validate.enable": false,
+  "css.validate": false,
+  "javascript.validate.enable": false
 }

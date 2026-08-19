@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>
-                    <div style="font-weight:bold; color: var(--text-primary);">${prod.nombre}</div>
+                    <div style="font-weight:bold; color: var(--text-primary);">${prod.nombre_producto || prod.nombre || 'Sin Nombre'}</div>
                     <div style="font-size:0.85rem; color: var(--text-secondary);">${prod.categoria || 'General'}</div>
                 </td>
                 <td>Bs. ${precio.toFixed(2)}</td>
@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = allProducts.filter(p => 
-            (p.nombre || '').toLowerCase().includes(term) || 
+            (p.nombre_producto || p.nombre || '').toLowerCase().includes(term) || 
             (p.categoria || '').toLowerCase().includes(term)
         );
         renderTable(filtered);
